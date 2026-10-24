@@ -47,6 +47,7 @@ for (const [f, evs] of Object.entries(eventsByFile)) {
 
 const JOB_IDS = new Set(jobs.jobs.map((j) => j.id).concat(jobs.partTimeJobs.map((j) => j.id)));
 const CLUB_IDS = new Set([...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles].map((c) => c.id));
+const HOBBY_IDS = new Set(clubs.hobbies.map((h) => h.id));
 const ps = schools.postSecondary;
 const SCHOOL_IDS = new Set([
   ...schools.preschool, ...schools.elementary, ...schools.juniorHigh, ...schools.highSchool,
@@ -57,7 +58,7 @@ const QUAL_IDS = new Set(random.qualifications.map((q) => q.id));
 const MENU_SOURCES = new Set([
   'schools.preschool', 'schools.elementary', 'schools.juniorHigh', 'schools.highSchool', 'schools.postByPlan',
   'schools.vocational', 'schools.graduate', 'schools.abroad', 'jobs.jobs', 'jobs.partTimeJobs', 'jobs.midCareer', 'jobs.civil',
-  'clubs.lessons', 'clubs.jhsClubs', 'clubs.hsClubs', 'clubs.univCircles', 'clubs.current', 'focus', 'qualifications',
+  'clubs.lessons', 'clubs.jhsClubs', 'clubs.hsClubs', 'clubs.univCircles', 'clubs.current', 'clubs.hobbies', 'focus', 'qualifications',
 ]);
 const SPECIAL_SCHOOL = new Set(['jh_free_or_el_free']);
 
@@ -228,6 +229,10 @@ for (const s of STAGES) { if (!(s in vis.byStage)) err('visuals.byStage', `在�
 for (const c of new Set(jobs.jobs.map((j) => j.cat))) { if (!vis.byJobCat[c]) err('visuals.byJobCat', `職業ジャンル「${c}」の背景がない`); else bgOk(`visuals.byJobCat.${c}`, vis.byJobCat[c]); }
 for (const [j, b] of Object.entries(vis.byJobOverride)) { if (!JOB_IDS.has(j)) err('visuals.byJobOverride', `未定義の職業「${j}」`); bgOk(`visuals.byJobOverride.${j}`, b); }
 for (const [e, b] of Object.entries(vis.byEmployment)) { if (!EMPLOY.has(e)) err('visuals.byEmployment', `未定義の雇用「${e}」`); bgOk(`visuals.byEmployment.${e}`, b); }
+for (const [k, v] of Object.entries(clubs.hobbyRules.firstFrom)) { if (!LIKES.has(k)) err('hobbyRules', `未定義のlike「${k}」`); if (v && !HOBBY_IDS.has(v)) err('hobbyRules', `未定義の趣味「${v}」`); }
+for (const j of vis.hqEligibleJobs) if (!JOB_IDS.has(j)) err('visuals.hqEligibleJobs', `未定義の職業「${j}」`);
+for (const c of vis.sportByClub.arena) if (!CLUB_IDS.has(c)) err('visuals.sportByClub', `未定義のclub「${c}」`);
+for (const b of vis.backgrounds) if (!fs.existsSync(path.join(__dirname, '..', b.file))) err('visuals.backgrounds', `画像がない「${b.file}」`);
 for (let a = 0; a <= 120; a++) if (vis.portraits.ages.filter((p) => a >= p.from && a <= p.to).length !== 1) err('visuals.portraits', `${a}歳の顔グラが0枚または重複`);
 for (const g of ps.graduate) if (g.requires) { checkFlags(`graduate.${g.id}`, g.requires); if (g.stage === 'grad_doctor' && !g.requires.includes('edu_master_grad')) err(`graduate.${g.id}`, 'I-8違反：博士は修士修了が必要'); }
 for (const c of [...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles]) {

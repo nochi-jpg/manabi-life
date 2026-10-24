@@ -234,7 +234,8 @@
       "pro_athlete_exp": "プロスポーツ経験",
       "creator_hit": "作品がヒット",
       "union_member": "労働組合員",
-      "naitei_school": "進学先が決まっている"
+      "naitei_school": "進学先が決まっている",
+      "hq_assign": "本社・本部勤務"
     }
   },
   "modifiers": {
@@ -292,7 +293,8 @@
     "cohabit": "結婚せず同居",
     "tryYears": "子どもを望んでからの年数",
     "kenshinFlag": "健診で要再検査が出た",
-    "will": "遺言・エンディングノートがある"
+    "will": "遺言・エンディングノートがある",
+    "hobbies": "趣味のIDのリスト（最大3つ。clubs.hobbies）"
   },
   "personOps": [
     "add",

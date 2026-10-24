@@ -126,8 +126,8 @@ button:active{transform:translateY(3px) scale(.98)}
 @keyframes fade{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
 .kv{display:grid;grid-template-columns:92px 1fr;align-items:center;min-height:36px;border-bottom:2px dashed #ecdcc2;font-size:17px}
 .kv .k{color:var(--ink2);font-size:15px;display:flex;align-items:center;gap:4px}
-.chips{display:flex;flex-wrap:wrap;gap:4px;padding:3px 0}
-.chip{display:inline-flex;align-items:center;gap:3px;height:26px;padding:0 10px;border-radius:999px;background:#fff;box-shadow:0 2px 0 #d9cdb5;font-size:14px}
+.chips{display:flex;flex-wrap:nowrap;gap:4px;padding:3px 0;overflow:hidden}
+.chip{display:inline-flex;align-items:center;gap:3px;height:26px;padding:0 8px;white-space:nowrap;border-radius:999px;background:#fff;box-shadow:0 2px 0 #d9cdb5;font-size:14px}
 .chip.no{color:#a7aec4;background:#f2ede4;box-shadow:none}
 .fam{display:grid;grid-template-columns:44px 64px 1fr;align-items:center;min-height:46px;border-bottom:2px dashed #ecdcc2;font-size:16px}
 .fam .av{width:36px;height:36px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 0 #d9cdb5}
@@ -221,7 +221,7 @@ button:active{transform:translateY(3px) scale(.98)}
   </div>
   <div id="paused">⏸ 一時停止中</div>
 
-  <div id="bg"><div class="ph">🏫</div><div class="tag">📍 教室</div></div>
+  <div id="bg" style="background-image:url(../assets/bg/elem.jpg)"><div class="tag">📍 小学校</div></div>
 
   <div class="pearl" id="det">
     <div class="tabs">
@@ -232,7 +232,8 @@ button:active{transform:translateY(3px) scale(.98)}
     </div>
     <div class="page on" id="p1">
       <div class="kv"><span class="k">📍 住まい</span><span>神奈川県（実家）</span></div>
-      <div class="kv"><span class="k">🎒 習い事</span><span class="chips"><span class="chip">🎹 ピアノ</span><span class="chip">🎮 テレビゲーム</span></span></div>
+      <div class="kv"><span class="k">🎒 習い事</span><span class="chips"><span class="chip">🎹 ピアノ</span><span class="chip">🏊 スイミング</span></span></div>
+      <div class="kv"><span class="k">✨ 趣味 <small style="font-size:12px">2/3</small></span><span class="chips"><span class="chip">🎮 テレビゲーム</span><span class="chip">🖍️ お絵かき</span></span></div>
       <div class="kv"><span class="k">💕 恋愛</span><span class="chips"><span class="chip no">なし</span></span></div>
       <div class="kv"><span class="k">📜 資格</span><span class="chips"><span class="chip no">なし</span></span></div>
       <div class="kv"><span class="k">🏥 病気</span><span class="chips"><span class="chip no">なし</span></span></div>
