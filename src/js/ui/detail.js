@@ -43,7 +43,8 @@ const Detail = (() => {
     const ai = D().ai_impact.jobs[j.id] || { risk: 0 };
     const aiL = ai.risk >= 0.7 ? ['大', 'dn', 'AIや機械に置きかわりやすい'] : ai.risk >= 0.45 ? ['中', 'mid', '仕事のやり方が大きく変わりそう'] : ['小', 'up', '人にしかできない部分が大きい'];
     const chips = [];
-    (j.requires || []).forEach((f) => chips.push(`<span class="chip ${G.flags[f] ? 'ok' : 'ng'}">${G.flags[f] ? '✓' : '✗'} ${esc(licName(f))}</span>`));
+    const exp = Menu.expectedFlags();
+    (j.requires || []).forEach((f) => chips.push(G.flags[f] ? `<span class="chip ok">✓ ${esc(licName(f))}</span>` : exp.has(f) ? `<span class="chip ok">🎓 ${esc(licName(f))}（取得見込み）</span>` : `<span class="chip ng">✗ ${esc(licName(f))}</span>`));
     chips.push(`<span class="chip ok">✓ ${eduLabel[j.eduMin || 0]}</span>`);
     if (j.shiftWork) chips.push('<span class="chip">🌙 夜勤・交代制</span>');
     chips.push(`<span class="chip">⏰ 残業 月${j.overtime || 10}時間</span>`);

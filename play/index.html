@@ -4339,6 +4339,15 @@ const Menu = (() => {
     if (ai && D().ai_impact.rules.growthJobs.includes(j.id) && calYear() >= 2035) d += 2;
     return rateOf(d);
   }
+  // 資格取得見込み：最終学年なら、卒業で必ずもらえる資格（学校の onGraduate・grantOnGrad）を持っているものとして就職先を選べる
+  function expectedFlags() {
+    const out = new Set();
+    if (!G.school || schoolYearsLeft() > 1) return out;
+    const t = school(G.school.tmpl) || (G.vars.major && school(G.vars.major));
+    if (t) [...(t.onGraduate || []), ...(t.grantOnGrad || [])].forEach((f) => { if (!G.flags[f]) out.add(f); });
+    return out;
+  }
+  const licLabel = (f) => (D().flags.flags.license || {})[f] || f;
   function jobOk(j, mode) {
     if (j.viaEventOnly) return false;
     if (j.id === 'j_parttime_general') return mode !== 'civil';
@@ -4346,7 +4355,8 @@ const Menu = (() => {
     if (mode !== 'civil' && j.exam === 'ev_m_civil_exam') return false;
     if (mode !== 'civil' && j.exam === 'ev_m_kyosai') return false;
     if ((j.eduMin || 0) > eduLevel()) return false;
-    if ((j.requires || []).some((f) => !G.flags[f])) return false;
+    const exp = expectedFlags();
+    if ((j.requires || []).some((f) => !G.flags[f] && !exp.has(f))) return false;
     if ((j.excludes || []).some((f) => G.flags[f])) return false;
     if (j.minAge && G.age < j.minAge) return false;
     if (j.maxAge && G.age > j.maxAge) return false;
@@ -4361,15 +4371,22 @@ const Menu = (() => {
   }
   function jobMenu(mode) {
     const list = J().jobs.filter((j) => jobOk(j, mode));
+    const exp = expectedFlags();
     const out = list.map((j) => {
       const ai = D().ai_impact.jobs[j.id];
       const sal = Econ.salaryPreview(j);
-      return { id: j.id, tmpl: j.id, emoji: j.emoji, label: j.label, name: j.label, sub: `年収 約${sal}万円${ai && ai.risk >= 0.7 ? '・🤖AIの影響大' : ''}`, rate: jobRate(j, mode), job: true };
+      const expect = (j.requires || []).filter((f) => exp.has(f));
+      return { id: j.id, tmpl: j.id, emoji: j.emoji, label: j.label, name: j.label, sub: `年収 約${sal}万円${ai && ai.risk >= 0.7 ? '・🤖AIの影響大' : ''}${expect.length ? `・🎓 ${expect.map(licLabel).join('・')}取得見込み` : ''}`, rate: jobRate(j, mode), job: true, expect: expect.length > 0 };
     });
+    const tm = G.school && school(G.school.tmpl);
     // 好きなこと・学部に合うものを先に。そのあと合格率の高い順
     const like = Cond.likeMain();
-    const fit = (o) => { const j = job(o.id); let s = 0; if ((j.tags || []).includes(like)) s += 2; if (G.vars.major) { const dp = dept(G.vars.major) || school(G.vars.major); if (dp && (dp.opens || []).some((x) => (j.tags || []).includes(x) || j.cat === x || j.id.includes(x))) s += 3; } return s; };
-    for (const o of out) { const f = fit(o); if (f >= 3) o.sub += '・👍 学んだことが生きる'; else if (f >= 2) o.sub += '・💚 好きなことに合う'; }
+    const fit = (o) => { const j = job(o.id); let s = 0; if ((j.tags || []).includes(like)) s += 2; if (G.vars.major) { const dp = dept(G.vars.major) || school(G.vars.major); if (dp && (dp.opens || []).some((x) => (j.tags || []).includes(x) || j.cat === x || j.id.includes(x))) s += 3; }
+      // 通っている学校（専門学校・短大など）で学んだこと
+      if (s < 3 && tm && (tm.opens || []).some((x) => (j.tags || []).includes(x) || j.cat === x || j.id.includes(x))) s += 3;
+      if (o.expect) s += 6; // 資格取得見込みの仕事はいちばん上に
+      return s; };
+    for (const o of out) { const f = fit(o); if (f >= 3 && !o.expect) o.sub += '・👍 学んだことが生きる'; else if (f >= 2) o.sub += '・💚 好きなことに合う'; }
     return out.sort((a, b) => fit(b) + b.rate / 40 - (fit(a) + a.rate / 40)).slice(0, 25);
   }
 
@@ -4419,7 +4436,7 @@ const Menu = (() => {
     return Math.round(clamp(p, 0.03, 0.97) * 100);
   }
 
-  return { build, wv, lessonHere, school, dept, job, club, hobby, qual, remember, picked, schoolName, selfHensachi, rateOf, eduLevel, focusLabel, focusOk, FOCUS, isStudent, reportAvg, univCost, inst, prefShort };
+  return { expectedFlags, build, wv, lessonHere, school, dept, job, club, hobby, qual, remember, picked, schoolName, selfHensachi, rateOf, eduLevel, focusLabel, focusOk, FOCUS, isStudent, reportAvg, univCost, inst, prefShort };
 })();
 </script>
 <script>'use strict';
@@ -7131,7 +7148,8 @@ const Detail = (() => {
     const ai = D().ai_impact.jobs[j.id] || { risk: 0 };
     const aiL = ai.risk >= 0.7 ? ['大', 'dn', 'AIや機械に置きかわりやすい'] : ai.risk >= 0.45 ? ['中', 'mid', '仕事のやり方が大きく変わりそう'] : ['小', 'up', '人にしかできない部分が大きい'];
     const chips = [];
-    (j.requires || []).forEach((f) => chips.push(`<span class="chip ${G.flags[f] ? 'ok' : 'ng'}">${G.flags[f] ? '✓' : '✗'} ${esc(licName(f))}</span>`));
+    const exp = Menu.expectedFlags();
+    (j.requires || []).forEach((f) => chips.push(G.flags[f] ? `<span class="chip ok">✓ ${esc(licName(f))}</span>` : exp.has(f) ? `<span class="chip ok">🎓 ${esc(licName(f))}（取得見込み）</span>` : `<span class="chip ng">✗ ${esc(licName(f))}</span>`));
     chips.push(`<span class="chip ok">✓ ${eduLabel[j.eduMin || 0]}</span>`);
     if (j.shiftWork) chips.push('<span class="chip">🌙 夜勤・交代制</span>');
     chips.push(`<span class="chip">⏰ 残業 月${j.overtime || 10}時間</span>`);
