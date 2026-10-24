@@ -1,0 +1,69 @@
+{
+  "_comment": "顔グラと背景の割り当て。背景は『いまいる場所のジャンル』で決める。上から順に判定し、最初に当てはまったものを使う（priority）。",
+  "portraits": {
+    "files": "assets/faces/{gender}_{age}.png  例: assets/faces/F_10.png（gender は M / F）",
+    "ages": [
+      { "img": 0, "from": 0, "to": 2, "label": "赤ちゃん" },
+      { "img": 5, "from": 3, "to": 7, "label": "幼児〜小学校低学年" },
+      { "img": 10, "from": 8, "to": 12, "label": "小学生" },
+      { "img": 15, "from": 13, "to": 17, "label": "中高生" },
+      { "img": 20, "from": 18, "to": 24, "label": "大学生・若手" },
+      { "img": 30, "from": 25, "to": 34, "label": "30代" },
+      { "img": 40, "from": 35, "to": 49, "label": "40代" },
+      { "img": 60, "from": 50, "to": 69, "label": "50〜60代" },
+      { "img": 80, "from": 70, "to": 120, "label": "高齢" }
+    ]
+  },
+  "backgrounds": [
+    { "id": "bg_home", "file": "assets/bg/home.jpg", "label": "家（リビング）", "core": true },
+    { "id": "bg_nursery", "file": "assets/bg/nursery.jpg", "label": "保育園・幼稚園", "core": true },
+    { "id": "bg_classroom", "file": "assets/bg/classroom.jpg", "label": "教室", "core": true },
+    { "id": "bg_hospital", "file": "assets/bg/hospital.jpg", "label": "病院", "core": true },
+    { "id": "bg_office", "file": "assets/bg/office.jpg", "label": "オフィス", "core": true },
+    { "id": "bg_worksite", "file": "assets/bg/worksite.jpg", "label": "工場・作業現場", "core": true },
+    { "id": "bg_shop", "file": "assets/bg/shop.jpg", "label": "お店（店内）", "core": true },
+    { "id": "bg_street", "file": "assets/bg/street.jpg", "label": "街・道路", "core": true },
+    { "id": "bg_nature", "file": "assets/bg/nature.jpg", "label": "田畑・海辺", "core": true },
+    { "id": "bg_studio", "file": "assets/bg/studio.jpg", "label": "スタジオ・アトリエ", "core": true },
+    { "id": "bg_stadium", "file": "assets/bg/stadium.jpg", "label": "競技場・体育館", "core": true },
+    { "id": "bg_abroad", "file": "assets/bg/abroad.jpg", "label": "海外の街", "core": true },
+    { "id": "bg_airport", "file": "assets/bg/airport.jpg", "label": "空港", "core": false, "fallback": "bg_street" },
+    { "id": "bg_lab", "file": "assets/bg/lab.jpg", "label": "研究室", "core": false, "fallback": "bg_office" }
+  ],
+  "priority": [
+    { "if": "入院中・自分が要介護（施設）", "bg": "bg_hospital" },
+    { "if": "海外にいる（留学中・lives_abroad）", "bg": "bg_abroad" },
+    { "if": "学校に在籍（stage）", "byStage": true },
+    { "if": "働いている（job）", "byJob": true },
+    { "if": "それ以外", "bg": "bg_home" }
+  ],
+  "byStage": {
+    "baby": "bg_home", "nursery": "bg_nursery", "kindergarten": "bg_nursery",
+    "elem": "bg_classroom", "jhs": "bg_classroom", "hs": "bg_classroom", "hs_corr": "bg_classroom", "hs_night": "bg_classroom",
+    "kosen": "bg_classroom", "univ": "bg_classroom", "univ_med": "bg_classroom", "junior_college": "bg_classroom", "vocational": "bg_classroom",
+    "grad_master": "bg_classroom", "grad_doctor": "bg_classroom", "grad_prof": "bg_classroom", "ronin": "bg_classroom", "free_school": "bg_classroom",
+    "abroad_study": "bg_abroad", "hikikomori": "bg_home", "none": null
+  },
+  "byJobCat": {
+    "it": "bg_office", "business": "bg_office", "office": "bg_office", "finance": "bg_office", "global": "bg_office",
+    "engineering": "bg_office", "science": "bg_lab", "civil": "bg_office", "law": "bg_office", "writing": "bg_office", "startup": "bg_office",
+    "creative": "bg_studio", "design": "bg_studio", "entertain": "bg_studio",
+    "manufacturing": "bg_worksite", "construction": "bg_worksite",
+    "logistics": "bg_street", "airline": "bg_airport",
+    "medical": "bg_hospital", "welfare": "bg_hospital",
+    "education": "bg_classroom",
+    "sport": "bg_stadium",
+    "food": "bg_shop", "beauty": "bg_shop", "service": "bg_shop", "animal": "bg_shop",
+    "agri": "bg_nature"
+  },
+  "byJobOverride": {
+    "j_nursery": "bg_nursery",
+    "j_police": "bg_street", "j_firefighter": "bg_street", "j_sdf": "bg_stadium",
+    "j_architect": "bg_office", "j_construction_mgr": "bg_worksite",
+    "j_cleaning": "bg_office", "j_game_creator": "bg_office", "j_media": "bg_office",
+    "j_professor": "bg_classroom", "j_family_business": "bg_shop"
+  },
+  "byEmployment": {
+    "none": "bg_home", "unemployed": "bg_home", "homemaker": "bg_home", "retired": "bg_home", "leave": "bg_home"
+  }
+}

@@ -220,6 +220,15 @@ for (const d of ps.departments) {
   if (d.exam && !EVENT_IDS.has(d.exam)) err(`dept.${d.id}`, `exam イベントがない「${d.exam}」`);
   if (d.stage && !STAGES.has(d.stage)) err(`dept.${d.id}`, `未定義のstage「${d.stage}」`);
 }
+// 背景・顔グラの割り当て漏れ
+const vis = D('visuals.json');
+const BG = new Set(vis.backgrounds.map((b) => b.id));
+const bgOk = (where, id) => { if (id !== null && !BG.has(id)) err(where, `未定義の背景「${id}」`); };
+for (const s of STAGES) { if (!(s in vis.byStage)) err('visuals.byStage', `在籍「${s}」の背景がない`); else bgOk(`visuals.byStage.${s}`, vis.byStage[s]); }
+for (const c of new Set(jobs.jobs.map((j) => j.cat))) { if (!vis.byJobCat[c]) err('visuals.byJobCat', `職業ジャンル「${c}」の背景がない`); else bgOk(`visuals.byJobCat.${c}`, vis.byJobCat[c]); }
+for (const [j, b] of Object.entries(vis.byJobOverride)) { if (!JOB_IDS.has(j)) err('visuals.byJobOverride', `未定義の職業「${j}」`); bgOk(`visuals.byJobOverride.${j}`, b); }
+for (const [e, b] of Object.entries(vis.byEmployment)) { if (!EMPLOY.has(e)) err('visuals.byEmployment', `未定義の雇用「${e}」`); bgOk(`visuals.byEmployment.${e}`, b); }
+for (let a = 0; a <= 120; a++) if (vis.portraits.ages.filter((p) => a >= p.from && a <= p.to).length !== 1) err('visuals.portraits', `${a}歳の顔グラが0枚または重複`);
 for (const g of ps.graduate) if (g.requires) { checkFlags(`graduate.${g.id}`, g.requires); if (g.stage === 'grad_doctor' && !g.requires.includes('edu_master_grad')) err(`graduate.${g.id}`, 'I-8違反：博士は修士修了が必要'); }
 for (const c of [...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles]) {
   checkFlags(`clubs.${c.id}.set`, c.set);
