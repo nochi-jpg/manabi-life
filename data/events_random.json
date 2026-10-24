@@ -33,6 +33,7 @@
     { "id": "q_teacher_extra", "emoji": "🍎", "label": "通信大学で教員免許", "flag": "lic_teacher_elem", "rate": 0.5, "w": { "academic": 0.4 }, "cost": 40, "years": 2, "requires": ["edu_univ_grad"] }
   ],
   "events": [
+    {"id": "ev_r_free_school_offer", "kind": "choice", "emoji": "🌱", "cat": "school", "when": {"age": [7, 11], "stage": ["elem"], "stat": {"social": ["<=", 25], "stress": [">=", 65]}, "once": true}, "weight": {"base": 4}, "text": "このごろ学校がつらそうな{name}を見て、親が言った。「学校のほかにも、学べる場所はあるよ。フリースクールに行ってみる？」", "choices": [{"label": "🌱 フリースクールに通ってみる", "effects": {"set": ["free_school_offer"], "school": {"enter": "el_free"}, "stats": {"stress": -20, "social": 3, "academic": -2}, "personRelation": {"father": 5, "mother": 5}, "log": "🌱 フリースクールに通いはじめた"}}, {"label": "🏫 今の学校でもう少しがんばる", "effects": {"stats": {"stress": 5, "social": 2}, "log": "🏫 今の学校でがんばることにした"}}, {"label": "🗣️ 家族で話して、担任の先生に相談する", "effects": {"stats": {"stress": -8, "social": 4}, "personRelation": {"father": 3, "mother": 3}, "log": "🗣️ 家族と先生に相談した"}}]},
 
     { "id": "ev_r_class_rep", "kind": "choice", "emoji": "🙋", "cat": "school",
       "when": { "age": [8, 17], "stage": ["elem", "jhs", "hs"], "cooldownYears": 2 },

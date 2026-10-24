@@ -202,7 +202,7 @@
     "univ": "bg_univ",
     "univ_med": "bg_univ",
     "junior_college": "bg_univ",
-    "vocational": "bg_univ",
+    "vocational": "bg_hq",
     "grad_master": "bg_lab",
     "grad_doctor": "bg_lab",
     "grad_prof": "bg_univ",

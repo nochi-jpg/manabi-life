@@ -147,6 +147,23 @@
         "jpn": 0.7
       },
       "note": "日本の義務教育として扱われない場合がある"
+    },
+    {
+      "id": "el_free",
+      "emoji": "🌱",
+      "label": "フリースクール",
+      "stage": "free_school",
+      "cost": 40,
+      "quality": 0.8,
+      "exam": false,
+      "when": {
+        "flags": {
+          "any": [
+            "free_school_offer"
+          ]
+        }
+      },
+      "note": "小学校で人間関係がうまくいかず、親がすすめたときだけ選べる。在籍校の出席扱いになることもある"
     }
   ],
   "juniorHigh": [

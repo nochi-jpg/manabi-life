@@ -111,7 +111,8 @@
       "lives_dorm": "寮・下宿",
       "edu_ikkan": "中高一貫校に在籍（高校へ内部進学できる）",
       "edu_affiliated": "大学の付属校に在籍（系列大学へ内部進学できる）",
-      "naitei_internal": "内部進学が決まった"
+      "naitei_internal": "内部進学が決まった",
+      "free_school_offer": "親からフリースクールをすすめられた"
     },
     "license": {
       "lic_car": "普通自動車免許",
