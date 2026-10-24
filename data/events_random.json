@@ -1116,5 +1116,13 @@
         { "label": "🏥 仕事を調整して付き添う", "effects": { "stats": { "stress": 6 }, "person": { "relation": "spouse", "delta": 10 }, "jobHoursMul": 0.85 } },
         { "label": "💼 仕事を続け、できる範囲で支える", "effects": { "stats": { "stress": 4 } } }
       ] }
+    ,{ "id": "ev_r_adult_lesson", "kind": "choice", "emoji": "🎒", "cat": "lesson",
+      "when": { "age": [22, 85], "cooldownYears": 4 },
+      "weight": { "base": 0.8, "mul": [["focus_hobby", 2], ["focus_health", 1.5], ["focus_qualify", 1.5], ["retired_flag", 2], ["stress>=70", 1.3]] },
+      "text": "{someone}に誘われて、大人向けの習い事の体験に行ってみた。",
+      "choices": [
+        { "menu": { "source": "clubs.adultLessons", "page": 5, "filter": "age" }, "effects": { "club": { "join": "$pick" }, "stats": { "happiness": 2 } } },
+        { "label": "🙂 今はいいかな", "effects": {} }
+      ] }
   ]
 }

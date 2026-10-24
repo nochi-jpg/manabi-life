@@ -202,3 +202,48 @@
 .repcard .rg b.s2{color:var(--pink)}.repcard .rg b.s1{color:var(--blue3)}.repcard .rg b.s0{color:var(--ink3)}
 .repcard .rcm{grid-column:1/3;font-size:14px;color:var(--ink2)}
 .mbox .list button{height:48px;font-size:17px}
+/* ---------- 職業・学校の詳細 ---------- */
+.dbox{width:1184px;height:576px;padding:var(--sp3) var(--sp3);display:grid;grid-template-columns:432px 1fr;column-gap:var(--sp3)}
+.dbox .img{height:232px;border-radius:16px;background:var(--soft) center/cover no-repeat;position:relative}
+.dbox .img .tag{position:absolute;left:12px;bottom:12px;height:32px;padding:0 12px;border-radius:999px;background:#fff;color:var(--blue);font-size:14px;display:flex;align-items:center;border:2px solid var(--line)}
+.dbox .jt{margin-top:var(--sp2);display:flex;align-items:center;gap:var(--sp1)}
+.dbox .jt .e{font-size:40px}
+.dbox .jt .n{font-size:26px;font-weight:900;line-height:1.15}
+.dbox .jt .n small{display:block;font-size:13px;color:var(--ink2);font-weight:700}
+.dbox .chips{flex-wrap:wrap;margin-top:var(--sp1);gap:6px;overflow:visible}
+.dbox .chip.ok{background:#e4f8ee;color:#1f9d6a}.dbox .chip.ng{background:#ffe8eb;color:#d0384f}
+.drate{margin-top:var(--sp2);height:64px;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--sp3);background:var(--green);color:#fff}
+.drate.mid{background:var(--gold)}.drate.lo{background:var(--red)}
+.drate span{font-size:16px}.drate b{font-size:34px}
+.dbox .ai{margin-top:var(--sp1);height:40px;border-radius:12px;background:var(--soft2);display:flex;align-items:center;gap:6px;padding:0 var(--sp2);font-size:14px}
+.dbox .sec{background:var(--soft);border-radius:16px;padding:10px var(--sp2);margin-bottom:12px}
+.dbox .sec h4{font-size:14px;color:var(--ink2);margin-bottom:6px}
+.money{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--sp1)}
+.money div{background:#fff;border-radius:12px;padding:6px 12px}
+.money span{display:block;font-size:13px;color:var(--ink2)}
+.money b{font-size:24px;font-variant-numeric:tabular-nums}.money small{font-size:13px;color:var(--ink2)}
+.dbox .note{margin-top:6px;font-size:13px;color:var(--ink2)}
+.ld{display:grid;grid-template-columns:120px 1fr 40px 48px;align-items:center;column-gap:var(--sp1);height:32px;font-size:15px}
+.lv{height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
+.lv.h{background:var(--red)}.lv.m{background:var(--gold)}.lv.l{background:var(--green)}
+.stars{color:var(--gold);letter-spacing:2px;font-size:17px}.stars i{color:var(--soft3);font-style:normal}
+.eff{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--sp1)}
+.eff div{height:56px;border-radius:12px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;color:var(--ink2)}
+.eff b{font-size:17px;color:var(--ink3)}.eff b.dn,.dn{color:var(--red)}.eff b.up,.up{color:#1f9d6a}.mid{color:var(--gold)}
+.subj{display:grid;grid-template-columns:96px 1fr 48px 48px;align-items:center;column-gap:var(--sp1);height:28px;font-size:15px}
+.subj .me,.subj .need{text-align:right;font-variant-numeric:tabular-nums}.subj .me.ok{color:#1f9d6a}.subj .me.ng{color:var(--red)}.subj .need{color:var(--ink2)}
+.after{display:grid;grid-template-columns:96px 1fr;font-size:14px;margin-bottom:6px}.after .k{color:var(--ink2)}
+.dbox .btns{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp3);margin-top:var(--sp1)}
+.dbox .btns button{height:52px;font-size:18px}
+/* ---------- 習い事を続ける？（ui/lessons.html） ---------- */
+.lbox{width:820px;padding:var(--sp4) var(--sp5)}
+.lbox .q{position:static;text-align:left;font-size:22px;line-height:1.5;font-weight:800}.lbox .q small{display:block;font-size:14px;color:var(--ink2);font-weight:700;margin-top:0}
+.lbox .ls{margin-top:var(--sp2)}
+.lbox .l{display:grid;grid-template-columns:44px 1fr 120px 120px;column-gap:var(--sp2);align-items:center;height:72px;border-bottom:2px solid #eef3fa}
+.lbox .l .e{font-size:30px;text-align:center}
+.lbox .l .n{font-size:20px;line-height:1.3}.lbox .l .n small{display:block;font-size:13px;color:var(--ink2)}
+.lbox .l button{height:44px;font-size:16px;box-shadow:none}
+.lbox .l button.q2.on{background:#8a97b5;border-color:#8a97b5}
+.lbox .sum{margin-top:var(--sp2);display:grid;grid-template-columns:44px 1fr;column-gap:var(--sp2);font-size:15px;color:var(--ink2)}
+.lbox .sum b{color:var(--ink)}
+.lbox .ok{margin-top:var(--sp4);width:100%;height:56px;font-size:19px}

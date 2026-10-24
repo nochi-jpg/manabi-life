@@ -276,7 +276,7 @@ const Clubs = {
 const People = {
   apply(v, ctx) {
     if (v.add) this.add(v.add, ctx, v);
-    if (v.promote) { const [a, b] = v.promote.split('>'); const p = person(a); if (p) { p.role = b; p.since = G.year; if (b === 'spouse') { p.income = p.income || Math.round(normal(300, 120)); } } }
+    if (v.promote) { const [a, b] = v.promote.split('>'); const p = person(a); if (p) { p.role = b; p.since = G.year; if (b === 'spouse') { p.income = p.income || Math.max(0, Math.round(chance(0.25) ? normal(100, 60) : normal(320, 120))); } } }
     if (v.end) { const [a, b] = v.end.split('>'); const p = person(a); if (p) { if (b === 'apart') { p.apart = true; p.role = a; p.livesApart = true; p.alive = true; p.away = true; G.people = G.people.filter((x) => x !== p); G.vars.apartParent = p; } else { p.role = b || 'ex'; } } }
     if (v.kill) { const target = v.kill === '$who' ? ctx.who : person(v.kill); if (target) this.kill(target, ctx); }
     if (v.relation) { const tg = v.relation === 'spouse' || v.relation === 'partner' ? person(v.relation) : ctx.who; if (tg) tg.relation = clamp(tg.relation + (v.delta || 0), 0, 100); }

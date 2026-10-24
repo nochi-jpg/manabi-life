@@ -46,7 +46,7 @@ for (const [f, evs] of Object.entries(eventsByFile)) {
 }
 
 const JOB_IDS = new Set(jobs.jobs.map((j) => j.id).concat(jobs.partTimeJobs.map((j) => j.id)));
-const CLUB_IDS = new Set([...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles].map((c) => c.id));
+const CLUB_IDS = new Set([...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles, ...(clubs.adultLessons || [])].map((c) => c.id));
 const HOBBY_IDS = new Set(clubs.hobbies.map((h) => h.id));
 const ps = schools.postSecondary;
 const SCHOOL_IDS = new Set([
@@ -58,7 +58,7 @@ const QUAL_IDS = new Set(random.qualifications.map((q) => q.id));
 const MENU_SOURCES = new Set([
   'schools.preschool', 'schools.elementary', 'schools.juniorHigh', 'schools.highSchool', 'schools.postByPlan',
   'schools.vocational', 'schools.graduate', 'schools.abroad', 'jobs.jobs', 'jobs.partTimeJobs', 'jobs.midCareer', 'jobs.civil',
-  'clubs.lessons', 'clubs.jhsClubs', 'clubs.hsClubs', 'clubs.univCircles', 'clubs.current', 'clubs.hobbies', 'schools.affiliatedDepts', 'focus', 'qualifications',
+  'clubs.lessons', 'clubs.adultLessons', 'clubs.jhsClubs', 'clubs.hsClubs', 'clubs.univCircles', 'clubs.current', 'clubs.hobbies', 'schools.affiliatedDepts', 'focus', 'qualifications',
 ]);
 const SPECIAL_SCHOOL = new Set(['jh_free_or_el_free']);
 
@@ -266,7 +266,7 @@ for (const c of ending.question.choices) { if (!ending.criteria[c.id]) err('endi
 for (const [jh, hs] of Object.entries(schools.ikkanHigh)) { if (!SCHOOL_IDS.has(jh) || !SCHOOL_IDS.has(hs)) err('schools.ikkanHigh', `未定義の学校「${jh}→${hs}」`); }
 for (let a = 0; a <= 120; a++) if (vis.portraits.ages.filter((p) => a >= p.from && a <= p.to).length !== 1) err('visuals.portraits', `${a}歳の顔グラが0枚または重複`);
 for (const g of ps.graduate) if (g.requires) { checkFlags(`graduate.${g.id}`, g.requires); if (g.stage === 'grad_doctor' && !g.requires.includes('edu_master_grad')) err(`graduate.${g.id}`, 'I-8違反：博士は修士修了が必要'); }
-for (const c of [...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles]) {
+for (const c of [...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles, ...(clubs.adultLessons || [])]) {
   checkFlags(`clubs.${c.id}.set`, c.set);
   checkFlags(`clubs.${c.id}.grantOnAchieve`, c.grantOnAchieve);
   (c.riskEvents || []).forEach((id) => { if (!EVENT_IDS.has(id)) err(`clubs.${c.id}`, `riskEvents がない「${id}」`); });

@@ -20,6 +20,7 @@ const Popup = (() => {
   // ---- 選択肢イベント ----
   // view.opts: [{i, label, rate} | {i, menu:true, items:[...], label?}]
   function choice(view, cb) {
+    if (view.type === 'lessons') return lessons(view, cb);
     // 1つのリストにまとめる（ふつうの選択肢 → メニューの候補）。6こ以上なら5こずつページ送り
     const entries = [];
     for (let k = 0; k < view.opts.length; k++) {
@@ -76,6 +77,23 @@ const Popup = (() => {
       <div class="rcm">🧑‍🏫 ${esc(r.comment)}</div></div>`;
   }
 
+  // ---- 習い事を続ける？（ui/lessons.html） ----
+  function lessons(view, cb) {
+    const keep = {}; view.items.forEach((x) => (keep[x.id] = !x.quit));
+    const render = () => {
+      const cost = view.items.filter((x) => keep[x.id]).reduce((a, x) => a + x.cost, 0);
+      const box = show(`<div class="cs">🎒 ${esc(view.date)} ・ ${esc(view.ageLabel)}</div>
+        <div class="q">${esc(view.text)}<small>${esc(view.note)}</small></div>
+        <div class="ls">${view.items.map((x) => `<div class="l"><span class="e">${x.emoji}</span><span class="n">${esc(x.label)}<small>${x.years}年目 ・ 年${x.cost}万円 ・ ${esc(x.eff)}</small></span>
+          <button data-k="${x.id}" data-v="1" class="${keep[x.id] ? 'on' : ''}">続ける</button><button data-k="${x.id}" data-v="0" class="q2 ${keep[x.id] ? '' : 'on'}">やめる</button></div>`).join('')}</div>
+        <div class="sum"><span>💡</span><span>続けると：<b>年${cost}万円</b>（${G.age < 16 ? '家計から' : '所持金から'}）</span></div>
+        <button class="ok main" id="lOk">これで決める ▶</button>`, 'lbox');
+      $$('[data-k]', box).forEach((b) => (b.onclick = () => { keep[b.dataset.k] = b.dataset.v === '1'; render(); }));
+      $('#lOk', box).onclick = () => { close(); cb(Engine.chooseLessons(keep)); };
+    };
+    render();
+  }
+
   // ---- かんたんなメニュー（重点方針など） ----
   function menu({ title, note, items, cur }, cb) {
     let page = 0;
@@ -105,6 +123,3 @@ const Popup = (() => {
   }
   return { choice, menu, list, confirm, close, isOpen: () => open, show };
 })();
-
-// 職業・学校の詳細（task5 で中身をつくる）
-const Detail = { enabled: false, isSchool: () => false };

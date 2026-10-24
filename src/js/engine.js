@@ -69,6 +69,8 @@ const Engine = (() => {
       }
     }
     Q.push(...afters);
+    // 習い事を続ける？（要望3：春に。学年が上がる・入学・就職のとき）
+    if (G.q === 0 && G.clubs.some((c) => isLesson(c.id))) Q.push({ id: '__lessons', ctx: {} });
     // 3. リスク（病気・事故・失業など）
     let riskChoice = false;
     for (const src of ['events_random', 'events_flow', 'events_world']) {
@@ -95,10 +97,10 @@ const Engine = (() => {
     }
     // 5. ランダムな選択肢イベント（1季節に最大1つ、同じ年に最大2つ）
     //    それぞれの候補が「重み×0.008／季節」の確率で起きる。起きたものが複数なら重みで1つ選ぶ
-    const hasChoice = () => Q.some((x) => ev(x.id).kind === 'choice');
+    const hasChoice = () => Q.some((x) => (ev(x.id) || {}).kind === 'choice');
     if (!hasChoice() && (G.randomChoicesYear || 0) < 2) {
       const hit = [];
-      const k = G.age < 6 ? 0.005 : 0.008;
+      const k = G.age < 6 ? 0.005 : 0.007;
       for (const e0 of D().events_random.events) {
         const e = ev(e0.id);
         if (e.kind !== 'choice' || !e.weight || e.type === 'scheduled' || e.risk || gentleOut(e.id)) continue;
@@ -140,14 +142,14 @@ const Engine = (() => {
   }
   function finishQueue(Q) {
     // 必須の選択肢は最後のほうに（流れるイベントを先に見せる）。通知表は季節の最後
-    const rank = (x) => { const e = ev(x.id); if (x.id === 'ev_m_report_card' || x.id === 'ev_m_focus_adult') return 3; if (e.when && e.when.after) return 2; return e.kind === 'choice' ? 1 : 0; };
+    const rank = (x) => { if (x.id === '__lessons') return 4; const e = ev(x.id); if (x.id === 'ev_m_report_card' || x.id === 'ev_m_focus_adult') return 3; if (e.when && e.when.after) return 2; return e.kind === 'choice' ? 1 : 0; };
     G.queue = Q.map((x, i) => ({ ...x, i })).sort((a, b) => rank(a) - rank(b) || a.i - b.i);
   }
   // 季節の指定がないイベントは、1年に1回まで
   function onceYearOk(e) {
     const w = e.when || {};
     // 社会人の「新しい1年の重点方針」は5年に1回（毎年だと選択が多すぎて1プレイが長くなる）
-    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 23 && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < 5) return false;
+    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 19 && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < 5) return false;
     if (w.season || w.date) return true;
     return G.lastFired[e.id] !== G.year;
   }
@@ -182,6 +184,7 @@ const Engine = (() => {
     if (G.pending) return { choice: G.pending.view };
     if (!G.queue || !G.queue.length) { advance(); return { posts: [], season: true }; }
     const it = G.queue.shift();
+    if (it.id === '__lessons') return openLessons();
     const e = ev(it.id);
     if (!e) return { posts: [] };
     const ctx = unpackCtx(it.ctx); ctx.ev = e;
@@ -329,6 +332,46 @@ const Engine = (() => {
     ctx.lotteryResult = win ? (win >= 10000 ? `1等！${win.toLocaleString('ja-JP')}万円が当たった！！` : win >= 1 ? `${win}万円が当たった！` : `${Math.round(win * 10000).toLocaleString('ja-JP')}円が当たった。`) : 'はずれ。';
   }
 
+  // ---------- 習い事を続ける？ ----------
+  const isLesson = (id) => { const d = Menu.club(id); return !!d && !!d.age; };
+  function openLessons() {
+    const LC = D().clubs.lessonContinue;
+    const ls = G.clubs.filter((c) => isLesson(c.id));
+    if (!ls.length) return { posts: [] };
+    const stageNow = G.job && G.job.id && G.jobYears === 0 ? 'work' : G.stage;
+    const changed = stageNow !== G.vars.lessonStage && LC.askAt.includes(stageNow);
+    const outOfAge = ls.some((c) => { const d = Menu.club(c.id); return G.age > d.age[1]; });
+    G.vars.lessonStage = stageNow;
+    if (!changed && !outOfAge && !chance(LC.askEveryYearChance)) return { posts: [] };
+    const qc = LC.quitChance;
+    const items = ls.map((c) => {
+      const d = Menu.club(c.id);
+      let pq = qc.byLesson[c.id] ?? (changed ? qc.atStage[stageNow] ?? qc.default : qc.default * 0.5);
+      if (G.age > d.age[1]) pq = Math.max(pq, 0.85);
+      if (G.age >= 22 && c.id.startsWith('ls_')) pq = Math.max(pq, 0.8); // 大人になってからも続ける人は少数派
+      const eff = Object.keys(d.yearly || {}).slice(0, 2).map((k) => ({ health: '健康↑', social: '人間関係↑', happiness: '満足感↑', stress: (d.yearly.stress > 0 ? 'ストレス↑' : 'ストレス↓') }[k] || (k.startsWith('skill.') ? '技術↑' : k.startsWith('subj.') ? '学力↑' : ''))).filter(Boolean).join(' ');
+      return { id: c.id, emoji: d.emoji, label: d.label, years: G.year - (c.since || G.year) + 1, cost: d.cost, eff, quit: chance(pq) };
+    });
+    const when = { jhs: '中学生になる', hs: '高校生になる', univ: '新しい学校に入る', work: '社会人になる' }[changed ? stageNow : ''] || '新しい学年になる';
+    const view = { ev: '__lessons', type: 'lessons', emoji: '🎒', date: `${calYear()}年 ${MONTH[G.q]}月`, ageLabel: ageLabel(), text: `${when}。習い事はどうする？`, note: changed ? 'いそがしくなります。続けるものを選ぼう' : '続けるものを選ぼう', items, rng: RNG.s };
+    G.pending = { view, ctxRaw: {}, extra: {} };
+    save();
+    return { choice: view };
+  }
+  function chooseLessons(keep) {
+    G.pending = null;
+    const out = { posts: [] };
+    const e = { id: '__lessons', emoji: '🎒', cat: 'lesson' };
+    const quit = G.clubs.filter((c) => isLesson(c.id) && keep[c.id] === false);
+    G.clubs = G.clubs.filter((c) => !quit.includes(c));
+    const kept = G.clubs.filter((c) => isLesson(c.id));
+    const nm = (c) => (Menu.club(c.id) || {}).label;
+    if (quit.length) post(out, e, `${quit.map(nm).join('・')}をやめた。`, {}, 'choice', '');
+    if (kept.length) post(out, e, `${kept.map(nm).join('・')}は続けることにした。`, {}, quit.length ? '' : 'choice', '');
+    save();
+    return out;
+  }
+
   // ---------- 判定の確率 ----------
   function rollP(roll, ctx) {
     if (!roll) return 1;
@@ -448,10 +491,10 @@ const Engine = (() => {
     } else {
       let p = curve(G.gender === 'F' ? RC.death_F : RC.death_M, G.age) / 100;
       const h = G.stats.health;
-      p *= h < 20 ? 6 : h < 35 ? 3 : h < 50 ? 1.6 : h > 80 ? 0.7 : 1;
+      p *= h < 20 ? 4 : h < 35 ? 2 : h < 45 ? 1.3 : h > 75 ? 0.8 : 1;
       p *= G.vars.deathRiskMul || 1;
-      if (['dz_cancer_lung', 'dz_cancer_stomach', 'dz_cancer_colon', 'dz_cancer_breast'].some((f) => G.flags[f])) p += 0.08 * (G.vars.cancerStage || 2) / 2;
-      if (G.flags.dz_heart || G.flags.dz_stroke_after) p *= 1.5;
+      if (['dz_cancer_lung', 'dz_cancer_stomach', 'dz_cancer_colon', 'dz_cancer_breast'].some((f) => G.flags[f])) p += 0.05 * (G.vars.cancerStage || 2) / 2;
+      if (G.flags.dz_heart || G.flags.dz_stroke_after) p *= 1.2;
       if (G.age < 35) p = Math.min(p, 0.003);
       if (chance(p)) {
         die = true;
@@ -490,7 +533,7 @@ const Engine = (() => {
     s.stress += (base - s.stress) * 0.2;
     // ③ 健康：年齢の上限と生活習慣で決まる「目標」に少しずつ近づく（病気・けがのイベントで下がる）
     const a = G.age;
-    const cap = a < 40 ? 90 : a < 60 ? 90 - (a - 40) * 0.5 : a < 80 ? 80 - (a - 60) * 1 : 60 - (a - 80) * 1.2;
+    const cap = a < 40 ? 90 : a < 60 ? 90 - (a - 40) * 0.5 : a < 80 ? 82 - (a - 60) * 0.8 : 66 - (a - 80) * 0.8;
     let ht = cap + (G.talents.t_health - 50) * 0.15;
     if (G.flags.smoker) ht -= 10; if (G.flags.heavy_drinker) ht -= 8; if (G.flags.exercise_habit) ht += 6;
     if (G.flags.dz_diabetes) ht -= 6; if (G.flags.dz_hypertension) ht -= 3; if (G.flags.dz_heart) ht -= 8; if (G.flags.dz_stroke_after) ht -= 12;
@@ -508,14 +551,14 @@ const Engine = (() => {
     for (const [k, v] of Object.entries(F)) s[k] = s[k] + (v / 4) * half;
     if (G.focus === 'focus_health' && !G.flags.exercise_habit && chance(0.04)) G.flags.exercise_habit = true;
     // ⑤ 満足感：目標に20%ずつ近づく
-    let tgt = 50 + (s.social - 50) * 0.3 + (s.health - 75) * 0.3 - (s.stress - 35) * 0.4;
+    let tgt = 40 + (s.social - 50) * 0.3 + (s.health - 75) * 0.3 - (s.stress - 35) * 0.4;
     if (Econ.working() && G.job) tgt += (s.jobSatisfaction - 50) * 0.2;
     if (G.flags.married) tgt += ((person('spouse') || {}).relation - 50) * 0.1 + 3;
     tgt += Math.min(6, people('child').length * 3);
     if (G.age >= 18) {
       const mi = Math.max(10, Econ.annualIncome() / 12);
       if (G.cash < 0) tgt -= Math.min(15, (-G.cash / Math.max(60, Econ.annualIncome())) * 15 + 5);
-      else if (G.cash > mi * 6) tgt += Math.min(10, (G.cash / (mi * 12)) * 5);
+      else if (G.cash > mi * 6) tgt += Math.min(6, (G.cash / (mi * 12)) * 3);
     }
     if (G.flags.dz_depression) tgt -= 10;
     const likeOk = G.hobbies.length ? 2 : 0; tgt += likeOk;
@@ -527,7 +570,7 @@ const Engine = (() => {
     // 記録（エンディング用）
     const H = G.hist;
     H.happiness.push(Math.round(s.happiness)); H.social.push(Math.round(s.social)); H.stress.push(Math.round(s.stress)); H.health.push(Math.round(s.health));
-    if (G.q === 3 || (isQuietYear() && G.q === 2)) {
+    if (G.q === 3) {
       H.cash.push(Math.round(G.cash)); H.income.push(Math.round(Econ.annualIncome())); H.assets.push(Econ.assetsValue());
       H.maxAssets = Math.max(H.maxAssets || 0, G.cash + Econ.assetsValue());
       H.years++;
@@ -639,7 +682,17 @@ const Engine = (() => {
       }
       G.stats.academic = acad();
       if (['elem', 'jhs', 'hs', 'hs_corr', 'hs_night', 'kosen', 'free_school'].includes(st)) makeReport();
-    } else if (!Menu.isStudent() && G.age >= 22) {
+    }
+    if (G.job && G.job.id && Econ.working()) {
+      // 仕事を1年続けたときのステータスの変化（job_display.json）
+      const j = Menu.job(G.job.id) || {}; const JD = D().job_display.statEffects;
+      const E = { ...(JD.byCat[j.cat] || {}) };
+      if (G.stats.physicalLoad >= 70) E.health = (E.health || 0) - 1; if (G.stats.mentalLoad >= 70) E.stress = (E.stress || 0) + 1;
+      if (Econ.overtime() >= 40) { E.health = (E.health || 0) - 0.5; E.happiness = (E.happiness || 0) - 0.5; }
+      if ((j.tags || []).includes(Cond.likeMain())) E.happiness = (E.happiness || 0) + 1;
+      for (const [k, v] of Object.entries(E)) if (k !== 'stress' && k !== 'health') Effects.stat(k, v);
+    }
+    if (baseG) { /* 学生は上で計算ずみ */ } else if (!Menu.isStudent() && G.age >= 22) {
       // 社会人：使わない教科は年−1（英語は海外勤務なら0）
       for (const k of ['jpn', 'math', 'sci', 'soc']) G.subj[k] = clamp(G.subj[k] - 0.5, 1, 99);
       if (!G.flags.lives_abroad && !G.flags.transfer_abroad) G.subj.eng = clamp(G.subj.eng - 0.7, 1, 99);
@@ -717,5 +770,5 @@ const Engine = (() => {
     }
     return false;
   }
-  return { begin, next, choose, chooseMenuNext, schedule, setFocus, onLike, initSubjects, die, rollP, ev, buildQueue, advance, checkDeath, ageLabel, acad };
+  return { begin, next, choose, chooseMenuNext, chooseLessons, isLesson, schedule, setFocus, onLike, initSubjects, die, rollP, ev, buildQueue, advance, checkDeath, ageLabel, acad };
 })();

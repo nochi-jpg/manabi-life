@@ -41,7 +41,7 @@ const Econ = (() => {
     return Math.round(v);
   }
   const annualIncome = () => jobGross() + sideGross() + pensionAnnual();
-  const monthlyIncome = () => Math.round((jobGross() / (hasBonus() ? 16 : 12)) * 10) / 10;
+  const monthlyIncome = () => Math.round((jobGross() / (12 + (hasBonus() ? D().job_display.pay.bonusMonthsByForm[G.job.form] ?? 4 : 0))) * 10) / 10;
   const hasBonus = () => !!G.job && (D().jobs.forms[G.job.form] || {}).bonus === true && G.employment !== 'leave';
 
   // ---- 出世（ranks.json） ----
@@ -104,14 +104,14 @@ const Econ = (() => {
 
   // ---- 生活費（年・万円） ----
   function livingCost() {
-    const base = { tokyo: 175, A: 165, B: 150, C: 140 }[tierKey()];
+    const base = { tokyo: 185, A: 175, B: 160, C: 150 }[tierKey()];
     let v = base * (G.vars.livingCostMul || 1);
     const sp = person('spouse'); if (sp && G.flags.married) v += 85;
     // 収入が多いほど使うお金も増える
     const net = (jobGross() + sideGross() + pensionAnnual()) * 0.78 + (sp && G.flags.married ? (sp.income || 0) * 0.78 : 0);
-    if (net > 300) v += (net - 300) * 0.3;
+    if (net > 300) v += (net - 300) * 0.6;
     if (G.age >= 65) v += 15; // 医療・介護
-    if (G.flags.lives_with_parents && !G.flags.married) v *= 0.45;
+    if (G.flags.lives_with_parents && !G.flags.married) v *= 0.6;
     return v;
   }
   const CHILD_COST = { baby: 70, nursery: 60, elem: 90, jhs: 130, hs: 140, univ: 180, univ_away: 280, voc: 160, none: 0, work: 0 };
@@ -173,9 +173,10 @@ const Econ = (() => {
     // 税・保険料を引いた手取り（年）
     const netYear = gross + side - taxes.income - taxes.resident - taxes.si;
     if (hasBonus()) {
-      const monthly = netYear / 16;
+      const bm = (D().job_display.pay.bonusMonthsByForm[G.job.form] ?? 4) * (G.vars.raiseMul && G.vars.raiseMul < 1 ? 0.9 : 1);
+      const monthly = netYear / (12 + bm);
       inc += monthly * 3;
-      if (q === 1 || q === 3) { bonus = monthly * 2; inc += bonus; }
+      if (q === 0 || q === 2) { bonus = monthly * bm / 2; inc += bonus; } // 賞与は6月（春）と12月（秋）
     } else inc += netYear / 4;
     inc += pen / 4;
     if (G.flags.welfare) inc += 30;
@@ -191,6 +192,7 @@ const Econ = (() => {
       if (G.flags.living_alone && ['univ', 'univ_med', 'junior_college', 'vocational', 'grad_master', 'grad_doctor', 'grad_prof'].includes(G.stage)) inc += (w < 35 ? 4 : w < 65 ? 7 : 10) * 3;
       if (G.flags.scholarship_loan && G.school) { inc += 15; addLoan('scholar', 15, 0, 'scholar'); }
       out += (G.age < 18 ? 0.6 : 1.5) * 3; // 自分で使うお金
+      out += (side * 0.75) / 4; // バイト代の多くは使う（服・遊び・スマホ）
       if (G.flags.living_alone) out += 6 * 3;
     } else {
       out += livingCost() / 4 + rentYear() / 4 + childCosts() / 4;

@@ -45,6 +45,7 @@ for (let n = 0; n < N; n++) {
       let guard = 0;
       while (r.choice && guard++ < 5) {
         const v = r.choice;
+        if (v.type === 'lessons') { const keep = {}; v.items.forEach((x) => (keep[x.id] = !x.quit)); r = api.Engine.chooseLessons(keep); continue; }
         stats.popups[v.ev] = (stats.popups[v.ev] || 0) + 1;
         let oi = Math.random() < 0.6 ? 0 : Math.floor(Math.random() * v.opts.length);
         // 子どものうちは「働く」「行かない」をあまり選ばない（ふつうの子の選び方に近づける）
@@ -69,7 +70,8 @@ for (let n = 0; n < N; n++) {
     if (G.vars.marriageNo) stats.married++;
     stats.kids += api.people('child', false).length;
     for (const p of G.log) fired[p.id] = (fired[p.id] || 0) + 1;
-    stats.cash.push(Math.round(G.cash)); stats.happy.push(G.hist.happiness.reduce((a, b) => a + b, 0) / Math.max(1, G.hist.happiness.length));
+    stats.cash.push(Math.round(G.cash));
+    for (const a of [25, 30, 45, 60, 75]) { if (G.hist.cash[a] != null) { (stats['c' + a] = stats['c' + a] || []).push(G.hist.cash[a]); (stats['i' + a] = stats['i' + a] || []).push(G.hist.income[a]); } } stats.happy.push(G.hist.happiness.reduce((a, b) => a + b, 0) / Math.max(1, G.hist.happiness.length));
   } catch (e) { stats.errors.push(e.stack.split('\n').slice(0, 4).join(' | ')); }
 }
 const avg = (a) => (a.length ? (a.reduce((x, y) => x + y, 0) / a.length).toFixed(1) : '-');
@@ -77,6 +79,7 @@ const med = (a) => { const s = a.slice().sort((x, y) => x - y); return s[Math.fl
 console.log(`=== ${N}人の人生（${MODE}） ===`);
 console.log(`寿命 平均${avg(stats.ages)}歳 / 選択の回数 平均${avg(stats.choices)} / 最期の所持金 中央値${med(stats.cash)}万 / 満足感の平均 ${avg(stats.happy)}`);
 console.log(`寿命 男${avg(stats.agesM || [])} 女${avg(stats.agesF || [])}`);
+console.log('所持金の中央値（年齢別）', [25, 30, 45, 60, 75].map((a) => `${a}歳:${med(stats['c' + a] || [0])}万/年収${med(stats['i' + a] || [0])}`).join(' '));
 console.log('死因', JSON.stringify(stats.causes));
 console.log('学歴', stats.edu);
 console.log(`結婚 ${(stats.married / N * 100).toFixed(0)}% / 子ども 平均${(stats.kids / N).toFixed(2)}人 / 終わらなかった ${stats.stuck}`);

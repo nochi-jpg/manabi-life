@@ -6,7 +6,7 @@ const Menu = (() => {
   const school = (id) => allSchools().find((x) => x.id === id);
   const dept = (id) => S().postSecondary.departments.find((d) => d.id === id);
   const job = (id) => J().jobs.find((x) => x.id === id) || J().partTimeJobs.find((x) => x.id === id);
-  const allClubs = () => { const c = C(); return [...c.lessons, ...c.jhsClubs, ...c.hsClubsExtra, ...c.univCircles]; };
+  const allClubs = () => { const c = C(); return [...c.lessons, ...c.jhsClubs, ...c.hsClubsExtra, ...c.univCircles, ...(c.adultLessons || [])]; };
   const club = (id) => allClubs().find((x) => x.id === id);
   const hobby = (id) => C().hobbies.find((x) => x.id === id);
   const qual = (id) => D().events_random.qualifications.find((q) => q.id === id);
@@ -82,6 +82,7 @@ const Menu = (() => {
       case 'jobs.civil': return jobMenu('civil', filter);
       case 'jobs.partTimeJobs': return J().partTimeJobs.filter((p) => G.age >= (p.minAge || 16) && (!p.requires || !p.requires.stage || p.requires.stage.includes(G.stage))).map((p) => item(p, { sub: `時給${p.wage}円・週${p.hoursWeek}時間` }));
       case 'clubs.lessons': return C().lessons.filter((l) => !l.age || (G.age >= l.age[0] && G.age <= l.age[1])).filter((l) => !G.clubs.some((c) => c.id === l.id)).map((l) => item(l, { sub: `年${l.cost}万円` }));
+      case 'clubs.adultLessons': return (C().adultLessons || []).filter((l) => !l.age || (G.age >= l.age[0] && G.age <= l.age[1])).filter((l) => !G.clubs.some((c) => c.id === l.id)).map((l) => item(l, { sub: `年${l.cost}万円` }));
       case 'clubs.jhsClubs': return C().jhsClubs.map((l) => item(l, { sub: clubSub(l) }));
       case 'clubs.hsClubs': return [...C().jhsClubs.filter((c) => !C().hsClubsExtra.some((x) => x.label === c.label)), ...C().hsClubsExtra].map((l) => item(l, { sub: clubSub(l) }));
       case 'clubs.univCircles': return C().univCircles.map((l) => item(l, { sub: clubSub(l) }));

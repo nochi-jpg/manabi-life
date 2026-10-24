@@ -1606,5 +1606,205 @@
         "dementia": 0.85
       }
     }
-  ]
+  ],
+  "_adultComment": "大人になってから始める習い事（2026-10-24 追加の要望3）。ev_r_adult_lesson で始める。cost は年間（万円）・所持金から。time は合計 time ≤4 の計算に入れる。",
+  "adultLessons": [
+    {
+      "id": "al_dance",
+      "emoji": "💃",
+      "label": "社交ダンス",
+      "age": [
+        25,
+        90
+      ],
+      "cost": 12,
+      "time": 1,
+      "tags": [
+        "like_outdoor",
+        "music"
+      ],
+      "yearly": {
+        "health": 2,
+        "social": 4,
+        "happiness": 3,
+        "stress": -2
+      }
+    },
+    {
+      "id": "al_boki",
+      "emoji": "🧾",
+      "label": "簿記の講座",
+      "age": [
+        18,
+        70
+      ],
+      "cost": 6,
+      "time": 1,
+      "tags": [
+        "like_math"
+      ],
+      "yearly": {
+        "subj.math": 1,
+        "stress": 1
+      }
+    },
+    {
+      "id": "al_english",
+      "emoji": "🗣️",
+      "label": "英会話スクール",
+      "age": [
+        18,
+        90
+      ],
+      "cost": 18,
+      "time": 1,
+      "tags": [
+        "global"
+      ],
+      "yearly": {
+        "subj.eng": 3,
+        "social": 1
+      }
+    },
+    {
+      "id": "al_calligraphy",
+      "emoji": "🖌️",
+      "label": "書道",
+      "age": [
+        20,
+        95
+      ],
+      "cost": 6,
+      "time": 1,
+      "tags": [
+        "like_draw",
+        "like_book"
+      ],
+      "yearly": {
+        "skill.art": 2,
+        "stress": -3,
+        "happiness": 2
+      }
+    },
+    {
+      "id": "al_yoga",
+      "emoji": "🧘",
+      "label": "ヨガ",
+      "age": [
+        20,
+        90
+      ],
+      "cost": 9,
+      "time": 1,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "health": 3,
+        "stress": -4
+      }
+    },
+    {
+      "id": "al_cooking",
+      "emoji": "🍳",
+      "label": "料理教室",
+      "age": [
+        20,
+        90
+      ],
+      "cost": 8,
+      "time": 1,
+      "tags": [],
+      "yearly": {
+        "skill.cooking": 4,
+        "happiness": 2,
+        "social": 1
+      }
+    },
+    {
+      "id": "al_piano",
+      "emoji": "🎹",
+      "label": "大人のピアノ教室",
+      "age": [
+        20,
+        95
+      ],
+      "cost": 12,
+      "time": 1,
+      "tags": [
+        "music",
+        "like_draw"
+      ],
+      "yearly": {
+        "skill.music": 4,
+        "happiness": 3,
+        "stress": -2
+      }
+    },
+    {
+      "id": "al_gym",
+      "emoji": "🏋️",
+      "label": "スポーツジム",
+      "age": [
+        18,
+        90
+      ],
+      "cost": 10,
+      "time": 1,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "health": 3,
+        "stress": -2
+      },
+      "set": [
+        "exercise_habit"
+      ]
+    },
+    {
+      "id": "al_programming",
+      "emoji": "💻",
+      "label": "プログラミング講座",
+      "age": [
+        18,
+        70
+      ],
+      "cost": 15,
+      "time": 1,
+      "tags": [
+        "like_game",
+        "like_math",
+        "it"
+      ],
+      "yearly": {
+        "skill.it": 5,
+        "stress": 1
+      }
+    }
+  ],
+  "lessonContinue": {
+    "_comment": "習い事を続ける・やめる（要望3）。学年が上がる春や人生の分岐点（中学・高校・大学入学、就職）に選ぶ。quitChance は「やめる」を最初から選んでおく確率のめやす（大人のスイミング継続は少数派、など）",
+    "askAt": [
+      "jhs",
+      "hs",
+      "univ",
+      "work"
+    ],
+    "askEveryYearChance": 0.25,
+    "quitChance": {
+      "default": 0.25,
+      "atStage": {
+        "jhs": 0.45,
+        "hs": 0.55,
+        "univ": 0.6,
+        "work": 0.75
+      },
+      "byLesson": {
+        "ls_swim": 0.8,
+        "ls_soccer": 0.6,
+        "ls_juken_juku": 1.0
+      }
+    }
+  }
 }
