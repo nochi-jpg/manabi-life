@@ -17,7 +17,7 @@ const Main = (() => {
             <button data-s="2">×2</button><button data-s="4">×4</button>
           </div></div>
       </div>
-      <div class="panel" id="hero"><div class="pic" id="pic"><img id="faceImg" alt=""><span class="place" id="bgTag"></span></div><div class="role" id="role"></div></div>
+      <div class="panel" id="hero"><div class="pic" id="pic"><img id="faceImg" alt=""><span class="place" id="bgTag"></span><button id="backChoice">💬 選択肢に<br>もどる ▶</button></div><div class="role" id="role"></div></div>
       <div class="panel" id="stat"><div id="statL"></div><div id="statR"></div></div>
       <div id="mid">
         <button id="focusBtn"></button>
@@ -35,6 +35,7 @@ const Main = (() => {
     $$('#speed button', el).forEach((b) => (b.onclick = () => setSpeed(+b.dataset.s)));
     $$('[data-sz]', el).forEach((b) => (b.onclick = () => { Options.set('tlSize', b.dataset.sz); applySize(); }));
     $('#focusBtn', el).onclick = () => openFocus();
+    $('#backChoice', el).onclick = () => Popup.restore();
     $('#repBtn', el).onclick = () => { stop(); Popup.reports(() => { refresh(); kick(); }); };
     $('#logBtn', el).onclick = () => { stop(); App.show('history', 'backlog'); };
     $('#optBtn', el).onclick = () => { stop(); App.show('options', 'main'); };
@@ -199,6 +200,8 @@ const Main = (() => {
   }
 
   // ---------- 進行 ----------
+  // 選択肢を最小化しているあいだ：顔グラに「選択肢にもどる」、ゲームは進まない
+  function setMini(on) { if (!el) return; el.classList.toggle('mini', on); const b = $('#backChoice', el); if (b) b.classList.toggle('on', on); if (on) { stop(); refresh(); } }
   function stop() { clearTimeout(timer); timer = 0; running = false; }
   function kick() { if (App.cur !== 'main') return; clearTimeout(timer); running = true; timer = setTimeout(loop, 60); }
   function loop() {
@@ -263,11 +266,12 @@ const Main = (() => {
   return {
     enter(elm) {
       el = elm; postQ = [];
+      Popup.clearMini();
       skeleton(); refresh(); fillFeed();
       if (G.pending) { Popup.choice(G.pending.view, (res) => handle(res)); }
       else kick();
     },
-    refresh, kick, stop, fxHtml, FX_L,
+    refresh, kick, stop, fxHtml, FX_L, setMini,
   };
 })();
 Screens.main = { enter: (el) => Main.enter(el) };

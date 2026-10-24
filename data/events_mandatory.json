@@ -95,7 +95,7 @@
       "when": { "age": [10, 10], "season": ["Q1"], "stage": ["elem"], "region": ["A", "B"], "none": ["edu_elem_private"], "once": true },
       "text": "小学4年生。クラスで中学受験の塾に通い始める子が増えてきた。",
       "choices": [
-        { "label": "📝 中学受験の塾に通う（3年で約250万）", "when": { "talent": { "familyWealth": [">=", 35] } }, "effects": { "club": { "join": "ls_juken_juku" }, "set": ["juken_track"], "stats": { "stress": 5 } } },
+        { "label": "📝 中学受験の塾に通う（3年で約250万）", "when": { "jukuOk": true }, "effects": { "club": { "join": "ls_juken_juku" }, "set": ["juken_track"], "stats": { "stress": 5 } } },
         { "label": "📘 公立中高一貫校の適性検査だけ受ける", "effects": { "set": ["juken_track"], "var": { "ikkanOnly": true } } },
         { "label": "🏫 地元の公立中学に行く", "effects": { "stats": { "stress": -2, "happiness": 2 } } }
       ]
@@ -181,6 +181,30 @@
       "when": { "age": [16, 16], "season": ["Q1"], "all": ["edu_jhs_grad"], "stage": ["none"], "var": { "target": ["!none"] }, "once": true },
       "text": "高校生になった！{school}に入学。",
       "effects": { "school": { "enter": "$target" }, "log": "🏫 高校に入学" }
+    },
+    {
+      "id": "ev_m_pay_hs", "kind": "flow", "emoji": "👪", "cat": "money",
+      "when": { "stage": ["hs", "hs_corr", "hs_night", "kosen"], "yearInStage": 1, "season": ["Q2"], "poorHome": false, "once": true },
+      "text": "高校生になったので、お金のことを家族で確認した。習い事・教育費・スマホ代は、これまでどおり親が出してくれる。おこづかいは月{pocket}万円。",
+      "effects": { "clear": ["self_pay_school"] }
+    },
+    {
+      "id": "ev_m_pay_hs_poor", "kind": "flow", "emoji": "👪", "cat": "money",
+      "when": { "stage": ["hs", "hs_corr", "hs_night", "kosen"], "yearInStage": 1, "season": ["Q2"], "poorHome": true, "once": true },
+      "text": "家計が苦しいので「高校からは、習い事とスマホ代は自分で出してね」と親に言われた。おこづかいは月{pocket}万円。バイトも考えよう。",
+      "effects": { "set": ["self_pay_school"], "stats": { "stress": 3 } }
+    },
+    {
+      "id": "ev_m_pay_univ", "kind": "flow", "emoji": "👪", "cat": "money",
+      "when": { "stage": ["univ", "univ_med", "junior_college", "vocational", "abroad_study"], "yearInStage": 1, "season": ["Q2"], "poorHome": false, "once": true },
+      "text": "進学したので、お金のことを家族で確認した。学費・習い事・スマホ代は親が出してくれる。おこづかいは月{pocket}万円。",
+      "effects": { "clear": ["self_pay_school"] }
+    },
+    {
+      "id": "ev_m_pay_univ_poor", "kind": "flow", "emoji": "👪", "cat": "money",
+      "when": { "stage": ["univ", "univ_med", "junior_college", "vocational", "abroad_study"], "yearInStage": 1, "season": ["Q2"], "poorHome": true, "once": true },
+      "text": "「学費はなんとかするけど、習い事とスマホ代は自分で出してね」と親に言われた。おこづかいは月{pocket}万円。",
+      "effects": { "set": ["self_pay_school"], "stats": { "stress": 3 } }
     },
     {
       "id": "ev_m_after_jhs_work", "kind": "choice", "emoji": "🔧", "counselor": "parents",
@@ -502,7 +526,7 @@
     },
     {
       "id": "ev_m_job_review", "kind": "choice", "emoji": "🔄", "counselor": "self",
-      "when": { "season": ["Q1"], "jobYears": [5, 10, 15, 20, 25, 30], "employment": ["seishain", "keiyaku", "civil_servant", "freelance", "self_employed"], "age": [22, 59] },
+      "when": { "season": ["Q1"], "jobYears": [5, 15, 25], "employment": ["seishain", "keiyaku", "civil_servant", "freelance", "self_employed"], "age": [22, 59] },
       "text": "今の仕事について{jobYears}年。給料{income}万円、満足感{jobSat}。このままでいい？",
       "choices": [
         { "label": "🙂 今の仕事を続ける", "effects": { "stats": { "happiness": 1 } } },

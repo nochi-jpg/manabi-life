@@ -4,6 +4,7 @@
 const Popup = (() => {
   const ov = () => $('#pop');
   let open = false;
+  let mini = null; // 最小化中の選択肢（もどるときに呼ぶ関数）
   const PER = 8;
   const COUNSEL = { parents: '👪 家族で話し合い', parents_teacher: '🧑‍🏫 先生と親からの提案', teacher: '🧑‍🏫 先生から', self: '💭 自分で決める', spouse: '💑 パートナーと', family: '👨‍👩‍👧 家族と' };
   const rc = (r) => (r >= 70 ? 'hi' : r >= 40 ? 'mid' : 'lo');
@@ -14,6 +15,13 @@ const Popup = (() => {
     return $('.box', o);
   }
   function close() { ov().classList.remove('on'); ov().innerHTML = ''; open = false; }
+  // ---- 選択肢を最小化して、ステータスを見る ----
+  // 最小化中はゲームが進まない（isOpen が true のまま）。顔グラの「選択肢にもどる」で元の画面にもどる
+  const MINI_BTN = '<button class="minb" id="miniBtn">📊 ステータスを見る</button>';
+  function bindMini(box, restore) { const b = $('#miniBtn', box); if (b) b.onclick = () => minimize(restore); }
+  function minimize(restore) { close(); mini = restore; Main.setMini(true); }
+  function restore() { if (!mini) return; if (open) close(); const f = mini; mini = null; Main.setMini(false); f(); }
+  function clearMini() { mini = null; Main.setMini(false); }
   const splitEmoji = (s) => { const m = String(s || '').match(/^(\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*)\s*(.*)$/u); return m ? [m[1], m[2]] : ['・', s || '']; };
   function btnHtml(e, name, sub, rate) {
     return `<span class="oe">${e}</span><span class="on2">${esc(name)}${sub ? `<small>${esc(sub)}</small>` : ''}</span>${rate != null ? `<span class="rate ${rc(rate)}">${rate}%</span>` : ''}`;
@@ -91,15 +99,16 @@ const Popup = (() => {
       const sorter = canSort ? `<div class="flt"><button data-sort="def" class="${sort === 'def' ? 'on' : ''}">おすすめ順</button><button data-sort="rate" class="${sort === 'rate' ? 'on' : ''}">🎯 受かりやすい順</button>${canPay ? `<button data-sort="pay" class="${sort === 'pay' ? 'on' : ''}">💴 年収が高い順</button>` : ''}</div>` : '';
       let box;
       if (report) {
-        box = show(`<div class="pleft">${paperHtml(report)}</div><div class="pright"><div class="q">${esc(view.text.replace(/^\d+年3月。通知表が配られた。/, ''))}<small>選んだ方針で、1年間のステータスの伸び方が変わります</small></div>
+        box = show(`<div class="pleft">${paperHtml(report)}</div>${MINI_BTN}<div class="pright"><div class="q">${esc(view.text.replace(/^\d+年3月。通知表が配られた。/, ''))}<small>選んだ方針で、1年間のステータスの伸び方が変わります</small></div>
           ${btns.replace('class="opts"', 'class="opts one"')}${pagerHtml(page, pages)}${factHtml(view.fact)}</div>`, 'paper');
       } else {
         box = show(`
-          <div class="cs">${COUNSEL[view.counselor] || '💭 どうする？'}</div>
+          <div class="cs">${COUNSEL[view.counselor] || '💭 どうする？'}</div>${MINI_BTN}
           <div class="top"><div class="who">${view.emoji || '💭'}</div>
             <div><div class="ttl">${esc(view.date)} ・ ${esc(view.ageLabel)}</div><div class="txt">${esc(view.text)}</div></div>${sorter}</div>
           ${prefBar}${btns}${pagerHtml(page, pages)}${factHtml(view.fact)}`);
       }
+      bindMini(box, render);
       const po = $('#pfOther', box); if (po) po.onclick = () => { pmode = 'prefs'; ppage = 0; render(); };
       const ph = $('#pfHome', box); if (ph) ph.onclick = () => usePref(G.pref, false);
       const pr = $('#pfRep', box); if (pr) pr.onclick = () => reports(() => render());
@@ -186,12 +195,13 @@ const Popup = (() => {
     const render = () => {
       const cost = view.items.filter((x) => keep[x.id]).reduce((a, x) => a + x.cost, 0);
       const n = view.items.filter((x) => keep[x.id]).length;
-      const box = show(`<div class="cs">🎒 ${esc(view.date)} ・ ${esc(view.ageLabel)}</div>
+      const box = show(`<div class="cs">🎒 ${esc(view.date)} ・ ${esc(view.ageLabel)}</div>${MINI_BTN}
         <div class="q">${esc(view.text)}<small>${esc(view.note)}</small></div>
         <div class="ls">${view.items.map((x) => `<div class="l"><span class="e">${x.emoji}</span><span class="n">${esc(x.label)}<small>${x.years}年目 ・ 年${x.cost}万円 ・ ${esc(x.eff)}</small></span>
           ${x.lock ? `<span class="lock">${esc(x.lock)}</span><button class="q2 on" disabled>やめる</button>` : `<button data-k="${x.id}" data-v="1" class="${keep[x.id] ? 'on' : ''}">続ける</button><button data-k="${x.id}" data-v="0" class="q2 ${keep[x.id] ? '' : 'on'}">やめる</button>`}</div>`).join('')}</div>
-        <div class="sum"><span>💡</span><span>続けると：<b>年${cost}万円</b>（${G.age < 16 ? '家計から' : '所持金から'}）${view.cap ? `　家計で出せるめやす：年${view.cap}万円まで` : ''}</span></div>
+        <div class="sum"><span>💡</span><span>続けると：<b>年${cost}万円</b>（${G.age < 16 ? '家計から' : '所持金から'}）${view.cap ? `　家計で出せるめやす：年${view.cap}万円まで${Engine.jukuOk() ? '（中学受験の塾は別わく）' : ''}` : ''}</span></div>
         <div class="lbtns"><button id="lAdd" ${n >= 4 ? 'disabled' : ''}>＋ 習い事を増やす（${n}/4）</button><button class="ok main" id="lOk">これで決める ▶</button></div>`, 'lbox');
+      bindMini(box, render);
       $$('[data-k]', box).forEach((b) => (b.onclick = () => { keep[b.dataset.k] = b.dataset.v === '1'; render(); }));
       $('#lOk', box).onclick = () => { close(); cb(Engine.chooseLessons(keep)); };
       $('#lAdd', box).onclick = () => picker({ title: '🎒 習い事を増やす', note: '増やすほどストレスも増えます（4つまで）', items: Engine.lessonCandidates() }, (it) => {
@@ -355,5 +365,5 @@ const Popup = (() => {
     $('#cN', box).onclick = () => { close(); cb(false); };
     $('#cY', box).onclick = () => { close(); cb(true); };
   }
-  return { assets, invest, choice, result, reports, paperHtml, menu, picker, person, expenses, death, info, list, confirm, close, isOpen: () => open, show };
+  return { assets, invest, choice, result, reports, paperHtml, menu, picker, person, expenses, death, info, list, confirm, close, isOpen: () => open || !!mini, isMini: () => !!mini, restore, clearMini, show };
 })();

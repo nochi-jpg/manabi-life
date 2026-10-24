@@ -68,7 +68,10 @@ for (let n = 0; n < N; n++) {
     const edu = G.flags.edu_doctor_grad ? '博士' : G.flags.edu_master_grad ? '修士' : G.flags.edu_univ_grad ? '大卒' : G.flags.edu_jc_grad || G.flags.edu_vocational_grad || G.flags.edu_kosen_grad ? '短大専門高専' : G.flags.edu_hs_grad ? '高卒' : '中卒';
     stats.edu[edu] = (stats.edu[edu] || 0) + 1;
     if (G.vars.marriageNo) stats.married++;
-    stats.kids += api.people('child', false).length;
+    const nk = api.people('child', false).length;
+    stats.kids += nk; if (G.vars.marriageNo) stats.kidsM = (stats.kidsM || 0) + nk;
+    if (G.vars.marriageNo) { const w = G.log.find((p) => p.id === 'ev_r_wedding' || /と結婚した！/.test(p.t || '')); if (w && w.age != null) (stats.mAge = stats.mAge || []).push(w.age); (stats.kidDist = stats.kidDist || {})[nk] = (stats.kidDist[nk] || 0) + 1; }
+    if ((G.reports || []).some((r) => r.kind === 'u')) { stats.univ = (stats.univ || 0) + 1; if (G.log.some((p) => p.id === 'ev_m_univ_low_gpa')) stats.lowGpa = (stats.lowGpa || 0) + 1; }
     for (const p of G.log) fired[p.id] = (fired[p.id] || 0) + 1;
     stats.cash.push(Math.round(G.cash)); if (G.cash < (stats.minCash ?? 0)) { stats.minCash = G.cash; stats.worst = { cash: G.hist.cash, income: G.hist.income, flags: Object.keys(G.flags).join(','), emp: G.employment, job: G.job && G.job.id, loans: G.loans, rec: G.vars.recurring, kids: api.people('child', false).length, log: G.log.filter((p) => p.cat === 'money' || p.kind === 'choice').slice(-25).map((p) => p.age + ' ' + p.t + (p.chosen ? ' ▶' + p.chosen : '')) }; }
     for (const a of [25, 30, 45, 60, 75]) { if (G.hist.cash[a] != null) { (stats['c' + a] = stats['c' + a] || []).push(G.hist.cash[a]); (stats['i' + a] = stats['i' + a] || []).push(G.hist.income[a]); } } stats.happy.push(G.hist.happiness.reduce((a, b) => a + b, 0) / Math.max(1, G.hist.happiness.length));
@@ -85,6 +88,8 @@ if (process.argv.includes('--worst')) console.log(JSON.stringify(stats.worst, nu
 console.log('死因', JSON.stringify(stats.causes));
 console.log('学歴', stats.edu);
 console.log(`結婚 ${(stats.married / N * 100).toFixed(0)}% / 子ども 平均${(stats.kids / N).toFixed(2)}人 / 終わらなかった ${stats.stuck}`);
+console.log(`結婚した人の子ども 平均${((stats.kidsM || 0) / Math.max(1, stats.married)).toFixed(2)}人 / GPA低下イベント ${stats.lowGpa || 0}/${stats.univ || 0}人（大学などに入った人の${((stats.lowGpa || 0) / Math.max(1, stats.univ || 0) * 100).toFixed(1)}%）`);
+if (stats.mAge) console.log(`結婚した年齢 中央値${med(stats.mAge)}歳 / 結婚した人の子どもの数`, JSON.stringify(stats.kidDist));
 console.log('最初の仕事（上位）', Object.entries(stats.jobs).sort((a, b) => b[1] - a[1]).slice(0, 15).map(([k, v]) => `${k}:${v}`).join(' '));
 if (process.argv.includes('--popups')) console.log(Object.entries(stats.popups).sort((a, b) => b[1] - a[1]).slice(0, 30).map(([k, v]) => `${k}:${(v / N).toFixed(2)}`).join(' '));
 if (process.argv.includes('--fired')) console.log(Object.entries(fired).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k}:${v}`).join(' '));

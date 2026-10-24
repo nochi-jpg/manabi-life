@@ -95,6 +95,12 @@ const Engine = (() => {
         if (!gentleOut(id) && onceYearOk(e) && Cond.test(e.when, ctx) && chance(0.5)) { add(id, ctx); break; }
       }
     }
+    // プロポーズ：付き合って2年以上たったら、毎年40%（45歳からは12%）で「する」か「される」が来る（ランダムを待たない）
+    if (G.q === 1 && G.age >= 22 && G.flags.has_partner && !G.flags.married && !hasChoiceQ(Q) && chance(G.age < 45 ? 0.4 : 0.12)) {
+      const id = chance(0.5) ? 'ev_r_propose' : 'ev_r_proposed';
+      const e = ev(id); const ctx = { ev: e }; const w = { ...e.when, person: { ...e.when.person, years: 2 } };
+      if (e && !gentleOut(id) && onceYearOk(e) && Cond.test(w, ctx)) add(id, ctx);
+    }
     // 4. 条件がそろったら起きる流れイベント（重みなし）・判定つきの流れイベント
     for (const src of ['events_flow', 'events_random', 'events_family']) {
       for (const e0 of L(src)) {
@@ -162,7 +168,8 @@ const Engine = (() => {
     const w = e.when || {};
     // 社会人の「新しい1年の重点方針」は5年に1回（毎年だと選択が多すぎて1プレイが長くなる）
     if (e.id === 'ev_m_focus_adult' && G.stage !== 'none' && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < 2) return false;
-    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 19 && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < (G.age >= 40 ? 10 : 5)) return false;
+    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 70) return false; // 70歳からは聞かない（いつでも▼から変えられる）
+    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 19 && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < (G.age >= 40 ? 15 : 10)) return false;
     // 30代からは、新しい趣味を聞くのは10年に1回
     if (['ev_r_new_hobby', 'ev_r_senior_hobby', 'ev_r_adult_lesson'].includes(e.id) && G.age >= 30) { const last = Math.max(...['ev_r_new_hobby', 'ev_r_senior_hobby', 'ev_r_adult_lesson'].map((x) => G.lastFired[x] ?? -99)); if (G.year - last < 10) return false; }
     if (w.season || w.date) return true;
@@ -424,7 +431,7 @@ const Engine = (() => {
       return { ...lessonItem(c), quit: out, lock: out ? '年齢・学年で終わり' : null };
     }).filter(Boolean);
     // 家計が苦しくなったら、高いものから続けられなくなる
-    if (cap != null) { let tot = items.filter((x) => !x.quit).reduce((a, x) => a + x.cost, 0); for (const x of items.slice().sort((a, b) => b.cost - a.cost)) { if (tot <= cap) break; if (!x.quit) { x.quit = true; x.lock = '家計が苦しく、続けられない'; tot -= x.cost; } } }
+    if (cap != null) { let tot = items.filter((x) => !x.quit).reduce((a, x) => a + capCost(x.id, x.cost), 0); for (const x of items.slice().sort((a, b) => capCost(b.id, b.cost) - capCost(a.id, a.cost))) { if (tot <= cap) break; if (!x.quit && capCost(x.id, x.cost) > 0) { x.quit = true; x.lock = '家計が苦しく、続けられない'; tot -= x.cost; } } }
     const when = { jhs: '中学生になる', hs: '高校生になる', univ: '新しい学校に入る', work: '社会人になる' }[changed ? stageNow : ''] || '新しい学年になる';
     const view = { ev: '__lessons', type: 'lessons', emoji: '🎒', date: `${calYear()}年 ${MONTH[G.q]}月`, ageLabel: ageLabel(), text: force ? '家の収入が変わった。習い事を見直そう。' : `${when}。習い事はどうする？`, note: changed ? 'いそがしくなります。続けるものを選ぼう（増やすこともできます）' : '続けるもの・増やすものを選ぼう', items, cap: G.age < 16 ? lessonCap() : null, rng: RNG.s };
     G.pending = { view, ctxRaw: {}, extra: {} };
@@ -436,13 +443,20 @@ const Engine = (() => {
   function lessonEff(d) { const L = []; for (const [k, v] of Object.entries(d.yearly || {})) { const t = `${EFF_L[k] || k}${v > 0 ? '↑' : '↓'}`; if (!L.includes(t)) L.push(t); } return L.slice(0, 3).join(' '); }
   function lessonItem(c) { const d = Menu.club(c.id); return { id: c.id, emoji: d.emoji, label: d.label, years: G.year - (c.since || G.year) + 1, cost: d.cost, eff: lessonEff(d) }; }
   // 家計で決まる、習い事にかけられる1年の金額（万円）
-  function lessonCap() { const w = G.talents.familyWealth; return w < 15 ? 8 : w < 35 ? 16 : w < 65 ? 32 : w < 85 ? 64 : 120; }
+  // 世帯年収の15%まで（家のくらしで決まる下限あり）。年収600万円なら年90万円
+  const hhIncome = () => { try { return Fam.householdIncome().total || 0; } catch (e) { return 0; } };
+  function lessonCap() { const w = G.talents.familyWealth; const base = w < 15 ? 8 : w < 35 ? 16 : w < 65 ? 32 : w < 85 ? 64 : 120; return Math.round(Math.max(base, hhIncome() * 0.15)); }
+  // 中学受験の塾だけは別わく：世帯年収が500万円以上（または家のくらしがふつう以上）なら、上限とは別に出せる
+  const JUKU = 'ls_juken_juku';
+  function poorHome() { return G.talents.familyWealth < 15 && Econ.parentsIncome() < 350; }
+  function jukuOk() { return hhIncome() >= 500 || G.talents.familyWealth >= 35; }
+  const capCost = (id, cost) => (id === JUKU && jukuOk() ? 0 : cost || 0);
   // 習い事を増やす（上限4つ）。ことわられたら msg を返す
   function addLesson(id, keep) {
     const d = Menu.club(id); if (!d) return { ok: false, msg: '' };
     const kept = G.clubs.filter((c) => isLesson(c.id) && keep[c.id] !== false);
     if (kept.length >= 4) return { ok: false, msg: '習い事は4つまで。どれかをやめないと増やせない。' };
-    const cost = kept.reduce((a, c) => a + ((Menu.club(c.id) || {}).cost || 0), 0) + (d.cost || 0);
+    const cost = kept.reduce((a, c) => a + capCost(c.id, (Menu.club(c.id) || {}).cost), 0) + capCost(id, d.cost);
     if (G.age < 16 ? cost > lessonCap() : G.cash < (d.cost || 0)) return { ok: false, msg: G.age < 16 ? '家計が厳しいため、これ以上は増やせない…' : '所持金が足りないので、これ以上は増やせない…' };
     G.clubs.push({ id, since: G.year, isNew: true });
     (d.set || []).forEach((f) => Effects.setFlag(f, true));
@@ -587,7 +601,7 @@ const Engine = (() => {
     if (c.age >= 18) Fam.childAdultYear(c);
     if (c.plan === 'work' && c.age === 18) c.stage = 'work_start';
     if (c.plan === 'voc' && c.age === 20) { c.stage = 'work_start'; c.costStage = 'none'; }
-    if (c.plan === 'univ' && c.age === 22) { c.stage = 'work_start'; c.costStage = 'none'; }
+    if (c.plan === 'univ' && c.age === 22) { const away = ['univ_away', 'abroad'].includes(c.costStage); c.stage = 'work_start'; c.costStage = 'none'; if (away) { Fam.notice('🎓', `${c.name}が大学を卒業した。仕送り（月${c.sendMoney ?? 7}万円）はこれで終わり。`, 'family'); c.abroad = false; } }
     if (c.stage === 'work_start' && !c.job) { Fam.assignJob(c); if (!c.jobLabel) c.jobLabel = '会社員'; }
     c.relation = clamp(c.relation + normal(0, 2) + (G.focus === 'focus_family' ? 2 : 0), 0, 100);
   }
@@ -602,7 +616,7 @@ const Engine = (() => {
       const h = G.stats.health;
       p *= h < 20 ? 4 : h < 35 ? 2 : h < 45 ? 1.3 : h > 75 ? 0.8 : 1;
       p *= G.vars.deathRiskMul || 1;
-      p *= G.gender === 'M' ? 0.68 : 0.74; // 統計の平均寿命（男81歳・女87歳）に合わせる
+      p *= G.gender === 'M' ? 0.66 : 0.44; // 統計の平均寿命（男81歳・女87歳）に合わせる
       if (['dz_cancer_lung', 'dz_cancer_stomach', 'dz_cancer_colon', 'dz_cancer_breast'].some((f) => G.flags[f])) p += 0.05 * (G.vars.cancerStage || 2) / 2;
       if (G.flags.dz_heart || G.flags.dz_stroke_after) p *= 1.2;
       if (G.age < 35) p = Math.min(p, 0.003);
@@ -893,7 +907,7 @@ const Engine = (() => {
     const key = st === 'vocational' ? 'voc' : st === 'univ_med' || ['nurse', 'med', 'dent', 'pharm'].includes(G.vars.major) ? 'med' : G.vars.major === 'edu' ? 'edu' : d && d.track === 'rikei' ? 'rikei' : 'bunkei';
     const pool = shuffle(COURSES[key]).slice(0, 6).concat(shuffle(COURSES.common).slice(0, 2));
     const f = G.focus;
-    const base = 71 + (G.stats.academic - 50) * 0.5 + (f === 'focus_study' ? 8 : f === 'focus_parttime' ? -6 : f === 'focus_friends' || f === 'focus_love' ? -3 : 0) - (G.stats.stress > 70 ? 6 : 0);
+    const base = 75.5 + (G.stats.academic - 50) * 0.55 + (f === 'focus_study' ? 8 : f === 'focus_parttime' ? -6 : f === 'focus_friends' || f === 'focus_love' ? -3 : 0) - (G.stats.stress > 70 ? 6 : 0);
     const GR = (sc) => (sc >= 90 ? ['S', 4] : sc >= 80 ? ['A', 3] : sc >= 70 ? ['B', 2] : sc >= 60 ? ['C', 1] : ['D', 0]);
     const rows = pool.map((nm) => { const sc = Math.round(clamp(base + normal(0, 9), 20, 100)); const [g, gp] = GR(sc); return { l: nm, sc, v: g, gp }; });
     const gpa = Math.round((rows.reduce((a, x) => a + x.gp, 0) / rows.length) * 100) / 100;
@@ -945,5 +959,5 @@ const Engine = (() => {
     }
     return false;
   }
-  return { prefMenu, prefCounts, PREF_SRC, univReport, lessonEffText: (d) => lessonEff(d), begin, next, choose, chooseMenuNext, chooseLessons, addLesson, lessonCandidates, lessonCap, isLesson, snap, diff, schedule, setFocus, onLike, initSubjects, die, rollP, ev, buildQueue, advance, checkDeath, ageLabel, acad };
+  return { prefMenu, prefCounts, PREF_SRC, univReport, lessonEffText: (d) => lessonEff(d), begin, next, choose, chooseMenuNext, chooseLessons, addLesson, lessonCandidates, lessonCap, jukuOk, poorHome, isLesson, snap, diff, schedule, setFocus, onLike, initSubjects, die, rollP, ev, buildQueue, advance, checkDeath, ageLabel, acad };
 })();

@@ -56,9 +56,54 @@
       "choices": [
         { "label": "🏫 地元の大学（自宅から通う）", "when": { "tier": ["A", "B"] }, "effects": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ" } } },
         { "label": "🏫 地元の大学（数が少なく、せまき門）", "when": { "tier": ["C"] }, "roll": { "base": 0.45 }, "showRate": true, "success": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ" }, "log": "🌸 {child}は地元の大学に合格した。家から通える。" }, "fail": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ_away" }, "log": "🧳 地元の大学はだめだったが、県外の大学に合格。ひとり暮らしで仕送りが必要になる。" } },
-        { "label": "🏙️ 県外の大学（ひとり暮らし・仕送り 月7万円くらい）", "effects": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ_away" }, "personRelation": { "child": 3 } } },
+        { "label": "🏙️ 県外の大学に行きたい（ひとり暮らし）", "effects": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ" }, "schedule": [ { "event": "ev_m_child_away_pay", "inYears": [0, 0] } ] } },
+        { "label": "✈️ 海外の大学に留学したい", "effects": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ" }, "schedule": [ { "event": "ev_m_child_abroad_pay", "inYears": [0, 0] } ] } },
         { "label": "🛠️ 専門学校", "effects": { "childPlan": { "pathDone": true, "plan": "voc", "costStage": "voc" } } },
         { "label": "💼 就職する", "effects": { "childPlan": { "pathDone": true, "plan": "work" } } }
+      ] },
+
+    { "id": "ev_m_child_away_pay", "kind": "choice", "emoji": "🏙️", "cat": "family", "type": "scheduled", "counselor": "family",
+      "when": { "child": { "age": [17, 18], "alive": true } },
+      "text": "{child}が「県外の大学に行って、ひとり暮らしをしたい」と言っている。お金はどうする？（いまの家計：毎月{monthlyLeft}万円）",
+      "fact": { "text": "大学4年間の学費は、国公立で約250万円、私立で約400〜550万円。ひとり暮らしの学生の約半分が奨学金を借りている。", "src": "文部科学省・日本学生支援機構 学生生活調査" },
+      "choices": [
+        { "label": "💴 受け入れて、学費も生活費も全部出す", "effects": { "childPlan": { "costStage": "univ_away", "scholar": false }, "personRelation": { "child": 4 }, "schedule": [ { "event": "ev_m_child_send_money", "inYears": [0, 0] } ] } },
+        { "label": "🎓 受け入れるが、奨学金も借りてもらう", "effects": { "childPlan": { "costStage": "univ_away", "scholar": true }, "personRelation": { "child": 1 }, "schedule": [ { "event": "ev_m_child_send_money", "inYears": [0, 0] } ] } },
+        { "label": "🏠 あきらめてもらい、家から通える大学に", "effects": { "childPlan": { "costStage": "univ" }, "personRelation": { "child": -6 }, "log": "🏠 {child}は家から通える大学に行くことになった" } }
+      ] },
+
+    { "id": "ev_m_child_abroad_pay", "kind": "choice", "emoji": "✈️", "cat": "family", "type": "scheduled", "counselor": "family",
+      "when": { "child": { "age": [17, 18], "alive": true } },
+      "text": "{child}が「海外の大学に留学したい」と言っている。お金はどうする？（いまの家計：毎月{monthlyLeft}万円）",
+      "fact": { "text": "海外の大学の学費は、国や大学によって年100万〜500万円以上と大きくちがう。返さなくてよい給付型の留学奨学金もある。", "src": "日本学生支援機構 海外留学支援サイト" },
+      "choices": [
+        { "label": "💴 受け入れて、全部出す", "effects": { "childPlan": { "costStage": "abroad", "scholar": false }, "personRelation": { "child": 5 }, "schedule": [ { "event": "ev_m_child_send_money", "inYears": [0, 0] } ] } },
+        { "label": "🎓 受け入れるが、奨学金も使ってもらう", "effects": { "childPlan": { "costStage": "abroad", "scholar": true }, "personRelation": { "child": 2 }, "schedule": [ { "event": "ev_m_child_send_money", "inYears": [0, 0] } ] } },
+        { "label": "🏠 あきらめてもらい、国内の大学に", "effects": { "childPlan": { "costStage": "univ" }, "personRelation": { "child": -8 }, "log": "🏠 {child}は国内の大学に行くことになった" } }
+      ] },
+
+    { "id": "ev_m_child_send_money", "kind": "choice", "emoji": "💴", "cat": "family", "type": "scheduled", "counselor": "family",
+      "when": { "child": { "age": [17, 18], "alive": true } },
+      "text": "{child}への仕送りは、毎月いくらにする？（卒業するまで支出にふくまれます）",
+      "fact": { "text": "ひとり暮らしの大学生への仕送りは、平均で月7万円くらい。足りない分はアルバイトでかせぐ学生が多い。", "src": "全国大学生活協同組合連合会 学生生活実態調査" },
+      "choices": [
+        { "label": "🪙 月3万円（あとはバイトでがんばってもらう）", "effects": { "childPlan": { "sendMoney": 3 }, "personRelation": { "child": -2 }, "log": "💴 {child}への仕送りは月3万円に決めた" } },
+        { "label": "💴 月5万円", "effects": { "childPlan": { "sendMoney": 5 }, "log": "💴 {child}への仕送りは月5万円に決めた" } },
+        { "label": "💴 月7万円（平均くらい）", "effects": { "childPlan": { "sendMoney": 7 }, "personRelation": { "child": 1 }, "log": "💴 {child}への仕送りは月7万円に決めた" } },
+        { "label": "💰 月10万円（勉強に集中してもらう）", "effects": { "childPlan": { "sendMoney": 10 }, "personRelation": { "child": 3 }, "log": "💴 {child}への仕送りは月10万円に決めた" } }
+      ] },
+
+    { "id": "ev_m_senior_travel", "kind": "choice", "emoji": "🧳", "cat": "family",
+      "when": { "age": [65, 95], "season": ["Q2"], "cooldownYears": 10, "stat": { "health": [">=", 25] } },
+      "text": "{age}歳。時間ができたので、旅行に行こうかな。（いまの所持金：{cashNow}万円）",
+      "fact": { "text": "60代・70代は旅行にいちばんお金を使う世代のひとつ。国内旅行は1回平均で1人4〜5万円くらい。", "src": "観光庁 旅行・観光消費動向調査" },
+      "choices": [
+        { "label": "🏠 今回は行かない", "effects": {} },
+        { "label": "♨️ {spouse}と国内の温泉旅行（約30万円）", "when": { "all": ["married"], "person": { "role": "spouse", "alive": true } }, "effects": { "cash": -30, "stats": { "happiness": 8, "stress": -8 }, "personRelation": { "spouse": 5 }, "log": "♨️ {spouse}と温泉旅行に行った" } },
+        { "label": "✈️ {spouse}と海外旅行（約80万円）", "when": { "all": ["married"], "person": { "role": "spouse", "alive": true }, "money": { "cash": [">=", 80] } }, "effects": { "cash": -80, "stats": { "happiness": 14, "stress": -10, "health": -2 }, "personRelation": { "spouse": 8 }, "log": "✈️ {spouse}と海外旅行に行った" } },
+        { "label": "👪 子ども・孫といっしょに国内旅行（約50万円）", "when": { "child": { "alive": true, "age": [20, 80] } }, "effects": { "cash": -50, "stats": { "happiness": 12, "stress": -6, "social": 4 }, "personRelation": { "child": 5 }, "log": "👪 子どもや孫と旅行に行った" } },
+        { "label": "👫 友だちと国内旅行（約20万円）", "effects": { "cash": -20, "stats": { "happiness": 6, "stress": -6, "social": 5 }, "log": "👫 友だちと旅行に行った" } },
+        { "label": "🧳 ひとりで海外旅行（約45万円）", "when": { "money": { "cash": [">=", 45] } }, "effects": { "cash": -45, "stats": { "happiness": 9, "stress": -7, "health": -2 }, "log": "🧳 ひとりで海外旅行に行った" } }
       ] },
 
     { "id": "ev_r_separation", "kind": "choice", "emoji": "🧳", "cat": "family", "counselor": "spouse",

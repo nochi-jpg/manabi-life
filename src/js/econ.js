@@ -105,6 +105,11 @@ const Econ = (() => {
   // ---- 生活レベル ----
   const LEVELS = { save: { l: '節約', mul: 0.8, e: '🪙', d: '−20%・満足感↓' }, normal: { l: 'ふつう', mul: 1, e: '🙂', d: 'いまの生活' }, comfy: { l: 'ゆとり', mul: 1.2, e: '☕', d: '＋20%・満足感↑' }, lux: { l: 'ぜいたく', mul: 1.5, e: '💎', d: '＋50%・満足感↑↑' } };
   const lifeLevel = () => (G.flags.welfare ? 'save' : LEVELS[G.vars.lifeLevel] ? G.vars.lifeLevel : 'normal');
+  // 自分の世帯の年収（子どものおこづかいのめやす）
+  function homeIncome() { try { return Fam.householdIncome().total || 0; } catch (e) { return annualIncome(); } }
+  // 親の年収（自分がおこづかいをもらうとき）
+  function parentsIncome() { const ps = people('father|mother').filter((p) => p.alive); const v = ps.reduce((a, p) => a + (p.income || 0), 0); return v || [300, 450, 600, 800, 1100][Math.min(4, Math.floor(G.talents.familyWealth / 20))]; }
+  function myPocket() { const st = G.stage === 'elem' ? 'elem' : G.stage === 'jhs' ? 'jhs' : G.stage === 'hs' ? 'hs' : Menu.isStudent() && G.age >= 18 ? 'univ' : null; return st ? Math.max(0.1, pocketMoney(st, parentsIncome())) : 0; }
   // ---- 生活費（年・万円） ----
   function livingCost() {
     const sp = Fam.spouseHome();
@@ -114,7 +119,8 @@ const Econ = (() => {
     if (sp) v += 85;
     // 収入が多いほど使うお金も増える
     const net = (jobGross() + sideGross() + pensionAnnual()) * 0.78 + (sp ? (sp.income || 0) * 0.78 : 0);
-    if (net > 260) v += (net - 260) * 0.85;
+    // 収入が多いほど使うお金も増える（ふえた分の6割）。子どもがいる家は、その分を子どもの費用にあてる
+    if (net > 260) v += Math.max(0, (net - 260) * 0.65 - childCosts() * 0.65);
     if (G.age >= 65) v += 15; // 医療・介護
     if (G.cash < 0) v *= 0.85; // お金がないときは節約する
     v *= LEVELS[lifeLevel()].mul;
@@ -122,14 +128,34 @@ const Econ = (() => {
     else if (people('father|mother').some((p) => p.together && p.alive)) v *= G.vars.parentsMovedIn ? 0.92 : 0.85; // 親と同じ世帯：親も生活費を出してくれる
     return v;
   }
-  const CHILD_COST = { baby: 70, nursery: 60, elem: 90, jhs: 130, hs: 140, univ: 180, univ_away: 280, voc: 160, none: 0, work: 0 };
-  const STAGE_L = { baby: '0〜2歳', nursery: '保育園・幼稚園', elem: '小学生', jhs: '中学生', hs: '高校生', univ: '大学（自宅から）', univ_away: '大学（ひとり暮らし・仕送り）', voc: '専門学校' };
+  // 子ども1人の年間費用（公立のばあい。食費・服・学習費。私立・受験塾などは extraCost）
+  // univ_away・abroad は仕送りをのぞいた学費・生活費（仕送りは c.sendMoney 万円/月、ふつうは7万円）
+  const CHILD_COST = { baby: 55, nursery: 50, elem: 70, jhs: 100, hs: 110, univ: 160, univ_away: 170, abroad: 320, voc: 140, none: 0, work: 0 };
+  const STAGE_L = { baby: '0〜2歳', nursery: '保育園・幼稚園', elem: '小学生', jhs: '中学生', hs: '高校生', univ: '大学（自宅から）', univ_away: '大学（ひとり暮らし）', abroad: '海外の大学（留学）', voc: '専門学校' };
+  // おこづかい（月・万円）：全国平均（小学生 約0.1万・中学生 約0.25万・高校生 約0.5万・大学生 約1万）を、家の年収（600万円が平均）で増減
+  const POCKET = { elem: 0.1, jhs: 0.25, hs: 0.5, univ: 1, voc: 1 };
+  const pocketMul = (income) => clamp((income || 0) / 600, 0.5, 2);
+  function pocketMoney(stage, income) { const b = POCKET[stage]; return b ? Math.round(b * pocketMul(income) * 100) / 100 : 0; }
+  const AWAY = ['univ_away', 'abroad'];
+  const SCHOOL_STAGES = ['univ', 'univ_away', 'abroad', 'voc'];
+  // 子ども1人の1年の費用（奨学金を借りたら学費は半分くらい・仕送り・おこづかいをふくむ）
+  function childCost1(c, income) {
+    const st = childStage(c);
+    let v = (CHILD_COST[st] ?? 0) * (c.scholar && SCHOOL_STAGES.includes(st) ? 0.6 : 1);
+    if (AWAY.includes(st)) v += (c.sendMoney ?? 7) * 12;
+    else v += pocketMoney(st, income) * 12;
+    v += c.extraCost || 0;
+    if (G.flags.near_parents && c.age < 6) v -= 15;
+    return Math.max(0, v);
+  }
+  const childNote = (c, income) => { const st = childStage(c); const n = [STAGE_L[st] || '']; if (AWAY.includes(st)) n.push(`仕送り 月${c.sendMoney ?? 7}万`); else if (POCKET[st]) n.push(`おこづかい 月${round1(pocketMoney(st, income)).toFixed(1)}万`); if (c.scholar && SCHOOL_STAGES.includes(st)) n.push('奨学金あり'); return n.filter(Boolean).join('・'); };
   const childStage = (c) => c.costStage || (c.age < 3 ? 'baby' : c.age < 6 ? 'nursery' : c.age < 12 ? 'elem' : c.age < 15 ? 'jhs' : c.age < 18 ? 'hs' : 'none');
   // 費用がかかる子ども：いっしょに住む未成年＋仕送りしている学生（別れた相手が育てる子は養育費のほう）
-  const costKids = () => people('child').filter((c) => !c.withEx && !c.livesApart && (c.together || ['univ', 'univ_away', 'voc'].includes(c.costStage)));
+  const costKids = () => people('child').filter((c) => !c.withEx && !c.livesApart && (c.together || ['univ', 'univ_away', 'abroad', 'voc'].includes(c.costStage)));
   function childCosts() {
     let v = 0;
-    for (const c of costKids()) { v += CHILD_COST[childStage(c)] ?? 0; v += c.extraCost || 0; if (G.flags.near_parents && c.age < 6) v -= 15; }
+    const inc = homeIncome();
+    for (const c of costKids()) v += childCost1(c, inc);
     return Math.max(0, v);
   }
   function childAllowanceYear() {
@@ -148,7 +174,8 @@ const Econ = (() => {
     const add = (e, l, y, note = '', o = {}) => { if (y > 0.04) it.push({ e, l, y, note, q: o.q !== false, save: !!o.save, kind: o.kind || '' }); };
     if (G.age < 16) return { items: it, total: 0 };
     if (Menu.isStudent()) {
-      add('🧃', '自分で使うお金', (G.age < 18 ? 0.6 : 1.5) * 12, 'おこづかいから');
+      add('🧃', '自分で使うお金', Math.max(myPocket(), G.age < 18 ? 0.2 : 0.8) * 12 * 0.9, `おこづかい 月${round1(myPocket()).toFixed(1)}万円から`);
+      if (G.flags.self_pay_school) add('📱', '通信費', 0.6 * 12, 'スマホ代（自分で払う）');
       const side = sideGross(); if (side) add('👕', 'バイト代で使うお金', side * 0.75, '服・遊び・スマホ');
       if (G.flags.living_alone) add('🏠', 'ひとり暮らしの生活費', 72, '食費・光熱費など');
     } else {
@@ -158,7 +185,7 @@ const Econ = (() => {
       add('📱', '通信費', lc * 0.08, 'スマホ・ネット', { kind: 'life' });
       add('👔', '服・交際・その他', lc * 0.28, '', { kind: 'life' });
       add('🏠', G.flags.owns_house && !G.flags.renting ? '管理費・修繕' : '家賃', rentYear(), G.flags.welfare ? '住宅扶助' : pref().name);
-      for (const c of costKids()) add('👶', `子ども（${c.name}）`, (CHILD_COST[childStage(c)] ?? 0) + (c.extraCost || 0) - (G.flags.near_parents && c.age < 6 ? 15 : 0), STAGE_L[childStage(c)] || '');
+      { const hi = homeIncome(); for (const c of costKids()) add('👶', `子ども（${c.name}）`, childCost1(c, hi), childNote(c, hi)); }
       if (G.flags.lives_with_parents && !G.vars.rentMonthly && G.age >= 18 && !G.flags.married && !G.vars.parentsMovedIn) add('🏠', '家に入れるお金', 36, '実家ぐらし');
     }
     if (G.flags.smoker) add('🚬', 'たばこ', 6); if (G.flags.heavy_drinker) add('🍺', 'お酒', 4); else if (G.flags.drinker) add('🍺', 'お酒', 1.5);
@@ -170,7 +197,8 @@ const Econ = (() => {
     if (G.flags.caregiving) add('🤲', '介護', G.vars.careCost || 30, 'ヘルパー・おむつなど');
     if (G.flags.exercise_habit && G.vars.gym) add('🏋️', 'ジム', 9.6);
     let lh = 0; const lhn = [];
-    for (const c of G.clubs) { const d = Menu.club(c.id); if (d && G.age >= 16 && d.cost) { lh += d.cost; lhn.push(d.label.replace(/（.*）/, '')); } }
+    const parentsPay = Menu.isStudent() && !G.flags.self_pay_school; // 学生の習い事・教育費は、ふつうは親が出してくれる
+    for (const c of G.clubs) { const d = Menu.club(c.id); if (d && G.age >= 16 && d.cost && !parentsPay) { lh += d.cost; lhn.push(d.label.replace(/（.*）/, '')); } }
     for (const id of G.hobbies) { const hb = Menu.hobby(id); if (hb && G.age >= 16 && hb.cost) { lh += hb.cost; lhn.push(hb.label.replace(/（.*）/, '')); } }
     add('🎮', '習い事・趣味', lh, lhn.slice(0, 2).join('・') + (lhn.length > 2 ? 'など' : ''));
     for (const l of G.loans || []) if (l.left > 0 && !l.paused && l.yearly) { const [e, lb] = LOAN_L[l.type] || ['💳', 'ローン']; add(e, lb, Math.min(l.left, l.yearly), `のこり${man(l.left)}万円`); }
@@ -235,7 +263,7 @@ const Econ = (() => {
     const student = Menu.isStudent();
     if (student) {
       const w = G.talents.familyWealth;
-      inc += (w < 15 ? 0.3 : w < 35 ? 0.5 : w < 65 ? 0.8 : 1.5) * 3; // おこづかい（月）
+      if (!G.flags.living_alone) inc += myPocket() * 3; // おこづかい（月）：全国平均×親の年収
       if (G.flags.living_alone && !G.flags.allowance_cut && ['univ', 'univ_med', 'junior_college', 'vocational', 'grad_master', 'grad_doctor', 'grad_prof'].includes(G.stage)) inc += (w < 35 ? 4 : w < 65 ? 7 : 10) * 3;
       if (G.flags.scholarship_loan && G.school) { inc += 15; addLoan('scholar', 15, 0, 'scholar'); G.vars.scholarBorrowed = (G.vars.scholarBorrowed || 0) + 15; }
     }
@@ -314,5 +342,5 @@ const Econ = (() => {
     if (G.assets > 0) G.assets *= 1 + (G.flags.stock_trader || G.flags.crypto ? normal(0.04, 0.15) : normal(0.04, 0.06));
     if (G.flags.owns_rental && G.vars.rentalValue) G.vars.rentalValue *= 1 + (D().housing.investment.priceTrend[tierKey()] || 0);
   }
-  return { jobGross, sideGross, annualIncome, monthlyIncome, hasBonus, salaryPreview, salaryCurve, rankTrack, nextStep, curStep, nextStepRate, steps, overtime, aiRisk, pensionMonthly, pensionAnnual, incomeTaxes, livingCost, childCosts, childAllowanceYear, quarter, addLoan, totalDebt, loansLeft, netWorth, liquid, householdCash, assetsValue, yearAssets, working, tierKey, WORKING, expenses, netIncomeYear, welfareQ, LEVELS, lifeLevel, costKids, childStage, LOAN_L, scholarStart };
+  return { myPocket, parentsIncome, homeIncome, childCost1, pocketMoney, jobGross, sideGross, annualIncome, monthlyIncome, hasBonus, salaryPreview, salaryCurve, rankTrack, nextStep, curStep, nextStepRate, steps, overtime, aiRisk, pensionMonthly, pensionAnnual, incomeTaxes, livingCost, childCosts, childAllowanceYear, quarter, addLoan, totalDebt, loansLeft, netWorth, liquid, householdCash, assetsValue, yearAssets, working, tierKey, WORKING, expenses, netIncomeYear, welfareQ, LEVELS, lifeLevel, costKids, childStage, LOAN_L, scholarStart };
 })();

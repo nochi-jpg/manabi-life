@@ -129,6 +129,8 @@ function testKey(k, v, ctx) {
     case 'var': return Object.entries(v).every(([t, s]) => { let val = G.vars[t]; if (val === undefined) val = t === 'target' || t === 'pendingExam' ? 'none' : (t === 'schoolAway' || t === 'workAway') ? false : val; return matchSpec(val, s, ctx); });
     case 'counter': return Object.entries(v).every(([t, s]) => matchSpec(G.counters[t] || 0, s, ctx));
     case 'stage': return v.includes(G.stage);
+    case 'poorHome': return Engine.poorHome() === !!v; // とても貧しい家（親に「自分で出して」と言われる）
+    case 'jukuOk': return Engine.jukuOk() === !!v; // 中学受験の塾に通わせられる家計か（世帯年収）
     case 'employment': return v.includes(G.employment);
     case 'all': return v.every((f) => hasFlag(dyn(f, ctx)));
     case 'none': return !v.some((f) => hasFlag(dyn(f, ctx)));

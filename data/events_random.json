@@ -158,7 +158,7 @@
 
     { "id": "ev_r_pet", "kind": "choice", "emoji": "🐶", "cat": "life",
       "when": { "age": [6, 70], "none": ["pet"], "cooldownYears": 5 },
-      "weight": { "base": 1.2 },
+      "weight": { "base": 0.84 },
       "text": "知り合いの家で子犬・子猫が生まれた。もらわない？",
       "choices": [
         { "label": "🐶 飼う（年15万くらいかかる）", "effects": { "set": ["pet"], "stats": { "happiness": 6, "stress": -3 }, "schedule": [ { "event": "ev_f_pet_death", "inYears": [12, 16] } ] } },
@@ -214,7 +214,7 @@
 
     { "id": "ev_r_confessed", "kind": "choice", "emoji": "💝", "cat": "love",
       "when": { "age": [13, 60], "none": ["has_partner", "married"], "cooldownYears": 2 },
-      "weight": { "base": 1.5, "mul": [["looks>=65", 1.8], ["social>=65", 1.5], ["focus_love", 2], ["circle:u_tennis", 1.4], ["circle:u_allround", 1.4]] },
+      "weight": { "base": 1.5, "mul": [["age>=35", 0.5], ["age>=45", 0.4], ["looks>=65", 1.8], ["social>=65", 1.5], ["focus_love", 2], ["circle:u_tennis", 1.4], ["circle:u_allround", 1.4]] },
       "text": "{someone}から「付き合ってください」と告白された。",
       "choices": [
         { "label": "💕 付き合う", "effects": { "set": ["has_partner"], "person": { "add": "partner" }, "stats": { "happiness": 8 } } },
@@ -223,7 +223,7 @@
 
     { "id": "ev_r_meet", "kind": "choice", "emoji": "🤝", "cat": "love",
       "when": { "age": [19, 55], "none": ["has_partner", "married"], "cooldownYears": 2 },
-      "weight": { "base": 2, "mul": [["focus_love", 2], ["social>=60", 1.4], ["region:C", 0.7], ["owns_car", 1.2], ["age>=40", 0.6]] },
+      "weight": { "base": 4, "mul": [["focus_love", 2], ["social>=60", 1.4], ["region:C", 0.7], ["owns_car", 1.2], ["age>=23", 1.6], ["age>=35", 0.6], ["age>=40", 0.5], ["age>=45", 0.4]] },
       "text": "{place}で、話が合う人と出会った。",
       "choices": [
         { "label": "🍽️ 食事に誘ってみる", "roll": { "base": 0.4, "w": { "t_comm": 0.4, "looks": 0.2, "social": 0.3 } }, "success": { "set": ["has_partner"], "person": { "add": "partner" }, "stats": { "happiness": 8 }, "log": "💕 付き合うことになった" }, "fail": { "stats": { "happiness": -2 } } },
@@ -232,7 +232,7 @@
 
     { "id": "ev_r_konkatsu", "kind": "choice", "emoji": "🥂", "cat": "love",
       "when": { "age": [26, 50], "none": ["has_partner", "married"], "cooldownYears": 2 },
-      "weight": { "base": 1.5, "mul": [["age>=30", 1.5]] },
+      "weight": { "base": 3, "mul": [["age>=30", 1.5], ["age>=40", 0.5]] },
       "text": "友だちに婚活パーティーに誘われた。（参加費1万円）",
       "choices": [
         { "label": "🥂 行ってみる", "cash": -1, "roll": { "base": 0.3, "w": { "t_comm": 0.4, "looks": 0.3, "incomeRank": 0.3 } }, "success": { "set": ["has_partner"], "person": { "add": "partner" }, "stats": { "happiness": 6 }, "log": "💕 いい人と出会えた" }, "fail": { "stats": { "happiness": -2 } } },
@@ -251,12 +251,20 @@
 
     { "id": "ev_r_propose", "kind": "choice", "emoji": "💍", "cat": "love",
       "when": { "age": [20, 70], "all": ["has_partner"], "none": ["married"], "person": { "role": "partner", "alive": true, "relationMin": 55, "years": 1 } },
-      "weight": { "base": 2.5, "mul": [["age>=28", 1.5], ["incomeStable", 1.3]] },
+      "weight": { "base": 9, "mul": [["age>=28", 1.5], ["incomeStable", 1.3]] },
       "text": "{partner}と付き合って{partnerYears}年。結婚を考えている。",
       "choices": [
         { "label": "💍 プロポーズする", "roll": { "base": 0.7, "w": { "partnerRelation": 0.4 } }, "success": { "set": ["married"], "clear": ["has_partner"], "person": { "promote": "partner>spouse" }, "stats": { "happiness": 12 }, "schedule": [ { "event": "ev_r_surname_marry", "inYears": [0, 0] }, { "event": "ev_r_wedding", "inYears": [0, 0] } ], "log": "💍 {spouse}と結婚した！" }, "fail": { "stats": { "happiness": -6 }, "log": "💦 「もう少し考えたい」と言われた" } },
         { "label": "⏳ まだ早いかな", "effects": {} },
         { "label": "🏠 結婚はせず、いっしょに暮らす", "effects": { "var": { "cohabit": true }, "stats": { "happiness": 4 } } }
+      ] },
+    { "id": "ev_r_proposed", "kind": "choice", "emoji": "💍", "cat": "love",
+      "when": { "age": [20, 70], "all": ["has_partner"], "none": ["married"], "person": { "role": "partner", "alive": true, "years": 1 } },
+      "text": "{partner}と付き合って{partnerYears}年。ある日、{partner}から「結婚してください」とプロポーズされた。",
+      "choices": [
+        { "label": "💍 「はい」と答える", "effects": { "set": ["married"], "clear": ["has_partner"], "person": { "promote": "partner>spouse" }, "stats": { "happiness": 14 }, "schedule": [ { "event": "ev_r_surname_marry", "inYears": [0, 0] }, { "event": "ev_r_wedding", "inYears": [0, 0] } ], "log": "💍 {spouse}と結婚した！" } },
+        { "label": "⏳ 「もう少し待ってほしい」と伝える", "effects": { "stats": { "stress": 2 } } },
+        { "label": "🏠 結婚はせず、いっしょに暮らしたいと伝える", "effects": { "var": { "cohabit": true }, "stats": { "happiness": 3 } } }
       ] },
 
     { "id": "ev_r_wedding", "kind": "choice", "emoji": "💒", "cat": "love", "type": "scheduled",
@@ -271,7 +279,7 @@
     { "id": "ev_r_pregnancy", "kind": "flow", "emoji": "🤰", "cat": "family",
       "when": { "all": ["married"], "any": ["wants_children"], "person": { "role": "spouse", "alive": true, "fertile": true }, "childrenLess": 4 },
       "risk": "fertility",
-      "roll": { "ageCurve": { "25": 0.45, "30": 0.4, "35": 0.3, "38": 0.2, "40": 0.12, "43": 0.05, "45": 0.01 }, "of": "birthParentAge" },
+      "roll": { "ageCurve": { "25": 0.8, "30": 0.75, "35": 0.6, "38": 0.45, "40": 0.32, "43": 0.14, "45": 0.04 }, "of": "birthParentAge" },
       "success": { "text": "🤰 赤ちゃんができた！", "effects": { "schedule": [ { "event": "ev_f_childbirth", "inYears": [0, 1] } ] } },
       "fail": { "text": "", "effects": { "counter": {}, "silent": true, "var": { "tryYears": "+1" } } } },
 
@@ -446,7 +454,7 @@
 
     { "id": "ev_r_exercise", "kind": "choice", "emoji": "🏃", "cat": "health",
       "when": { "age": [20, 85], "none": ["exercise_habit"], "cooldownYears": 3 },
-      "weight": { "base": 2, "mul": [["health<60", 1.5], ["focus_health", 2.5]] },
+      "weight": { "base": 1.4, "mul": [["health<60", 1.5], ["focus_health", 2.5]] },
       "text": "最近、体力が落ちてきた気がする。",
       "choices": [
         { "label": "🏋️ ジムに通う（月8千円）", "roll": { "base": 0.5, "w": { "t_sport": 0.3 } }, "success": { "set": ["exercise_habit"], "log": "🏋️ 運動が習慣になった" }, "fail": { "cash": -5, "log": "😅 3か月で行かなくなった" } },
@@ -456,7 +464,7 @@
 
     { "id": "ev_r_kenshin", "kind": "choice", "emoji": "🩺", "cat": "health",
       "when": { "age": [30, 90], "season": ["Q3"], "cooldownYears": 1 },
-      "weight": { "base": 3, "mul": [["employment:seishain", 2], ["employment:civil_servant", 2]] },
+      "weight": { "base": 2.1, "mul": [["employment:seishain", 2], ["employment:civil_servant", 2]] },
       "text": "健康診断の結果：{kenshinResult}",
       "choices": [
         { "label": "🏥 再検査・精密検査を受ける", "when": { "var": { "kenshinFlag": [true] } }, "effects": { "earlyDetect": true, "cash": -1 } },
@@ -672,7 +680,7 @@
 
     { "id": "ev_r_scam", "kind": "choice", "emoji": "☎️", "cat": "money",
       "when": { "age": [18, 100], "cooldownYears": 5 },
-      "weight": { "base": 0.8, "mul": [["age>=70", 3], ["social<35", 1.5]] },
+      "weight": { "base": 0.56, "mul": [["age>=70", 3], ["social<35", 1.5]] },
       "text": "{scamText}",
       "choices": [
         { "label": "📞 家族や警察（#9110）に確認する", "effects": { "log": "📞 詐欺だとわかり、被害をまぬがれた" } },
@@ -690,7 +698,7 @@
       "note": "1等7億円の当選確率は2000万分の1。期待値は購入額の約45%。小学生に『期待値』を体感させる" },
 
     { "id": "ev_r_debt_crisis", "kind": "choice", "emoji": "💳", "cat": "money",
-      "when": { "age": [20, 90], "debtOverIncome": 1.0, "cooldownYears": 2 },
+      "when": { "age": [20, 90], "debtOverIncome": 1.0, "cooldownYears": 3 },
       "weight": { "base": 5 },
       "text": "借金が{debt}万円にふくらみ、返せなくなってきた。",
       "choices": [
@@ -751,12 +759,12 @@
       "effects": { "set": ["dz_dementia"], "stats": { "happiness": -5 }, "autoplayChoices": 0.3 } },
 
     { "id": "ev_r_qualify", "kind": "choice", "emoji": "📖", "cat": "work",
-      "when": { "age": [15, 70], "cooldownYears": 2 },
-      "weight": { "base": 1.5, "mul": [["focus_qualify", 3]] },
+      "when": { "age": [15, 64], "cooldownYears": 3 },
+      "weight": { "base": 1.5, "mul": [["focus_qualify", 3], ["age>=40", 0.6], ["age>=55", 0.5]] },
       "text": "資格の勉強をしようかな。",
       "choices": [
-        { "menu": { "source": "qualifications", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "set": ["$pickFlag"], "log": "📜 {pick}に合格！" }, "fail": { "stats": { "stress": 3 }, "log": "🍂 {pick}は不合格だった" } },
-        { "label": "🙅 今はいい", "effects": {} }
+        { "label": "🙅 今はいいかな", "effects": {} },
+        { "menu": { "source": "qualifications", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "set": ["$pickFlag"], "log": "📜 {pick}に合格！" }, "fail": { "stats": { "stress": 3 }, "log": "🍂 {pick}は不合格だった" } }
       ] },
 
     { "id": "ev_r_eiken", "kind": "choice", "emoji": "🔤", "cat": "school",
@@ -920,7 +928,7 @@
 
     { "id": "ev_r_reunion", "kind": "choice", "emoji": "🍻", "cat": "life",
       "when": { "age": [25, 80], "cooldownYears": 8 },
-      "weight": { "base": 1.5 },
+      "weight": { "base": 1.05 },
       "text": "{schoolName}の同窓会のお知らせが届いた。",
       "choices": [
         { "label": "🍻 行く", "effects": { "stats": { "social": 5, "happiness": 4 }, "cash": -1 } },
@@ -938,8 +946,8 @@
       "note": "hqName は職業で変わる（警察→県警本部、消防→消防本部、自衛隊→司令部、工場・メーカー→本社、病院→法人本部、市役所→本庁 など）。本社が別の都道府県なら引っ越し。転職・退職すると hq_assign は自動で外れる" },
 
     { "id": "ev_r_new_hobby", "kind": "choice", "emoji": "✨", "cat": "life",
-      "when": { "age": [6, 105], "cooldownYears": 2 },
-      "weight": { "base": 2, "mul": [["focus_hobby", 2.5], ["stress>=70", 1.3], ["retired_flag", 1.5]] },
+      "when": { "age": [6, 105], "cooldownYears": 4 },
+      "weight": { "base": 1.3, "mul": [["focus_hobby", 2.5], ["stress>=70", 1.3], ["retired_flag", 1.5]] },
       "text": "{hobbyTrigger}がきっかけで、新しいことをやってみたくなった。",
       "choices": [
         { "menu": { "source": "clubs.hobbies", "page": 5, "filter": "age" }, "effects": { "hobby": { "add": "$pick" } } },
@@ -947,8 +955,8 @@
       ] },
 
     { "id": "ev_r_dental", "kind": "choice", "emoji": "🦷", "cat": "health",
-      "when": { "age": [16, 90], "cooldownYears": 6 },
-      "weight": { "base": 1.5, "mul": [["age>=50", 1.5]] },
+      "when": { "age": [16, 90], "cooldownYears": 10 },
+      "weight": { "base": 1, "mul": [["age>=50", 1.5]] },
       "text": "歯が痛くて歯医者に行ったら、治療が必要と言われた。",
       "choices": [
         { "label": "🦷 保険の治療にする（3万円）", "effects": { "cash": -3, "stats": { "health": 1 } } },
@@ -1125,7 +1133,7 @@
       ] }
     ,{ "id": "ev_r_adult_lesson", "kind": "choice", "emoji": "🎒", "cat": "lesson",
       "when": { "age": [22, 85], "cooldownYears": 4 },
-      "weight": { "base": 0.8, "mul": [["focus_hobby", 2], ["focus_health", 1.5], ["focus_qualify", 1.5], ["retired_flag", 2], ["stress>=70", 1.3]] },
+      "weight": { "base": 0.56, "mul": [["focus_hobby", 2], ["focus_health", 1.5], ["focus_qualify", 1.5], ["retired_flag", 2], ["stress>=70", 1.3]] },
       "text": "{someone}に誘われて、大人向けの習い事の体験に行ってみた。",
       "choices": [
         { "menu": { "source": "clubs.adultLessons", "page": 5, "filter": "age" }, "effects": { "club": { "join": "$pick" }, "stats": { "happiness": 2 } } },

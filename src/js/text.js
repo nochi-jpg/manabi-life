@@ -92,6 +92,9 @@ const Text = (() => {
       case 'severance': return Math.round(severance());
       case 'pension': return Econ.pensionMonthly(); case 'pension2m': return Math.round(Econ.pensionMonthly() * 2 * 10) / 10;
       case 'bonus': return Math.round((G.lastDelta && G.lastDelta.bonus) || 0);
+      case 'cashNow': return man(Math.max(0, G.cash));
+      case 'pocket': return round1(Econ.myPocket()).toFixed(1);
+      case 'sendMoney': return ch ? String(ch.sendMoney ?? 7) : '7';
       case 'debt': return Math.round(Econ.totalDebt());
       case 'marriedYears': return G.year - (G.vars.marriedYear ?? G.year);
       case 'housePrice': return housePrice(); case 'downPayment': return Math.round(housePrice() * 0.1);
