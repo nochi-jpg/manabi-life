@@ -96,6 +96,8 @@ const Effects = (() => {
         case 'loanRate': case 'loanRateUp': { const l = (G.loans || []).find((x) => x.type === 'mortgage'); if (l) { l.rate = k === 'loanRate' ? v : (l.rate || 0) + v; l.yearly = annuity(l.left, l.rate, Math.max(5, 35 - (G.year - l.start))); } break; }
         case 'repayMul': { const l = (G.loans || []).find((x) => x.type === 'scholar'); if (l) l.yearly *= v; break; }
         case 'repayYearsMul': break;
+        case 'pauseRepay': { const l = (G.loans || []).find((x) => x.type === 'scholar'); if (l) { l.paused = true; Engine.schedule('__unpause', v, null, ctx); } break; }
+        case 'roll': break; // 効果の中の判定（説明用）
         case 'interest': G.cash -= 3; break;
         case 'earlyDetect': if (ctx.kenshinBad) G.vars.kenshinFlag = true; break;
         case 'setCancerFlag': if (G.mode !== 'gentle') setFlag('dz_cancer_' + (G.vars.cancerType || 'stomach'), true, ctx); break;
@@ -157,6 +159,7 @@ const School = {
     const p = Menu.picked(id) || (ctx.pick && ctx.pick.id === id ? ctx.pick : null);
     const tmplId = (p && p.tmpl) || id.split('#')[0];
     const t = Menu.school(tmplId) || {};
+    if (D().schools.preschool.some((x) => x.id === tmplId) && !t.stage) { for (const [k, d] of Object.entries(t.effects || {})) Effects.stat(k, d); return; } // 家庭で過ごす
     const stage = (p && p.stage) || t.stage || (D().schools.postSecondary.vocational.some((x) => x.id === tmplId) ? 'vocational' : D().schools.postSecondary.juniorCollege.some((x) => x.id === tmplId) ? 'junior_college' : 'univ');
     const years = (p && p.years) || t.years || { elem: 6, free_school: 6, jhs: 3, hs: 3, hs_corr: 3, hs_night: 4, kosen: 5, nursery: 3, kindergarten: 3, univ: 4, univ_med: 6, junior_college: 2, vocational: 2, grad_master: 2, grad_doctor: 3, grad_prof: 2 }[stage] || 3;
     const name = (p && p.name) || (t.label ? Menu.schoolName(t) : id);
@@ -164,6 +167,7 @@ const School = {
     G.school = { id, tmpl: tmplId, pick: id, name, emoji: t.emoji || (p && p.emoji) || '🏫', years, yearIn: 1, quality: t.quality || 1, cost: (p && p.cost) ?? t.cost ?? 0, h: p ? p.h : null };
     G.stage = stage;
     (t.grant || []).forEach((f) => Effects.setFlag(f, true));
+    if (D().schools.preschool.some((x) => x.id === tmplId)) { for (const [k, d] of Object.entries(t.effects || {})) { if (k === 'subj') for (const [a, b] of Object.entries(d)) G.vars['pre_' + a] = b; else if (k in G.stats) Effects.stat(k, d); } G.household.extraCost = (G.household.extraCost || 0) + (t.cost || 0); }
     if (p && p.dept) { G.vars.major = p.dept; const d = Menu.dept(p.dept); if (d) (d.autoSet || []).forEach((f) => Effects.setFlag(f, true)); }
     else if (['vocational', 'grad_master', 'grad_doctor', 'grad_prof'].includes(stage)) G.vars.major = tmplId;
     if (p && (p.city || p.where === 'abroad')) { G.vars.schoolAway = true; if (p.city === 'tokyo' && G.pref !== 'tokyo') Effects.setFlag('moved_to_tokyo', true); }

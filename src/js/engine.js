@@ -45,6 +45,7 @@ const Engine = (() => {
     const due = G.scheduled.filter((s) => s.at.year < G.year || (s.at.year === G.year && s.at.q <= G.q));
     G.scheduled = G.scheduled.filter((s) => !due.includes(s));
     for (const s of due) {
+      if (s.event === '__unpause') { (G.loans || []).forEach((l) => (l.paused = false)); continue; }
       if (s.event === '__return_leave') { if (G.employment === 'leave') G.employment = G.job ? G.job.form : 'none'; continue; }
       const e = ev(s.event); if (!e || gentleOut(e.id)) continue;
       const ctx = unpackCtx(s.data || {});
@@ -277,7 +278,7 @@ const Engine = (() => {
     G.choiceCount++;
     const out = { posts: [] };
     if (o.menu && item) { ctx.pick = item; ctx.pickName = item.name; Menu.remember(item); }
-    const label = o.menu && item ? `${item.emoji} ${item.name}` : o.label;
+    const label = (o.menu && item ? `${item.emoji} ${item.name}` : o.label || '').replace(/（[^）]*）/g, '');
     post(out, e, v.text.replace(/（.*$/, '').slice(0, 60), ctx, 'choice', label);
     // 選択肢そのものの効果
     if (c.cash) G.cash += Effects.num(c.cash, ctx);
@@ -353,6 +354,8 @@ const Engine = (() => {
     } else p = roll.base ?? 0.5;
     if (roll.w && typeof roll.w === 'object') for (const [k, w] of Object.entries(roll.w)) p += ((Cond.statVal(k === 'eng' ? 'subj.eng' : k) - 50) * w) / 100;
     if (roll.focusBonus) p += roll.focusBonus[G.focus] || 0;
+    if (roll.incomeBelow && Econ.annualIncome() >= roll.incomeBelow) p = 0;
+    if (roll.ageMinus) p -= Math.max(0, G.age - 30) * roll.ageMinus;
     if (roll.schoolMul && G.school) p *= roll.schoolMul[G.school.tmpl] || 1;
     return clamp(p, 0, 1);
   }
@@ -586,7 +589,7 @@ const Engine = (() => {
     const bonus = { like_outdoor: ['pe'], like_book: ['jpn', 'soc'], like_draw: ['art'], like_math: ['math', 'sci'], like_game: ['math'] }[like] || [];
     for (const k of D().flags.subjects) {
       const base = k === 'pe' ? G.talents.t_sport : k === 'art' ? G.talents.t_art : G.talents.t_academic;
-      G.subj[k] = Math.round(clamp(base + normal(0, 10) + (bonus.includes(k) ? 5 : 0) + (like === 'like_none' ? 1 : 0), 1, 99));
+      G.subj[k] = Math.round(clamp(base + normal(0, 10) + (bonus.includes(k) ? 5 : 0) + (like === 'like_none' ? 1 : 0) + (G.vars['pre_' + k] || 0), 1, 99));
     }
     G.stats.academic = acad();
   }
