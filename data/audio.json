@@ -1,0 +1,25 @@
+{
+  "_comment": "音の割り当て。ファイルは sounds/（公開リポジトリには入れない：MusMus・効果音ラボとも素材そのものの再配布は禁止のため。単一HTMLに埋め込んで配るのはOK）。",
+  "credits": { "bgm": "MusMus（https://musmus.main.jp/）", "se": "効果音ラボ（https://soundeffect-lab.info/）" },
+  "bgm": {
+    "title":   { "file": "sounds/bgm/title.ogg",   "src": "タイトル画面→キャラメイク.ogg", "use": "タイトル・性別と名前・県の抽選", "loop": true },
+    "baby":    { "file": "sounds/bgm/baby.ogg",    "src": "赤ちゃん→未就学児.ogg", "use": "0〜5歳", "loop": true },
+    "school":  { "file": "sounds/bgm/school.ogg",  "src": "学生時代.ogg", "use": "小学校〜大学・大学院・浪人", "loop": true },
+    "work":    { "file": "sounds/bgm/work.ogg",    "src": "社会人時代.ogg", "use": "学校を出てから退職まで（無職・休職もふくむ）", "loop": true },
+    "retire":  { "file": "sounds/bgm/retire.ogg",  "src": "定年退職後.ogg", "use": "定年退職（retired_flag）または65歳以上で働いていない", "loop": true },
+    "result":  { "file": "sounds/bgm/result.ogg",  "src": "リザルト画面.ogg", "use": "リザルト", "loop": true },
+    "history": { "file": "sounds/bgm/history.ogg", "src": "過去の人生確認.ogg", "use": "これまでの人生", "loop": true }
+  },
+  "bgmRules": { "fadeMs": 1500, "switchAt": "季節の切りかわり（Q1）で段階が変わったとき", "duringSuspense": "音量を30%に下げる" },
+  "se": {
+    "click":     { "file": "sounds/se/click.mp3",     "src": "基本クリックと選択.mp3", "use": "ボタン・タブ・選択肢の決定" },
+    "decide":    { "file": "sounds/se/decide.mp3",    "src": "進路選択などの重要ベント決定時.mp3", "use": "進路・就職・結婚・家を買うなど、大きな選択を決めたとき" },
+    "up":        { "file": "sounds/se/up.mp3",        "src": "ステータスやお金上昇時.mp3", "use": "所持金が増えた（給料・賞与）・ステータスが大きく上がった・昇進" },
+    "cheer":     { "file": "sounds/se/cheer.mp3",     "src": "歓声と拍手.mp3", "use": "合格・内定・資格合格・プロポーズ成功・出産・全国大会・宝くじ高額当選" },
+    "shock":     { "file": "sounds/se/shock.mp3",     "src": "ショック.mp3", "use": "不合格・不採用・病気の診断・リストラ・家族の死・離婚・所持金マイナス" },
+    "chime":     { "file": "sounds/se/chime.mp3",     "src": "学校のチャイム.mp3", "use": "入学（小・中・高・大学など）。長いので最初の6秒だけ流してフェードアウト", "maxMs": 6000 },
+    "crash":     { "file": "sounds/se/crash.mp3",     "src": "自動車事故.mp3", "use": "交通事故・自転車事故" },
+    "heartbeat": { "file": "sounds/se/heartbeat.mp3", "src": "心臓の鼓動1.mp3", "use": "結果の前のドキドキ（data/suspense.json）。約4秒なのでループして5秒", "loop": true }
+  },
+  "optionsDefault": { "bgmVolume": 0.6, "seVolume": 0.8, "speed": 1 }
+}

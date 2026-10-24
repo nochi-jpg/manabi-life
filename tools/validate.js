@@ -253,6 +253,11 @@ const jd = D('job_display.json');
 for (const c of new Set(jobs.jobs.map((j) => j.cat))) if (!jd.statEffects.byCat[c]) err('job_display.statEffects', `業界「${c}」のステータス変化がない`);
 for (const [c, m] of Object.entries(jd.statEffects.byCat)) for (const k of Object.keys(m)) if (!jd.statEffects.stats.includes(k)) err('job_display.' + c, `未定義のステータス「${k}」`);
 if (!vis.backgrounds.some((b) => b.id === vis.byFormFallback.part)) err('visuals.byFormFallback', '背景がない');
+const sus = D('suspense.json');
+const hasRoll = (o) => o && typeof o === 'object' && (o.roll || o.auto || Object.values(o).some((v) => typeof v === 'object' && hasRoll(v)));
+for (const id of Object.keys(sus.events)) { const e = allEvents.find((x) => x.id === id); if (!e) err('suspense', `イベントがない「${id}」`); else if (!hasRoll(e)) err('suspense.' + id, '判定（roll）のないイベントにドキドキ演出がついている'); }
+const aud = D('audio.json');
+if (!aud.se[sus.sound]) err('suspense', `効果音がない「${sus.sound}」`);
 for (let a = 0; a <= 120; a++) if (vis.portraits.ages.filter((p) => a >= p.from && a <= p.to).length !== 1) err('visuals.portraits', `${a}歳の顔グラが0枚または重複`);
 for (const g of ps.graduate) if (g.requires) { checkFlags(`graduate.${g.id}`, g.requires); if (g.stage === 'grad_doctor' && !g.requires.includes('edu_master_grad')) err(`graduate.${g.id}`, 'I-8違反：博士は修士修了が必要'); }
 for (const c of [...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles]) {

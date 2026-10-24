@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>まなびライフ オプション</title>
+<link rel="stylesheet" href="base.css">
+<style>
+#stage{background:#fdfdfb}
+#stage::before{display:none}
+.panel{position:absolute;left:290px;top:120px;width:700px;height:430px;padding:26px 34px;color:var(--ink);background:#fff;border:2px solid #dfe7f3;border-radius:24px;box-shadow:0 10px 30px rgba(47,106,168,.12)}
+h1{font-size:26px;color:var(--blue);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.row{display:grid;grid-template-columns:170px 1fr 56px;align-items:center;height:70px;border-bottom:2px solid #eef3fa;font-size:18px}
+.row .k{color:var(--ink)}
+.row .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--blue)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:5px;background:linear-gradient(90deg,var(--blue) var(--p),#e3ebf6 var(--p));outline:0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--blue);box-shadow:0 2px 4px rgba(0,0,0,.15)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--blue)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;grid-column:2/4}
+.seg button,.sw button{height:44px;font-size:17px;color:var(--blue);background:#fff;border:2px solid #c9d7ea;border-radius:999px;box-shadow:none}
+.seg button.on,.sw button.on{color:#fff;background:var(--blue);border-color:var(--blue)}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:8px;grid-column:2/4}
+.btns{position:absolute;left:34px;right:34px;bottom:26px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btns button{height:52px;font-size:18px;color:var(--blue);background:#fff;border:2px solid #c9d7ea;border-radius:999px;box-shadow:0 3px 0 #dfe7f3}
+.btns button.main{color:#fff;background:var(--blue);border-color:var(--blue);box-shadow:0 3px 0 #1f4f82}
+/* クレジット */
+#cr{display:none;background:rgba(253,253,251,.92);backdrop-filter:none}#cr.on{display:flex}
+#cr .box{width:760px;height:600px;padding:26px 36px;color:var(--ink);background:#fff;border:2px solid #dfe7f3;border-radius:24px;box-shadow:0 10px 30px rgba(47,106,168,.15);animation:pop .2s;position:relative}
+#cr h2{font-size:24px;color:var(--blue);margin-bottom:14px}
+.cr{display:grid;grid-template-columns:200px 1fr;align-items:baseline;padding:9px 0;border-bottom:2px solid #eef3fa;font-size:17px;line-height:1.5}
+.cr .k{font-size:14px;color:var(--ink2)}
+.cr small{display:block;font-size:13px;color:var(--ink2)}
+#crClose{position:absolute;left:36px;right:36px;bottom:24px;height:50px;font-size:18px;color:#fff;background:var(--blue);border:0;border-radius:999px;box-shadow:0 3px 0 #1f4f82}
+</style></head>
+<body>
+<div id="stage">
+  <div class="panel">
+    <h1>⚙️ オプション</h1>
+    <div class="row"><span class="k">🎵 BGMの音量</span><input type="range" min="0" max="100" value="60" data-v="v1"><span class="v" id="v1">60</span></div>
+    <div class="row"><span class="k">🔔 効果音の音量</span><input type="range" min="0" max="100" value="80" data-v="v2"><span class="v" id="v2">80</span></div>
+    <div class="row"><span class="k">⏩ はじめの速さ</span><div class="seg"><button class="on">▶ ふつう</button><button>×2</button><button>×4</button></div></div>
+    <div class="row"><span class="k">💓 ドキドキ演出</span><div class="sw"><button class="on">最後まで見る</button><button>タップで飛ばせる</button></div></div>
+    <div class="btns"><button id="crBtn">📜 クレジット</button><button class="main">もどる</button></div>
+  </div>
+  <div class="ov" id="cr"><div class="box">
+    <h2>📜 クレジット</h2>
+    <div class="cr"><span class="k">ゲームデザイン・制作</span><span>K.N（まなび堂）</span></div>
+    <div class="cr"><span class="k">音楽</span><span>MusMus<small>https://musmus.main.jp/</small></span></div>
+    <div class="cr"><span class="k">効果音</span><span>効果音ラボ<small>https://soundeffect-lab.info/</small></span></div>
+    <div class="cr"><span class="k">フォント</span><span>M PLUS Rounded 1c<small>SIL Open Font License 1.1</small></span></div>
+    <div class="cr"><span class="k">統計データ</span><span>文部科学省・厚生労働省・総務省・警察庁ほか<small>ゲーム内のデータ表示に出典を記載</small></span></div>
+    <div class="cr"><span class="k">AIと仕事の予想</span><span>野村総合研究所×オックスフォード大学（2015）／世界経済フォーラム（2025）</span></div>
+    <div class="cr"><span class="k">開発協力</span><span>Claude（Anthropic）</span></div>
+    <button id="crClose">とじる</button>
+  </div></div>
+</div>
+<script>
+const st=document.getElementById('stage');function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();
+document.querySelectorAll('input[type=range]').forEach(r=>{const u=()=>{r.style.setProperty('--p',r.value+'%');document.getElementById(r.dataset.v).textContent=r.value};r.oninput=u;u()});
+document.querySelectorAll('.seg,.sw').forEach(g=>g.querySelectorAll('button').forEach(b=>b.onclick=()=>{g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}));
+document.getElementById('crBtn').onclick=()=>document.getElementById('cr').classList.add('on');
+document.getElementById('crClose').onclick=()=>document.getElementById('cr').classList.remove('on');
+if(location.hash==='#credit')document.getElementById('cr').classList.add('on');
+</script>
+</body></html>

@@ -1,0 +1,168 @@
+{
+  "_comment": "結果がパーセントで決まる大きな分かれ道では、すぐに結果を出さず『〜中……』の画面で約5秒ためる（心臓の鼓動を流す）。速度が×2・×4でも短くしない（大事な場面なので）。2秒たったらタップで飛ばせる（オプションで切りかえ可）。",
+  "durationMs": 5000,
+  "skippableAfterMs": 2000,
+  "sound": "heartbeat",
+  "visual": "画面を暗くして、中央に文字。『……』が1文字ずつ増え、鼓動に合わせて文字がふるえる。最後の1秒は無音にしてから結果をドン（合格は cheer、不合格は shock）",
+  "events": {
+    "ev_m_elem_exam": {
+      "text": "小学校の受験中……",
+      "emoji": "✏️"
+    },
+    "ev_m_jhs_exam": {
+      "text": "中学入試の合格発表……",
+      "emoji": "📝"
+    },
+    "ev_m_hs_exam": {
+      "text": "高校入試の合格発表……",
+      "emoji": "📝"
+    },
+    "ev_m_post_exam": {
+      "text": "入学試験中……",
+      "emoji": "✏️"
+    },
+    "ev_m_grad_school_exam": {
+      "text": "大学院の入試中……",
+      "emoji": "🔬"
+    },
+    "ev_m_hs_job_hunt": {
+      "text": "就職試験の結果は……",
+      "emoji": "💼"
+    },
+    "ev_m_hs_job_hunt2": {
+      "text": "就職試験の結果は……",
+      "emoji": "💼"
+    },
+    "ev_m_job_hunt": {
+      "text": "就職面接中……",
+      "emoji": "👔"
+    },
+    "ev_m_job_hunt_autumn": {
+      "text": "就職面接中……",
+      "emoji": "👔"
+    },
+    "ev_m_after_jhs_work": {
+      "text": "面接中……",
+      "emoji": "👔"
+    },
+    "ev_m_civil_exam": {
+      "text": "公務員試験の結果は……",
+      "emoji": "🏛️"
+    },
+    "ev_m_kyosai": {
+      "text": "教員採用試験の結果は……",
+      "emoji": "🍎"
+    },
+    "ev_m_kokushi_doctor": {
+      "text": "医師国家試験の合格発表……",
+      "emoji": "🩺"
+    },
+    "ev_m_kokushi_dentist": {
+      "text": "歯科医師国家試験の合格発表……",
+      "emoji": "🦷"
+    },
+    "ev_m_kokushi_pharm": {
+      "text": "薬剤師国家試験の合格発表……",
+      "emoji": "💊"
+    },
+    "ev_m_kokushi_nurse": {
+      "text": "看護師国家試験の合格発表……",
+      "emoji": "🧑‍⚕️"
+    },
+    "ev_m_license_exam": {
+      "text": "国家試験の合格発表……",
+      "emoji": "📜"
+    },
+    "ev_m_exam_retry": {
+      "text": "再挑戦の合格発表……",
+      "emoji": "📜"
+    },
+    "ev_m_shihou": {
+      "text": "司法試験の合格発表……",
+      "emoji": "⚖️"
+    },
+    "ev_m_promotion_exam": {
+      "text": "昇任試験の結果は……",
+      "emoji": "📝"
+    },
+    "ev_m_contract_end": {
+      "text": "会社の返事は……",
+      "emoji": "📄"
+    },
+    "ev_m_job_review": {
+      "text": "転職先の面接中……",
+      "emoji": "🔄",
+      "onlyChoice": 1
+    },
+    "ev_m_scholarship": {
+      "text": "奨学金の審査中……",
+      "emoji": "🏅",
+      "onlyChoice": 2
+    },
+    "ev_r_job_search": {
+      "text": "面接中……",
+      "emoji": "🔍"
+    },
+    "ev_r_headhunt": {
+      "text": "面接中……",
+      "emoji": "📩"
+    },
+    "ev_r_first_love": {
+      "text": "告白の返事は……",
+      "emoji": "💌"
+    },
+    "ev_r_meet": {
+      "text": "食事の誘いの返事は……",
+      "emoji": "🍽️"
+    },
+    "ev_r_konkatsu": {
+      "text": "マッチングの結果は……",
+      "emoji": "🥂"
+    },
+    "ev_r_propose": {
+      "text": "プロポーズの返事は……",
+      "emoji": "💍"
+    },
+    "ev_r_cancer": {
+      "text": "治療中……",
+      "emoji": "🎗️"
+    },
+    "ev_r_startup": {
+      "text": "会社を立ち上げて2年……",
+      "emoji": "🚀"
+    },
+    "ev_r_house": {
+      "text": "住宅ローンの審査中……",
+      "emoji": "🏦"
+    },
+    "ev_r_invest_property": {
+      "text": "ローンの審査中……",
+      "emoji": "🏦"
+    },
+    "ev_r_qualify": {
+      "text": "資格試験の合格発表……",
+      "emoji": "📜"
+    },
+    "ev_r_eiken": {
+      "text": "英検の合格発表……",
+      "emoji": "🔤"
+    },
+    "ev_r_kentei": {
+      "text": "高卒認定試験の合格発表……",
+      "emoji": "📝"
+    },
+    "ev_r_council": {
+      "text": "生徒会選挙の開票中……",
+      "emoji": "🗳️"
+    },
+    "ev_r_lottery": {
+      "text": "宝くじの当せん番号は……",
+      "emoji": "🎫"
+    },
+    "ev_w_ai_restructure": {
+      "text": "社内の面談中……",
+      "emoji": "🤖",
+      "onlyChoice": 0
+    }
+  }
+}

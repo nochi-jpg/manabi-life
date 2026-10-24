@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>まなびライフ ドキドキ演出</title>
+<link rel="stylesheet" href="base.css">
+<style>
+#behind{position:absolute;inset:0;background:url(../docs/ui/mock-main.png) center/cover}
+#sus{position:absolute;inset:0;background:rgba(5,8,26,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:30}
+#sus .e{font-size:84px;animation:beat 1s infinite}
+#sus .t{margin-top:18px;font-size:40px;font-weight:900;letter-spacing:.08em;animation:beat 1s infinite}
+#sus .t span{display:inline-block;width:1.6em;text-align:left}
+#sus .bar{width:420px;height:8px;margin-top:30px;transform:none;border:0;background:rgba(255,255,255,.15)}
+#sus .bar i{background:linear-gradient(90deg,#ff6fa8,#ffcf3f);width:0;transition:width 5s linear}
+#sus .tap{margin-top:16px;font-size:14px;color:#9fb4dc;opacity:0;transition:.3s}
+@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.07)}24%{transform:scale(1)}36%{transform:scale(1.04)}}
+#res{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:31;background:rgba(5,8,26,.6)}
+#res.on{display:flex}
+#res .b{width:640px;padding:28px;text-align:center;color:var(--ink);background:#fcf9f3;border:4px solid #fff;border-radius:24px;box-shadow:inset 0 0 0 3px #ffe2a8,0 16px 40px rgba(5,10,40,.6);animation:popin .45s}
+#res .big{font-size:56px;font-weight:900;color:#e8457f;line-height:1.2}
+#res .sub{margin-top:6px;font-size:20px}
+#res button{margin-top:18px;width:260px;height:52px;font-size:19px}
+#start{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:40;width:360px;height:64px;font-size:22px}
+</style></head>
+<body>
+<div id="stage">
+  <div id="behind"></div>
+  <button class="gl g-green" id="start">▶ 入試の結果を見る（音が出ます）</button>
+  <div id="sus" style="display:none">
+    <div class="e">✏️</div>
+    <div class="t">入学試験中<span id="dots"></span></div>
+    <span class="bar"><i id="pb"></i></span>
+    <div class="tap" id="tap">タップで結果へ</div>
+  </div>
+  <div id="res"><div class="b"><div class="big">🌸 合格！</div><div class="sub">国立大学 教育学部（合格率 46%）</div><button class="gl g-green">やったー ▶</button></div></div>
+</div>
+<script>
+const st=document.getElementById('stage');function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();
+const hb=new Audio('../sounds/se/heartbeat.mp3');hb.loop=true;const ch=new Audio('../sounds/se/cheer.mp3');
+function run(){document.getElementById('start').style.display='none';const s=document.getElementById('sus');s.style.display='flex';
+  hb.currentTime=0;hb.play().catch(()=>{});requestAnimationFrame(()=>document.getElementById('pb').style.width='100%');
+  let n=0;const t=setInterval(()=>{n=(n+1)%7;document.getElementById('dots').textContent='……'.slice(0,Math.min(n,2))+(n>2?'…'.repeat(0):'')},500);
+  setTimeout(()=>document.getElementById('tap').style.opacity=1,2000);
+  setTimeout(()=>{hb.pause()},4000);                 // 最後の1秒は無音
+  setTimeout(()=>{clearInterval(t);s.style.display='none';document.getElementById('res').classList.add('on');ch.play().catch(()=>{})},5000);
+}
+document.getElementById('start').onclick=run;
+if(location.hash==='#mid'){document.getElementById('start').style.display='none';const s=document.getElementById('sus');s.style.display='flex';document.getElementById('dots').textContent='……';document.getElementById('pb').style.transition='none';document.getElementById('pb').style.width='55%';document.getElementById('tap').style.opacity=1}
+</script>
+</body></html>
