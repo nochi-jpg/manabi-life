@@ -1063,6 +1063,16 @@
         { "label": "🙈 そのまま払わない", "effects": { "set": ["blacklisted"], "stats": { "stress": 10 }, "log": "⚠️ 3か月以上の延滞で、信用情報に記録された（ローンやクレジットカードが作りにくくなる）" } }
       ] },
 
+    { "id": "ev_r_remote_work", "kind": "choice", "emoji": "🏠", "cat": "work",
+      "when": { "employment": ["seishain", "keiyaku", "haken", "freelance"], "jobId": ["j_it_engineer", "j_data_scientist", "j_designer", "j_office", "j_accounting", "j_journalist", "j_game_creator", "j_global", "j_cpa", "j_tax"], "none": ["remote_work"], "cooldownYears": 4 },
+      "weight": { "base": 1.5, "mul": [["child:any", 1.5], ["caregiving", 2]] },
+      "text": "会社で、家で働く「在宅勤務（リモートワーク）」ができるようになった。",
+      "choices": [
+        { "label": "🏠 在宅中心にする", "effects": { "set": ["remote_work"], "stats": { "stress": -4, "social": -3 }, "commuteCost": 0 } },
+        { "label": "🏢 会社に通い続ける", "effects": { "stats": { "social": 1 } } }
+      ],
+      "note": "在宅中は背景がリビングになる。転職・退職で remote_work は外れる" },
+
     { "id": "ev_r_spouse_illness", "kind": "choice", "emoji": "🏥", "cat": "family",
       "when": { "all": ["married"], "person": { "role": "spouse", "alive": true, "age": [45, 110] }, "cooldownYears": 5 },
       "weight": { "base": 1, "mul": [["spouseAge>=65", 2]] },

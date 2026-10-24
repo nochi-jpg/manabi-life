@@ -235,7 +235,8 @@
       "creator_hit": "作品がヒット",
       "union_member": "労働組合員",
       "naitei_school": "進学先が決まっている",
-      "hq_assign": "本社・本部勤務"
+      "hq_assign": "本社・本部勤務",
+      "remote_work": "在宅勤務"
     }
   },
   "modifiers": {

@@ -249,6 +249,10 @@ const aiSrc = new Set(ai.sources.map((x) => x.id));
 for (const j of jobs.jobs) { const r = ai.jobs[j.id]; if (!r) { err('ai_impact', `「${j.id}」のAI影響度がない`); continue; } if (!(r.risk >= 0 && r.risk <= 1)) err('ai_impact.' + j.id, 'risk は0〜1'); (r.src || []).forEach((x) => { if (!aiSrc.has(x)) err('ai_impact.' + j.id, `未定義の出典「${x}」`); }); }
 for (const id of Object.keys(ai.jobs)) if (!JOB_IDS.has(id)) err('ai_impact', `未定義の職業「${id}」`);
 ai.rules.growthJobs.forEach((j) => { if (!JOB_IDS.has(j)) err('ai_impact.growthJobs', `未定義の職業「${j}」`); });
+const jd = D('job_display.json');
+for (const c of new Set(jobs.jobs.map((j) => j.cat))) if (!jd.statEffects.byCat[c]) err('job_display.statEffects', `業界「${c}」のステータス変化がない`);
+for (const [c, m] of Object.entries(jd.statEffects.byCat)) for (const k of Object.keys(m)) if (!jd.statEffects.stats.includes(k)) err('job_display.' + c, `未定義のステータス「${k}」`);
+if (!vis.backgrounds.some((b) => b.id === vis.byFormFallback.part)) err('visuals.byFormFallback', '背景がない');
 for (let a = 0; a <= 120; a++) if (vis.portraits.ages.filter((p) => a >= p.from && a <= p.to).length !== 1) err('visuals.portraits', `${a}歳の顔グラが0枚または重複`);
 for (const g of ps.graduate) if (g.requires) { checkFlags(`graduate.${g.id}`, g.requires); if (g.stage === 'grad_doctor' && !g.requires.includes('edu_master_grad')) err(`graduate.${g.id}`, 'I-8違反：博士は修士修了が必要'); }
 for (const c of [...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles]) {

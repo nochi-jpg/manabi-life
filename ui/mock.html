@@ -109,8 +109,9 @@ button:active{transform:translateY(3px) scale(.98)}
   clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,0 100%);padding:12px 18px 12px 26px}
 #tl .hd{font-size:16px;color:#9fb4dc;display:flex;align-items:center;gap:8px;margin-bottom:8px}
 #tl .hd::after{content:'';flex:1;height:2px;background:linear-gradient(90deg,rgba(30,200,234,.6),transparent)}
-#feed{height:276px;overflow-y:auto;scrollbar-width:none;padding-right:4px;mask-image:linear-gradient(180deg,#000 85%,transparent)}
-#feed::-webkit-scrollbar{display:none}
+#feed{height:276px;overflow-y:auto;padding-right:8px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.35) transparent}
+#feed::-webkit-scrollbar{width:6px}#feed::-webkit-scrollbar-track{background:transparent}
+#feed::-webkit-scrollbar-thumb{background:rgba(255,255,255,.35);border-radius:3px}
 .post{display:grid;grid-template-columns:52px 36px 48px 40px 1fr;align-items:center;column-gap:8px;min-height:48px;padding:6px 10px;margin-bottom:6px;
   border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:18px;line-height:1.4;animation:drop .35s cubic-bezier(.34,1.5,.5,1)}
 .post{font-variant-numeric:tabular-nums}

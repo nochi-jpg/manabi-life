@@ -3,80 +3,309 @@
   "portraits": {
     "files": "assets/faces/{gender}_{age}.png  例: assets/faces/F_10.png（gender は M / F）",
     "ages": [
-      { "img": 0, "from": 0, "to": 2, "label": "赤ちゃん" },
-      { "img": 5, "from": 3, "to": 7, "label": "幼児〜小学校低学年" },
-      { "img": 10, "from": 8, "to": 12, "label": "小学生" },
-      { "img": 15, "from": 13, "to": 17, "label": "中高生" },
-      { "img": 20, "from": 18, "to": 24, "label": "大学生・若手" },
-      { "img": 30, "from": 25, "to": 34, "label": "30代" },
-      { "img": 40, "from": 35, "to": 49, "label": "40代" },
-      { "img": 60, "from": 50, "to": 69, "label": "50〜60代" },
-      { "img": 80, "from": 70, "to": 120, "label": "高齢" }
+      {
+        "img": 0,
+        "from": 0,
+        "to": 2,
+        "label": "赤ちゃん"
+      },
+      {
+        "img": 5,
+        "from": 3,
+        "to": 7,
+        "label": "幼児〜小学校低学年"
+      },
+      {
+        "img": 10,
+        "from": 8,
+        "to": 12,
+        "label": "小学生"
+      },
+      {
+        "img": 15,
+        "from": 13,
+        "to": 17,
+        "label": "中高生"
+      },
+      {
+        "img": 20,
+        "from": 18,
+        "to": 24,
+        "label": "大学生・若手"
+      },
+      {
+        "img": 30,
+        "from": 25,
+        "to": 34,
+        "label": "30代"
+      },
+      {
+        "img": 40,
+        "from": 35,
+        "to": 49,
+        "label": "40代"
+      },
+      {
+        "img": 60,
+        "from": 50,
+        "to": 69,
+        "label": "50〜60代"
+      },
+      {
+        "img": 80,
+        "from": 70,
+        "to": 120,
+        "label": "高齢"
+      }
     ]
   },
   "backgrounds": [
-    { "id": "bg_home", "file": "assets/bg/home.jpg", "label": "家（リビング）" },
-    { "id": "bg_nursery", "file": "assets/bg/nursery.jpg", "label": "保育園・幼稚園" },
-    { "id": "bg_elem", "file": "assets/bg/elem.jpg", "label": "小学校" },
-    { "id": "bg_secondary", "file": "assets/bg/secondary.jpg", "label": "中学・高校" },
-    { "id": "bg_univ", "file": "assets/bg/univ.jpg", "label": "日本の大学" },
-    { "id": "bg_abroad", "file": "assets/bg/abroad.jpg", "label": "海外の大学・街" },
-    { "id": "bg_hospital", "file": "assets/bg/hospital.jpg", "label": "病院" },
-    { "id": "bg_office", "file": "assets/bg/office.jpg", "label": "オフィス" },
-    { "id": "bg_hq", "file": "assets/bg/hq.jpg", "label": "大きなビル（本社・本部）" },
-    { "id": "bg_lab", "file": "assets/bg/lab.jpg", "label": "研究室" },
-    { "id": "bg_worksite", "file": "assets/bg/worksite.jpg", "label": "工場" },
-    { "id": "bg_shop", "file": "assets/bg/shop.jpg", "label": "お店" },
-    { "id": "bg_street", "file": "assets/bg/street.jpg", "label": "街・道路・線路" },
-    { "id": "bg_nature", "file": "assets/bg/nature.jpg", "label": "田園と港" },
-    { "id": "bg_studio", "file": "assets/bg/studio.jpg", "label": "スタジオ・アトリエ" },
-    { "id": "bg_stadium", "file": "assets/bg/stadium.jpg", "label": "屋外競技場" },
-    { "id": "bg_arena", "file": "assets/bg/arena.jpg", "label": "屋内競技場・体育館" },
-    { "id": "bg_plane", "file": "assets/bg/plane.jpg", "label": "飛行機の中" }
+    {
+      "id": "bg_home",
+      "file": "assets/bg/home.jpg",
+      "label": "家（リビング）"
+    },
+    {
+      "id": "bg_nursery",
+      "file": "assets/bg/nursery.jpg",
+      "label": "保育園・幼稚園"
+    },
+    {
+      "id": "bg_elem",
+      "file": "assets/bg/elem.jpg",
+      "label": "小学校"
+    },
+    {
+      "id": "bg_secondary",
+      "file": "assets/bg/secondary.jpg",
+      "label": "中学・高校"
+    },
+    {
+      "id": "bg_univ",
+      "file": "assets/bg/univ.jpg",
+      "label": "日本の大学"
+    },
+    {
+      "id": "bg_abroad",
+      "file": "assets/bg/abroad.jpg",
+      "label": "海外の大学・街"
+    },
+    {
+      "id": "bg_hospital",
+      "file": "assets/bg/hospital.jpg",
+      "label": "病院"
+    },
+    {
+      "id": "bg_office",
+      "file": "assets/bg/office.jpg",
+      "label": "オフィス"
+    },
+    {
+      "id": "bg_hq",
+      "file": "assets/bg/hq.jpg",
+      "label": "大きなビル（本社・本部）"
+    },
+    {
+      "id": "bg_lab",
+      "file": "assets/bg/lab.jpg",
+      "label": "研究室"
+    },
+    {
+      "id": "bg_worksite",
+      "file": "assets/bg/worksite.jpg",
+      "label": "工場"
+    },
+    {
+      "id": "bg_shop",
+      "file": "assets/bg/shop.jpg",
+      "label": "お店"
+    },
+    {
+      "id": "bg_street",
+      "file": "assets/bg/street.jpg",
+      "label": "街・道路・線路"
+    },
+    {
+      "id": "bg_nature",
+      "file": "assets/bg/nature.jpg",
+      "label": "田園と港"
+    },
+    {
+      "id": "bg_studio",
+      "file": "assets/bg/studio.jpg",
+      "label": "スタジオ・アトリエ"
+    },
+    {
+      "id": "bg_stadium",
+      "file": "assets/bg/stadium.jpg",
+      "label": "屋外競技場"
+    },
+    {
+      "id": "bg_arena",
+      "file": "assets/bg/arena.jpg",
+      "label": "屋内競技場・体育館"
+    },
+    {
+      "id": "bg_plane",
+      "file": "assets/bg/plane.jpg",
+      "label": "飛行機の中"
+    },
+    {
+      "id": "bg_konbini",
+      "file": "assets/bg/konbini.jpg",
+      "label": "コンビニ（アルバイト・パート）"
+    }
   ],
   "priority": [
-    { "if": "入院中・自分が要介護（施設）", "bg": "bg_hospital" },
-    { "if": "海外にいる（留学中・lives_abroad）", "bg": "bg_abroad" },
-    { "if": "学校に在籍（stage）", "byStage": true },
-    { "if": "本社・本部勤務（hq_assign）", "bg": "bg_hq" },
-    { "if": "働いている（job）", "byJob": "byJobOverride を先に見て、なければ byJobCat。プロスポーツ選手は sportByClub" },
-    { "if": "それ以外", "byEmployment": true, "default": "bg_home" }
+    {
+      "if": "入院中・自分が要介護（施設）",
+      "bg": "bg_hospital"
+    },
+    {
+      "if": "海外にいる（留学中・lives_abroad）",
+      "bg": "bg_abroad"
+    },
+    {
+      "if": "学校に在籍（stage）",
+      "byStage": true
+    },
+    {
+      "if": "在宅勤務（remote_work）",
+      "bg": "bg_home"
+    },
+    {
+      "if": "本社・本部勤務（hq_assign）",
+      "bg": "bg_hq"
+    },
+    {
+      "if": "働いている（job）",
+      "byJob": "byJobOverride を先に見て、なければ byJobCat。プロスポーツ選手は sportByClub"
+    },
+    {
+      "if": "それ以外",
+      "byEmployment": true,
+      "default": "bg_home"
+    }
   ],
   "byStage": {
-    "baby": "bg_home", "nursery": "bg_nursery", "kindergarten": "bg_nursery",
-    "elem": "bg_elem", "free_school": "bg_elem",
-    "jhs": "bg_secondary", "hs": "bg_secondary", "hs_corr": "bg_secondary", "hs_night": "bg_secondary", "kosen": "bg_secondary", "ronin": "bg_secondary",
-    "univ": "bg_univ", "univ_med": "bg_univ", "junior_college": "bg_univ", "vocational": "bg_univ",
-    "grad_master": "bg_lab", "grad_doctor": "bg_lab", "grad_prof": "bg_univ",
-    "abroad_study": "bg_abroad", "hikikomori": "bg_home", "none": null
+    "baby": "bg_home",
+    "nursery": "bg_nursery",
+    "kindergarten": "bg_nursery",
+    "elem": "bg_elem",
+    "free_school": "bg_elem",
+    "jhs": "bg_secondary",
+    "hs": "bg_secondary",
+    "hs_corr": "bg_secondary",
+    "hs_night": "bg_secondary",
+    "kosen": "bg_secondary",
+    "ronin": "bg_secondary",
+    "univ": "bg_univ",
+    "univ_med": "bg_univ",
+    "junior_college": "bg_univ",
+    "vocational": "bg_univ",
+    "grad_master": "bg_lab",
+    "grad_doctor": "bg_lab",
+    "grad_prof": "bg_univ",
+    "abroad_study": "bg_abroad",
+    "hikikomori": "bg_home",
+    "none": null
   },
   "byJobCat": {
-    "it": "bg_office", "business": "bg_office", "office": "bg_office", "finance": "bg_office", "global": "bg_hq",
-    "engineering": "bg_office", "science": "bg_lab", "civil": "bg_office", "law": "bg_office", "writing": "bg_office", "startup": "bg_office",
-    "creative": "bg_studio", "design": "bg_studio", "entertain": "bg_studio",
-    "manufacturing": "bg_worksite", "construction": "bg_worksite",
-    "logistics": "bg_street", "airline": "bg_plane",
-    "medical": "bg_hospital", "welfare": "bg_hospital",
+    "it": "bg_office",
+    "business": "bg_office",
+    "office": "bg_office",
+    "finance": "bg_office",
+    "global": "bg_hq",
+    "engineering": "bg_office",
+    "science": "bg_lab",
+    "civil": "bg_office",
+    "law": "bg_office",
+    "writing": "bg_office",
+    "startup": "bg_office",
+    "creative": "bg_studio",
+    "design": "bg_studio",
+    "entertain": "bg_studio",
+    "manufacturing": "bg_worksite",
+    "construction": "bg_worksite",
+    "logistics": "bg_street",
+    "airline": "bg_plane",
+    "medical": "bg_hospital",
+    "welfare": "bg_hospital",
     "education": "bg_secondary",
     "sport": "bg_stadium",
-    "food": "bg_shop", "beauty": "bg_shop", "service": "bg_shop", "animal": "bg_shop",
+    "food": "bg_shop",
+    "beauty": "bg_shop",
+    "service": "bg_shop",
+    "animal": "bg_shop",
     "agri": "bg_nature"
   },
   "byJobOverride": {
-    "j_nursery": "bg_nursery", "j_teacher_elem": "bg_elem", "j_professor": "bg_univ",
-    "j_civil_national": "bg_hq", "j_securities": "bg_hq", "j_trading": "bg_hq",
-    "j_police": "bg_street", "j_firefighter": "bg_street", "j_sdf": "bg_stadium",
+    "j_nursery": "bg_nursery",
+    "j_teacher_elem": "bg_elem",
+    "j_professor": "bg_univ",
+    "j_civil_national": "bg_hq",
+    "j_securities": "bg_hq",
+    "j_trading": "bg_hq",
+    "j_police": "bg_street",
+    "j_firefighter": "bg_street",
+    "j_sdf": "bg_stadium",
     "j_sports_instructor": "bg_arena",
-    "j_architect": "bg_office", "j_cleaning": "bg_office", "j_game_creator": "bg_office", "j_media": "bg_studio",
-    "j_family_business": "bg_shop", "j_mechanic": "bg_worksite"
+    "j_architect": "bg_office",
+    "j_cleaning": "bg_office",
+    "j_game_creator": "bg_office",
+    "j_media": "bg_studio",
+    "j_family_business": "bg_shop",
+    "j_mechanic": "bg_worksite",
+    "j_parttime_general": "bg_konbini",
+    "j_illustrator": "bg_home",
+    "j_youtuber": "bg_home"
   },
   "sportByClub": {
     "_comment": "プロスポーツ選手は、中高大で入っていた運動部が屋内競技なら屋内競技場、それ以外は屋外競技場",
-    "arena": ["c_basket", "c_volley", "c_tabletennis", "c_badminton", "c_kendo", "c_judo", "c_dance", "c_swim", "u_dance"],
+    "arena": [
+      "c_basket",
+      "c_volley",
+      "c_tabletennis",
+      "c_badminton",
+      "c_kendo",
+      "c_judo",
+      "c_dance",
+      "c_swim",
+      "u_dance"
+    ],
     "default": "bg_stadium"
   },
-  "hqEligibleJobs": ["j_police", "j_firefighter", "j_sdf", "j_factory", "j_maker_tech", "j_construction_mgr", "j_truck", "j_delivery", "j_train", "j_store_manager", "j_sales_shop", "j_hotel", "j_bank", "j_sales", "j_nurse", "j_care", "j_civil_local", "j_it_engineer", "j_office", "j_accounting"],
+  "hqEligibleJobs": [
+    "j_police",
+    "j_firefighter",
+    "j_sdf",
+    "j_factory",
+    "j_maker_tech",
+    "j_construction_mgr",
+    "j_truck",
+    "j_delivery",
+    "j_train",
+    "j_store_manager",
+    "j_sales_shop",
+    "j_hotel",
+    "j_bank",
+    "j_sales",
+    "j_nurse",
+    "j_care",
+    "j_civil_local",
+    "j_it_engineer",
+    "j_office",
+    "j_accounting"
+  ],
   "byEmployment": {
-    "none": "bg_home", "unemployed": "bg_home", "homemaker": "bg_home", "retired": "bg_home", "leave": "bg_home"
+    "none": "bg_home",
+    "unemployed": "bg_home",
+    "homemaker": "bg_home",
+    "retired": "bg_home",
+    "leave": "bg_home"
+  },
+  "byFormFallback": {
+    "_comment": "学生ではない非正規（パート・派遣）で、職業の背景が決まらないとき",
+    "part": "bg_konbini"
   }
 }

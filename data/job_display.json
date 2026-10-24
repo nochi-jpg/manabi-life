@@ -31,23 +31,216 @@
     ]
   },
   "statEffects": {
-    "_comment": "1年あたりの変化の向きと大きさ。表示は『健康 ↓大』のように。",
-    "health": {
-      "from": "physicalLoad",
-      "dir": -1
+    "_comment": "職業ごとの1年あたりのステータス変化（−2〜+2）。業界(cat)の基本値に、負荷・残業の補正を足す。表示は |値|≥1.5 大／≥1 中／≥0.5 小／それ未満は「−（変わらない）」。学力は大人になってからの『知識・考える力』として増減する",
+    "stats": [
+      "health",
+      "academic",
+      "stress",
+      "social",
+      "happiness"
+    ],
+    "labels": {
+      "health": "❤️ 健康",
+      "academic": "📚 学力",
+      "stress": "😣 ストレス",
+      "social": "🤝 人間関係",
+      "happiness": "😊 満足感"
     },
-    "stress": {
-      "from": "mentalLoad+overtime",
-      "dir": 1
+    "byCat": {
+      "it": {
+        "health": -1,
+        "academic": 1,
+        "stress": 1
+      },
+      "business": {
+        "health": -0.5,
+        "stress": 1,
+        "social": 2
+      },
+      "office": {
+        "health": -0.5,
+        "academic": -0.5,
+        "stress": 0.5,
+        "social": 0.5
+      },
+      "finance": {
+        "health": -0.5,
+        "academic": 1,
+        "stress": 1.5,
+        "social": 1
+      },
+      "global": {
+        "academic": 1.5,
+        "stress": 1.5,
+        "social": 1.5
+      },
+      "engineering": {
+        "health": -0.5,
+        "academic": 1,
+        "stress": 1
+      },
+      "science": {
+        "academic": 2,
+        "stress": 1,
+        "social": -0.5
+      },
+      "civil": {
+        "academic": 0.5,
+        "stress": 1,
+        "social": 1
+      },
+      "law": {
+        "academic": 2,
+        "stress": 2
+      },
+      "writing": {
+        "academic": 1.5,
+        "stress": 1.5,
+        "social": 1
+      },
+      "startup": {
+        "academic": 1,
+        "stress": 2,
+        "social": 1,
+        "happiness": 1
+      },
+      "creative": {
+        "health": -0.5,
+        "stress": 1,
+        "happiness": 1.5
+      },
+      "design": {
+        "academic": 0.5,
+        "stress": 1,
+        "happiness": 1
+      },
+      "entertain": {
+        "stress": 2,
+        "social": 2,
+        "happiness": 1
+      },
+      "manufacturing": {
+        "health": -1,
+        "academic": -1,
+        "stress": 0.5
+      },
+      "construction": {
+        "health": -1.5,
+        "academic": -0.5,
+        "social": 1
+      },
+      "logistics": {
+        "health": -1,
+        "academic": -1,
+        "stress": 1,
+        "social": -1
+      },
+      "airline": {
+        "health": -0.5,
+        "academic": 1,
+        "stress": 1.5
+      },
+      "medical": {
+        "health": -1,
+        "academic": 1.5,
+        "stress": 2,
+        "social": 1,
+        "happiness": 1
+      },
+      "welfare": {
+        "health": -1.5,
+        "stress": 1.5,
+        "social": 1.5,
+        "happiness": 1
+      },
+      "education": {
+        "academic": 1,
+        "stress": 2,
+        "social": 2,
+        "happiness": 1
+      },
+      "sport": {
+        "health": 2,
+        "academic": -1,
+        "stress": 1,
+        "happiness": 1.5
+      },
+      "food": {
+        "health": -1,
+        "academic": -0.5,
+        "stress": 1.5,
+        "happiness": 0.5
+      },
+      "beauty": {
+        "health": -0.5,
+        "social": 1.5,
+        "happiness": 1
+      },
+      "service": {
+        "health": -0.5,
+        "academic": -1,
+        "stress": 1,
+        "social": 1
+      },
+      "animal": {
+        "social": 0.5,
+        "happiness": 1.5
+      },
+      "agri": {
+        "health": 1,
+        "academic": -0.5,
+        "stress": -0.5,
+        "happiness": 0.5
+      }
     },
-    "social": {
-      "from": "t_comm を使う仕事か（weights.t_comm）",
-      "dir": 1
-    },
-    "happiness": {
-      "from": "jobSatisfaction の見込み（好きなことの tags 一致・給料・負荷）",
-      "dir": 1
-    }
+    "loadMods": [
+      {
+        "if": "physicalLoad>=70",
+        "health": -1
+      },
+      {
+        "if": "mentalLoad>=70",
+        "stress": 1
+      },
+      {
+        "if": "overtime>=40",
+        "health": -0.5,
+        "stress": 0.5,
+        "happiness": -0.5
+      },
+      {
+        "if": "shiftWork",
+        "health": -0.5
+      },
+      {
+        "if": "remote_work",
+        "stress": -0.5,
+        "social": -1,
+        "health": -0.5
+      },
+      {
+        "if": "likeMatch",
+        "happiness": 1
+      }
+    ],
+    "displayLevels": [
+      [
+        1.5,
+        "大"
+      ],
+      [
+        1,
+        "中"
+      ],
+      [
+        0.5,
+        "小"
+      ],
+      [
+        0,
+        "−"
+      ]
+    ]
   },
   "welfare": {
     "_comment": "福利厚生（★1〜5）。雇用形態で決め、業界で少し足す",
