@@ -33,3 +33,25 @@
 - **スクロールバー**：使うときは `ui/base.css` の `.scroll`（細い半透明のバー。ブラウザ標準の灰色のバーは出さない）
 - **評価の記号**：通知表は ◎〇△（中高は 1〜5）の文字だけ。丸い飾りはつけない
 - **間かく**：8の倍数（`ui/base.css` の `--sp1`〜`--sp5`）。部品どうし16px、かたまりどうし24px、ボタンどうし24px、わくの内側32px以上、最後の中身とボタンのあいだ32px以上。ボタンを画面のはしに `position:absolute` でくっつけず、中身の流れの最後に置く
+
+## スマホ・タブレットでのフルスクリーン（2026-10-24 追加）
+UIのサイズ感は変えない。1280×720 の `#stage` を画面に合わせて拡大・縮小し、余白は背景色で埋める（いまの base.css のしくみのまま）。
+
+### 起動のしかた
+- **Android（Chrome など）**：タイトル画面で最初にタップしたとき（「はじめる」など）に `document.documentElement.requestFullscreen({navigationUI:'hide'})` を呼び、続けて `screen.orientation.lock('landscape')` を試す。ブラウザの決まりで、タップなどの操作がないとフルスクリーンにできないため。失敗してもエラーは出さずにそのまま遊べるようにする。
+- **iPhone（Safari）**：iPhoneのSafariはページをフルスクリーンにするしくみ（Fullscreen API）に対応していない。代わりに
+  - `<meta name="apple-mobile-web-app-capable" content="yes">`・`<meta name="mobile-web-app-capable" content="yes">`・`<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">` を入れ、「ホーム画面に追加」から起動するとアドレスバーなしで全画面になるようにする
+  - Safariで開いたときだけ、タイトル画面に小さく「共有 → ホーム画面に追加 で全画面で遊べます」と案内を出す（1回閉じたら出さない。設定は保存）
+- **iPad**：`webkitRequestFullscreen` があれば Android と同じように全画面にする。
+- **PC（学校のLenovo・Edge）**：自動では全画面にしない。オプション画面の「全画面」ボタンで切りかえる（スマホでも同じボタンで出入りできる）。
+
+### 共通の設定
+- `<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">`
+- 高さは `100dvh` を使い、アドレスバーの出入りで画面がずれないようにする。ノッチ・ホームバーは `env(safe-area-inset-*)` の分だけよけて `#stage` を置く。
+- ピンチ拡大・ダブルタップ拡大・引っぱって更新を止める：`touch-action:manipulation`、`overscroll-behavior:none`。
+- 縦向きのときは「横向きにしてね」の画面を出す（ゲームは止める。横にしたら再開）。
+- 全画面がぬけたとき（`fullscreenchange`）は何もしない。オプションの「全画面」ボタンでもどれる。
+- Canva統合版は埋め込みの中で動くため、全画面が使えないことがある。そのときはボタンを出さず、ふつうに遊べればよい。
+
+### テスト
+Android（Chrome）、iPhone（Safari のまま／ホーム画面から）、iPad、PC（Edge）で、全画面・横向き・セーブの引きつぎを確認する。
