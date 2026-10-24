@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>まなびライフ 職業の詳細</title>
+<link rel="stylesheet" href="base.css">
+<style>
+#behind{position:absolute;inset:0;background:url(../docs/ui/mock-adult.png) center/cover;filter:blur(1px)}
+#box{position:relative;width:1180px;height:600px;padding:18px 22px;color:var(--ink);display:grid;grid-template-columns:430px 1fr;column-gap:20px;
+  background:#fcf9f3;border:4px solid #fff;border-radius:24px;box-shadow:inset 0 0 0 3px #ffe2a8,0 16px 40px rgba(5,10,40,.6);animation:pop .22s ease-out}
+.cs{position:absolute;left:24px;top:-20px;height:38px;padding:0 16px;border-radius:999px;display:flex;align-items:center;gap:6px;font-size:16px;color:#fff;
+  background:linear-gradient(180deg,#26346e,#16224a);border:3px solid #fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+/* 左 */
+.img{height:242px;border-radius:16px;background:url(../assets/bg/hospital.jpg) center/cover;position:relative;box-shadow:inset 0 0 0 3px #fff}
+.img .tag{position:absolute;left:10px;bottom:10px;height:32px;padding:0 12px;border-radius:999px;background:rgba(13,21,48,.82);color:#fff;font-size:15px;display:flex;align-items:center;gap:6px;border:2px solid rgba(255,255,255,.7)}
+.jt{margin-top:12px;display:flex;align-items:center;gap:10px}
+.jt .e{font-size:42px}
+.jt .n{font-size:28px;font-weight:900;line-height:1.1}
+.jt .n small{display:block;font-size:14px;color:var(--ink2);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{height:28px;padding:0 10px;border-radius:999px;background:#fff;box-shadow:0 2px 0 #d9cdb5;font-size:14px;display:inline-flex;align-items:center;gap:4px}
+.chip.ok{background:#e4f8ee;color:#1f9d6a}.chip.ng{background:#ffe8eb;color:#d0384f}
+.rate{margin-top:12px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:linear-gradient(180deg,#5fe0a8,#2fbf86);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+.rate span{font-size:16px}.rate b{font-size:36px}
+.ai{margin-top:10px;height:40px;border-radius:12px;background:#eef4ff;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:15px}
+.ai b{color:#1f9d6a}
+/* 右 */
+.sec{background:#fff;border-radius:16px;padding:10px 16px;box-shadow:0 3px 0 #ecdcc2;margin-bottom:12px}
+.sec h4{font-size:14px;color:var(--ink2);margin-bottom:6px}
+.money{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.money div{background:#fbf3e3;border-radius:12px;padding:8px 12px}
+.money span{display:block;font-size:13px;color:var(--ink2)}
+.money b{font-size:24px}.money small{font-size:13px;color:var(--ink2)}
+.ld{display:grid;grid-template-columns:130px 1fr 44px 42px;align-items:center;column-gap:10px;height:34px;font-size:16px}
+.lv{height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff}
+.lv.h{background:#e44d62}.lv.m{background:#f0a81c}.lv.l{background:#2fbf86}
+.stars{color:#f0a81c;letter-spacing:2px;font-size:18px}.stars i{color:#e6dccb;font-style:normal}
+.eff{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.eff div{height:58px;border-radius:12px;background:#fbf3e3;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;color:var(--ink2)}
+.eff b{font-size:18px}.dn{color:#e44d62}.up{color:#1f9d6a}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+.btns button{height:56px;font-size:19px}
+.src{margin-top:10px}
+</style></head>
+<body>
+<div id="stage">
+  <div id="behind"></div>
+  <div class="ov">
+    <div id="box">
+      <div class="cs">💼 就職活動 ・ 2032年4月</div>
+      <div>
+        <div class="img"><span class="tag">📍 神奈川県の総合病院</span></div>
+        <div class="jt"><span class="e">🧑‍⚕️</span><span class="n"><small>医療｜正社員</small>看護師</span></div>
+        <div class="chips"><span class="chip ok">✓ 看護師免許</span><span class="chip ok">✓ 専門学校卒以上</span><span class="chip">🌙 夜勤あり</span><span class="chip">⏰ 残業 月20時間</span></div>
+        <div class="rate"><span>この職場の合格率</span><b>82%</b></div>
+        <div class="ai">🤖 AIの影響：<b>小</b>（人にしかできないケアが中心）</div>
+      </div>
+      <div>
+        <div class="sec"><h4>💴 お給料</h4>
+          <div class="money">
+            <div><span>年収（1年目）</span><b>400</b><small>万円</small></div>
+            <div><span>年収（50歳ごろ）</span><b>580</b><small>万円</small></div>
+            <div><span>手取りの月収</span><b>20.8</b><small>万円</small></div>
+          </div>
+          <div style="margin-top:6px;font-size:14px;color:var(--ink2)">💰 賞与（ボーナス）：年2回・合計4か月分　／　手取り＝給料から税金・保険料をひいた額</div>
+        </div>
+        <div class="sec"><h4>⚖️ たいへんさ・はたらきやすさ</h4>
+          <div class="ld"><span>💪 肉体負荷</span><span class="bar c-red"><i style="--w:75%"></i></span><span>75</span><span class="lv h">大</span></div>
+          <div class="ld"><span>🧠 精神負荷</span><span class="bar c-blue"><i style="--w:70%"></i></span><span>70</span><span class="lv h">大</span></div>
+          <div class="ld"><span>🏢 福利厚生</span><span class="stars">★★★★<i>★</i></span><span></span><span class="lv l">よい</span></div>
+        </div>
+        <div class="sec"><h4>📊 1年ごとのステータスの変化（めやす）</h4>
+          <div class="eff">
+            <div>❤️ 健康<b class="dn">↓ 大</b></div>
+            <div>😣 ストレス<b class="dn">↑ 大</b></div>
+            <div>🤝 人間関係<b class="up">↑ 中</b></div>
+            <div>😊 満足感<b class="up">↑ 中</b></div>
+          </div>
+        </div>
+        <div class="btns"><button class="gl g-navy">◀ ほかの候補にもどる</button><button class="gl g-green">この職場を受ける ▶</button></div>
+        <div class="src"><span>📊</span><span>看護師国家試験の合格率は約90%。看護師は全国に約130万人います。<small>（厚生労働省）</small></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>const st=document.getElementById('stage');function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();</script>
+</body></html>

@@ -295,7 +295,18 @@
     "kenshinFlag": "健診で要再検査が出た",
     "will": "遺言・エンディングノートがある",
     "hobbies": "趣味のIDのリスト（上限なし。clubs.hobbies）",
-    "declinedExam": "昇任・管理職試験を見送った回数"
+    "declinedExam": "昇任・管理職試験を見送った回数",
+    "gender": [
+      "M",
+      "F"
+    ],
+    "surname": "今の苗字",
+    "given": "名前",
+    "birthSurname": "生まれたときの苗字",
+    "motherMaiden": "母の旧姓（親の離婚で使う）",
+    "partnerSurname": "恋人・配偶者の苗字",
+    "spouseSurname": "夫婦の苗字",
+    "surnameChanged": "結婚で苗字を変えたか（エンジンが surname≠birthSurname で自動判定）"
   },
   "personOps": [
     "add",

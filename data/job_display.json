@@ -1,0 +1,110 @@
+{
+  "_comment": "職業を選ぶときの詳しいポップアップ（必ず出す）と、お給料の入り方。jobs.json の値から自動で作る。",
+  "detailPopup": {
+    "always": true,
+    "items": [
+      "職場の画像（visuals.json）",
+      "職業名・業界・雇用形態",
+      "年収（初任→ピーク）と、手取りの月収のめやす",
+      "賞与（ボーナス）の有無と回数",
+      "肉体負荷・精神負荷（バー＋大中小）",
+      "福利厚生（★1〜5）",
+      "残業（月の時間）・夜勤・転勤",
+      "1年ごとのステータスの変化（大中小）",
+      "必要な資格・学歴（持っている／持っていない）",
+      "AIの影響（大中小）",
+      "合格率",
+      "facts（データ）"
+    ],
+    "buttons": [
+      "この職場を受ける",
+      "ほかの候補にもどる"
+    ]
+  },
+  "levels": {
+    "large": 70,
+    "mid": 40,
+    "labels": [
+      "小",
+      "中",
+      "大"
+    ]
+  },
+  "statEffects": {
+    "_comment": "1年あたりの変化の向きと大きさ。表示は『健康 ↓大』のように。",
+    "health": {
+      "from": "physicalLoad",
+      "dir": -1
+    },
+    "stress": {
+      "from": "mentalLoad+overtime",
+      "dir": 1
+    },
+    "social": {
+      "from": "t_comm を使う仕事か（weights.t_comm）",
+      "dir": 1
+    },
+    "happiness": {
+      "from": "jobSatisfaction の見込み（好きなことの tags 一致・給料・負荷）",
+      "dir": 1
+    }
+  },
+  "welfare": {
+    "_comment": "福利厚生（★1〜5）。雇用形態で決め、業界で少し足す",
+    "byForm": {
+      "civil_servant": 5,
+      "seishain": 4,
+      "keiyaku": 2,
+      "haken": 2,
+      "part": 1,
+      "student_part": 1,
+      "freelance": 1,
+      "self_employed": 1,
+      "executive": 3
+    },
+    "catBonus": {
+      "finance": 1,
+      "global": 1,
+      "engineering": 1,
+      "food": -1,
+      "service": -1,
+      "beauty": -1,
+      "creative": -1
+    },
+    "includes": [
+      "健康保険・厚生年金",
+      "有給休暇",
+      "育児休業・介護休業",
+      "退職金",
+      "住宅手当・家族手当",
+      "社員食堂・保養所"
+    ]
+  },
+  "pay": {
+    "_comment": "季節が1つ進むごとに3か月分の手取りが所持金に入る。賞与は6月（春の枠）と12月（秋の枠）。所持金の横に小さく『＋28.4万円』と出し、ふわっと消える。支出もまとめて『−12.0万円』と出す。",
+    "bonusMonthsByForm": {
+      "civil_servant": 4.5,
+      "seishain": 4,
+      "keiyaku": 0,
+      "haken": 0,
+      "part": 0,
+      "freelance": 0,
+      "self_employed": 0
+    },
+    "bonusSeasons": {
+      "Q1": 0.5,
+      "Q3": 0.5
+    },
+    "monthlyGross": "年収 ÷ (12 + 賞与の月数)",
+    "takeHome": 0.78,
+    "takeHomeNote": "手取り＝額面 − 所得税・住民税・健康保険・厚生年金・雇用保険（ざっくり22%）。フリーランス・自営業は国民健康保険・国民年金を自分で払う",
+    "freelance": "毎季節の収入が ±50% ぶれる。賞与なし",
+    "display": {
+      "income": "＋{n}万円（緑）",
+      "bonus": "💰 賞与 ＋{n}万円（金色）",
+      "expense": "−{n}万円（赤）",
+      "durationMs": 1600,
+      "rounding": "10万円未満は小数1けた（+8.4）、それ以上は整数（+124）。賞与をふくむときは 💰 をつける"
+    }
+  }
+}

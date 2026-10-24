@@ -6,7 +6,7 @@
 
 | | ID | 時期 | 条件 | 文章 | 選択肢 |
 |---|---|---|---|---|---|
-| 👶 | `ev_m_birth` | 0歳 春 |  | {year}年、{pref}で{name}が生まれた。家族は{family}。 |  |
+| 👶 | `ev_m_birth` | 0歳 春 |  | {year}年{month}月、{pref}で「{surname} {given}」が生まれた。家族は{family}。 |  |
 | 🧸 | `ev_m_preschool` | 3歳 春 |  | {name}も3歳。保育園や幼稚園をどうするか、家族で話し合っている。 | ［候補リスト:schools.preschool］ |
 | 🧒 | `ev_m_like_3` | 3歳 秋 |  | {name}は、どんなことをしているときが一番楽しそう？ | 🏃 外で遊ぶ<br>📖 本を読む<br>🎨 絵をかく<br>🔢 数をかぞえる・パズル<br>🎮 テレビゲーム<br>🙂 とくに決まっていない |
 | 🎒 | `ev_m_lesson_start` | 4歳 秋 |  | 近所の子が習い事を始めたらしい。{name}にも何かやらせてみる？ | ［候補リスト:clubs.lessons］<br>🏠 今はまだいい |
@@ -72,7 +72,7 @@
 | 🚗 | `ev_m_license_return` | 75〜100歳 春 | 必要:lic_car / 除外:license_returned | {age}歳。家族から「運転免許、そろそろ返したら？」と言われた。 | 🪪 免許を返納する<br>🚗 まだ運転を続ける |
 | 🕊️ | `ev_m_death` |  |  | {year}年{month}月。{name}は{age}歳で人生を終えた。{deathCause} |  |
 
-## ランダム選択肢イベント（109件）
+## ランダム選択肢イベント（111件）
 
 | | ID | 時期 | 条件 | 文章 | 選択肢 |
 |---|---|---|---|---|---|
@@ -112,6 +112,8 @@
 | 🎓 | `ev_r_child_univ_cost` |  | 子どもあり | {child}が大学に行きたいと言っている。学費は4年で{childTuition}万円。 | 💴 全部出してあげる<br>🤝 半分出して、残りは奨学金<br>📄 奨学金で行ってもらう<br>🙅 就職してほしいと伝える |
 | ⚡ | `ev_r_marital_crisis` |  | 必要:married / 人物:spouse | {spouse}との言い合いが増え、家の空気が重い。 | 🗣️ 時間をとって話し合う<br>🏥 夫婦カウンセリングに行く（10万）<br>💔 離婚する<br>😶 何もしない |
 | 💔 | `ev_r_divorce` |  | 必要:married / 人物:spouse | 離婚の話し合い。{childrenComment} | 📄 話し合いで決める（協議離婚）<br>⚖️ 弁護士に頼む（費用50万） |
+| 📝 | `ev_r_surname_marry` |  | 必要:married | 婚姻届を出す。日本の法律では、夫婦はどちらかの苗字にそろえる。どちらの苗字にする？ | 🙂 自分の苗字「{surname}」のまま（相手が変える）<br>📝 相手の苗字「{partnerSurname}」に変える |
+| 📝 | `ev_r_surname_divorce` |  | 必要:divorced / 除外:married | 離婚した。結婚のときに変えた苗字を、もとにもどす？（今の苗字を使い続けるなら、3か月以内に届け出が必要） | ↩️ 旧姓「{birthSurname}」にもどす<br>📝 今の苗字「{surname}」を使い続ける |
 | 🌷 | `ev_r_remarry_meet` | 28〜75歳 | どれか:divorced,widowed / 除外:married,has_partner | 新しい出会いがあった。もう一度、だれかと人生を歩む？ | 🌷 付き合ってみる<br>🙂 今はひとりでいい |
 | 🚗 | `ev_r_car_license` | 18〜40歳 | 除外:lic_car | 運転免許をとろうか考えている。 | 🏕️ 合宿で一気にとる（約25万・2週間）<br>🏫 教習所に通う（約32万）<br>🙅 今はとらない |
 | 🚙 | `ev_r_car_buy` | 18〜80歳 | 必要:lic_car / 除外:owns_car,license_returned | 車があったら便利だな……。 | 🚙 中古車を買う（80万）<br>🚗 新車をローンで買う（250万・5年ローン）<br>🚲 なくても生活できる |

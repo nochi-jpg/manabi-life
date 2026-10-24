@@ -83,8 +83,13 @@ button:active{transform:translateY(3px) scale(.98)}
 .bar i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--c1),var(--c2));transition:width .6s}
 .c-blue{--c1:#3d8bff;--c2:#7fc0ff}.c-red{--c1:#ff5a6e;--c2:#ffb04d}.c-mint{--c1:#3fe0a4;--c2:#7cf7c9}.c-pink{--c1:#ff6fa8;--c2:#ffb3d3}
 .c-gold{--c1:#ffcf3f;--c2:#fff09a}.c-gray{--c1:#7f8bb0;--c2:#b6c0de}
-.row .num{grid-column:2/4;justify-self:end;font-size:19px}
+.row .num{grid-column:2/4;justify-self:end;font-size:19px;white-space:nowrap}
 .row .num small{font-size:14px;color:var(--ink2);margin-left:2px}
+.delta{display:inline-block;vertical-align:2px;margin-right:5px;font-size:11px;white-space:nowrap;padding:0 6px;border-radius:999px;line-height:19px;animation:dfloat 1.6s ease-out infinite}
+.delta.inc{color:#fff;background:#2fbf86}
+.delta.bonus{color:#5a3d00;background:#ffcf3f}
+.delta.exp{color:#fff;background:#e44d62}
+@keyframes dfloat{0%{transform:translateY(6px);opacity:0}20%{transform:none;opacity:1}80%{opacity:1}100%{transform:translateY(-4px);opacity:0}}
 .dash{grid-column:2/4;justify-self:end;color:#b4bdd6;font-size:18px}
 
 /* ===== 重点方針・季節 ===== */
@@ -316,7 +321,7 @@ if(location.hash==='#adult'){
   const jr=document.querySelectorAll('#stat > div:nth-child(2) .row');
   jr[0].innerHTML='<span class="lb">💴 月収</span><span class="num">38.2<small>万円</small></span>';
   [[1,'c-red',55],[2,'c-blue',62],[3,'c-gold',58]].forEach(([i,c,v])=>{jr[i].querySelector('.bar').className='bar '+c;jr[i].querySelector('i').style.setProperty('--w',v+'%');jr[i].querySelector('.v').textContent=v});
-  jr[4].innerHTML='<span class="lb">👛 所持金</span><span class="num">312<small>万円</small></span>';
+  jr[4].innerHTML='<span class="lb">👛 所持金</span><span class="num"><span class="delta bonus">💰+124</span>312<small>万円</small></span>';
   document.getElementById('focus').innerHTML='<span class="k">重点方針</span>💼 仕事<span class="arw">▼</span>';
 }
 

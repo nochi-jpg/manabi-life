@@ -4,7 +4,7 @@
     {
       "id": "ev_m_birth", "kind": "flow", "emoji": "👶",
       "when": { "age": [0, 0], "season": ["Q1"], "once": true },
-      "text": "{year}年、{pref}で{name}が生まれた。家族は{family}。",
+      "text": "{year}年{month}月、{pref}で「{surname} {given}」が生まれた。家族は{family}。",
       "effects": { "log": "👶 {pref}で誕生" }
     },
     {
