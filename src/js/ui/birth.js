@@ -24,7 +24,10 @@ function familyLine(p) {
   if (p.role === 'father' || p.role === 'mother') what = esc(Fam.statusLabel(p));
   else if (p.role === 'sibling') what = p.age < 1 ? '👶 赤ちゃん' : p.age < 3 ? '🏠 家で過ごす' : p.age < 6 ? '🧸 保育園・幼稚園' : p.age < 12 ? '🎒 小学生' : p.age < 15 ? '🏫 中学生' : '📚 学生';
   else if (p.role === 'grandparent') what = p.together ? '🏠 いっしょに住んでいる' : `🏘️ ${esc(Fam.prefName(p.pref))}に住んでいる`;
-  return `<div class="kv"><span class="k">${roleEmoji(p)} ${p.role === 'grandparent' ? (p.side === 'mother' ? '母方の' : '父方の') : ''}${roleLabel(p)}（${p.age}）</span><span>${what}</span></div>`;
+  // なんとしても1行に：長い職業名ほど字を小さく（それでも入らなければ…で切る）
+  const len = String(what).replace(/<[^>]+>/g, '').replace(/\p{Extended_Pictographic}/gu, '').length;
+  const fs = len <= 9 ? '' : len <= 12 ? 'f14' : len <= 15 ? 'f12' : 'f11';
+  return `<div class="kv"><span class="k">${roleEmoji(p)} ${p.role === 'grandparent' ? (p.side === 'mother' ? '母方の' : '父方の') : ''}${roleLabel(p)}（${p.age}）</span><span class="one ${fs}">${what}</span></div>`;
 }
 Screens.birth = {
   enter(el) {

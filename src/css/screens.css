@@ -498,3 +498,7 @@
 .death .sum div{align-items:center}
 .death .sum .v{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .death .sum .edu .v{font-size:13px;line-height:1.3;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:keep-all;overflow-wrap:anywhere}
+/* 出生画面：家族の職業は1行に */
+#card .kv{grid-template-columns:120px minmax(0,1fr)}
+#card .kv .one{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#card .kv .one.f14{font-size:14px}#card .kv .one.f12{font-size:12px}#card .kv .one.f11{font-size:11px;letter-spacing:-.02em}
