@@ -4,107 +4,1607 @@
     "maxTime": 4,
     "studyPenaltyPerTime": 0.05,
     "quitEvent": "ev_r_quit_club",
-    "achievementEvents": ["ev_r_tournament"],
+    "achievementEvents": [
+      "ev_r_tournament"
+    ],
     "captainChance": "部員の中で skill と social が上位なら最終学年Q1に『部長・キャプテン』イベント"
   },
   "lessons": [
-    { "id": "ls_swim", "emoji": "🏊", "label": "スイミング", "age": [3, 12], "cost": 9, "time": 1, "tags": ["like_outdoor"], "yearly": { "skill.sport": 4, "health": 2, "subj.pe": 2 } },
-    { "id": "ls_piano", "emoji": "🎹", "label": "ピアノ", "age": [3, 18], "cost": 10, "time": 1, "tags": ["like_draw", "music"], "yearly": { "skill.music": 6, "subj.art": 2 }, "event": "ev_r_recital" },
-    { "id": "ls_english", "emoji": "🔤", "label": "英会話", "age": [3, 15], "cost": 12, "time": 1, "tags": ["global"], "yearly": { "subj.eng": 4 } },
-    { "id": "ls_soccer", "emoji": "⚽", "label": "サッカーチーム", "age": [5, 12], "cost": 6, "time": 2, "tags": ["like_outdoor"], "yearly": { "skill.sport": 6, "social": 3, "health": 2 }, "injury": 1.5 },
-    { "id": "ls_baseball", "emoji": "⚾", "label": "少年野球", "age": [6, 12], "cost": 6, "time": 2, "tags": ["like_outdoor"], "yearly": { "skill.sport": 6, "social": 3 }, "injury": 1.5, "parentLoad": 2 },
-    { "id": "ls_dance", "emoji": "💃", "label": "ダンス", "age": [4, 18], "cost": 9, "time": 1, "tags": ["like_outdoor", "like_draw"], "yearly": { "skill.sport": 3, "skill.music": 2, "social": 2 } },
-    { "id": "ls_karate", "emoji": "🥋", "label": "空手・柔道", "age": [4, 15], "cost": 6, "time": 1, "tags": ["like_outdoor"], "yearly": { "skill.sport": 4, "stress": -2 } },
-    { "id": "ls_shuji", "emoji": "🖌️", "label": "習字", "age": [5, 12], "cost": 5, "time": 1, "tags": ["like_draw", "like_book"], "yearly": { "subj.jpn": 2, "skill.art": 2 } },
-    { "id": "ls_soroban", "emoji": "🧮", "label": "そろばん", "age": [5, 12], "cost": 6, "time": 1, "tags": ["like_math"], "yearly": { "subj.math": 4 } },
-    { "id": "ls_art", "emoji": "🎨", "label": "絵画教室", "age": [4, 15], "cost": 7, "time": 1, "tags": ["like_draw"], "yearly": { "skill.art": 6, "subj.art": 3 } },
-    { "id": "ls_programming", "emoji": "💻", "label": "プログラミング教室", "age": [6, 15], "cost": 15, "time": 1, "tags": ["like_game", "like_math"], "yearly": { "skill.it": 7, "subj.math": 1 }, "tier": ["A", "B"] },
-    { "id": "ls_juku", "emoji": "✏️", "label": "学習塾", "age": [9, 17], "cost": 30, "time": 2, "tags": ["like_book", "like_math"], "set": ["juku"], "yearly": { "stress": 2 }, "note": "学力の伸び×1.3（mod_juku）" },
-    { "id": "ls_juken_juku", "emoji": "📝", "label": "中学受験の塾", "age": [9, 12], "cost": 80, "time": 3, "tags": ["like_book", "like_math"], "set": ["juku", "juken_track"], "yearly": { "stress": 6, "social": -2 }, "tier": ["A", "B"], "note": "小4〜小6。合計で約250万。学力の伸び×1.5" },
-    { "id": "ls_tutor_online", "emoji": "📱", "label": "通信教育・タブレット学習", "age": [6, 15], "cost": 6, "time": 0, "tags": [], "yearly": { "subjAll": 1 } }
+    {
+      "id": "ls_swim",
+      "emoji": "🏊",
+      "label": "スイミング",
+      "age": [
+        3,
+        12
+      ],
+      "cost": 9,
+      "time": 1,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 4,
+        "health": 2,
+        "subj.pe": 2
+      }
+    },
+    {
+      "id": "ls_piano",
+      "emoji": "🎹",
+      "label": "ピアノ",
+      "age": [
+        3,
+        18
+      ],
+      "cost": 10,
+      "time": 1,
+      "tags": [
+        "like_draw",
+        "music"
+      ],
+      "yearly": {
+        "skill.music": 6,
+        "subj.art": 2
+      },
+      "event": "ev_r_recital"
+    },
+    {
+      "id": "ls_english",
+      "emoji": "🔤",
+      "label": "英会話",
+      "age": [
+        3,
+        15
+      ],
+      "cost": 12,
+      "time": 1,
+      "tags": [
+        "global"
+      ],
+      "yearly": {
+        "subj.eng": 4
+      }
+    },
+    {
+      "id": "ls_soccer",
+      "emoji": "⚽",
+      "label": "サッカーチーム",
+      "age": [
+        5,
+        12
+      ],
+      "cost": 6,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 6,
+        "social": 3,
+        "health": 2
+      },
+      "injury": 1.5
+    },
+    {
+      "id": "ls_baseball",
+      "emoji": "⚾",
+      "label": "少年野球",
+      "age": [
+        6,
+        12
+      ],
+      "cost": 6,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 6,
+        "social": 3
+      },
+      "injury": 1.5,
+      "parentLoad": 2
+    },
+    {
+      "id": "ls_dance",
+      "emoji": "💃",
+      "label": "ダンス",
+      "age": [
+        4,
+        18
+      ],
+      "cost": 9,
+      "time": 1,
+      "tags": [
+        "like_outdoor",
+        "like_draw"
+      ],
+      "yearly": {
+        "skill.sport": 3,
+        "skill.music": 2,
+        "social": 2
+      }
+    },
+    {
+      "id": "ls_karate",
+      "emoji": "🥋",
+      "label": "空手・柔道",
+      "age": [
+        4,
+        15
+      ],
+      "cost": 6,
+      "time": 1,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 4,
+        "stress": -2
+      }
+    },
+    {
+      "id": "ls_shuji",
+      "emoji": "🖌️",
+      "label": "習字",
+      "age": [
+        5,
+        12
+      ],
+      "cost": 5,
+      "time": 1,
+      "tags": [
+        "like_draw",
+        "like_book"
+      ],
+      "yearly": {
+        "subj.jpn": 2,
+        "skill.art": 2
+      }
+    },
+    {
+      "id": "ls_soroban",
+      "emoji": "🧮",
+      "label": "そろばん",
+      "age": [
+        5,
+        12
+      ],
+      "cost": 6,
+      "time": 1,
+      "tags": [
+        "like_math"
+      ],
+      "yearly": {
+        "subj.math": 4
+      }
+    },
+    {
+      "id": "ls_art",
+      "emoji": "🎨",
+      "label": "絵画教室",
+      "age": [
+        4,
+        15
+      ],
+      "cost": 7,
+      "time": 1,
+      "tags": [
+        "like_draw"
+      ],
+      "yearly": {
+        "skill.art": 6,
+        "subj.art": 3
+      }
+    },
+    {
+      "id": "ls_programming",
+      "emoji": "💻",
+      "label": "プログラミング教室",
+      "age": [
+        6,
+        15
+      ],
+      "cost": 15,
+      "time": 1,
+      "tags": [
+        "like_game",
+        "like_math"
+      ],
+      "yearly": {
+        "skill.it": 7,
+        "subj.math": 1
+      },
+      "tier": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ls_juku",
+      "emoji": "✏️",
+      "label": "学習塾",
+      "age": [
+        9,
+        17
+      ],
+      "cost": 30,
+      "time": 2,
+      "tags": [
+        "like_book",
+        "like_math"
+      ],
+      "set": [
+        "juku"
+      ],
+      "yearly": {
+        "stress": 2
+      },
+      "note": "学力の伸び×1.3（mod_juku）"
+    },
+    {
+      "id": "ls_juken_juku",
+      "emoji": "📝",
+      "label": "中学受験の塾",
+      "age": [
+        9,
+        12
+      ],
+      "cost": 80,
+      "time": 3,
+      "tags": [
+        "like_book",
+        "like_math"
+      ],
+      "set": [
+        "juku",
+        "juken_track"
+      ],
+      "yearly": {
+        "stress": 6,
+        "social": -2
+      },
+      "tier": [
+        "A",
+        "B"
+      ],
+      "note": "小4〜小6。合計で約250万。学力の伸び×1.5"
+    },
+    {
+      "id": "ls_tutor_online",
+      "emoji": "📱",
+      "label": "通信教育・タブレット学習",
+      "age": [
+        6,
+        15
+      ],
+      "cost": 6,
+      "time": 0,
+      "tags": [],
+      "yearly": {
+        "subjAll": 1
+      }
+    }
   ],
   "jhsClubs": [
-    { "id": "c_baseball", "emoji": "⚾", "label": "野球部", "type": "sport", "cost": 5, "time": 3, "tags": ["like_outdoor"], "yearly": { "skill.sport": 8, "subj.pe": 4, "social": 4, "health": 2, "stress": 2 }, "injury": 2, "tourney": true },
-    { "id": "c_soccer", "emoji": "⚽", "label": "サッカー部", "type": "sport", "cost": 5, "time": 3, "tags": ["like_outdoor"], "yearly": { "skill.sport": 8, "subj.pe": 4, "social": 4, "health": 2 }, "injury": 2, "tourney": true },
-    { "id": "c_basket", "emoji": "🏀", "label": "バスケットボール部", "type": "sport", "cost": 4, "time": 3, "tags": ["like_outdoor"], "yearly": { "skill.sport": 8, "subj.pe": 4, "social": 4 }, "injury": 2, "tourney": true },
-    { "id": "c_volley", "emoji": "🏐", "label": "バレーボール部", "type": "sport", "cost": 4, "time": 3, "tags": ["like_outdoor"], "yearly": { "skill.sport": 7, "subj.pe": 4, "social": 4 }, "injury": 1.5, "tourney": true },
-    { "id": "c_track", "emoji": "🏃", "label": "陸上部", "type": "sport", "cost": 3, "time": 2, "tags": ["like_outdoor"], "yearly": { "skill.sport": 7, "subj.pe": 4, "health": 3 }, "injury": 1, "tourney": true },
-    { "id": "c_swim", "emoji": "🏊", "label": "水泳部", "type": "sport", "cost": 3, "time": 2, "tags": ["like_outdoor"], "yearly": { "skill.sport": 6, "subj.pe": 3, "health": 3 }, "injury": 0.5, "tourney": true },
-    { "id": "c_tennis", "emoji": "🎾", "label": "ソフトテニス部", "type": "sport", "cost": 4, "time": 2, "tags": ["like_outdoor"], "yearly": { "skill.sport": 6, "subj.pe": 3, "social": 3 }, "injury": 1, "tourney": true },
-    { "id": "c_badminton", "emoji": "🏸", "label": "バドミントン部", "type": "sport", "cost": 3, "time": 2, "tags": ["like_outdoor"], "yearly": { "skill.sport": 6, "subj.pe": 3, "social": 3 }, "injury": 1, "tourney": true },
-    { "id": "c_tabletennis", "emoji": "🏓", "label": "卓球部", "type": "sport", "cost": 3, "time": 2, "tags": ["like_outdoor", "like_game"], "yearly": { "skill.sport": 5, "subj.pe": 2, "social": 3 }, "injury": 0.5, "tourney": true },
-    { "id": "c_kendo", "emoji": "🤺", "label": "剣道部", "type": "sport", "cost": 6, "time": 2, "tags": ["like_outdoor"], "yearly": { "skill.sport": 6, "subj.pe": 3, "stress": -1 }, "injury": 1, "tourney": true },
-    { "id": "c_judo", "emoji": "🥋", "label": "柔道部", "type": "sport", "cost": 4, "time": 2, "tags": ["like_outdoor"], "yearly": { "skill.sport": 6, "subj.pe": 3 }, "injury": 2, "tourney": true },
-    { "id": "c_dance", "emoji": "💃", "label": "ダンス部", "type": "sport", "cost": 4, "time": 2, "tags": ["like_outdoor", "like_draw"], "yearly": { "skill.sport": 5, "skill.music": 2, "social": 4 }, "injury": 1, "tourney": true },
-    { "id": "c_brass", "emoji": "🎺", "label": "吹奏楽部", "type": "culture", "cost": 5, "time": 3, "tags": ["music", "like_draw"], "yearly": { "skill.music": 8, "subj.art": 3, "social": 4, "stress": 2 }, "tourney": true },
-    { "id": "c_chorus", "emoji": "🎶", "label": "合唱部", "type": "culture", "cost": 2, "time": 2, "tags": ["music"], "yearly": { "skill.music": 6, "social": 3 }, "tourney": true },
-    { "id": "c_art", "emoji": "🎨", "label": "美術部", "type": "culture", "cost": 2, "time": 1, "tags": ["like_draw"], "yearly": { "skill.art": 7, "subj.art": 4, "stress": -2 }, "tourney": true },
-    { "id": "c_science", "emoji": "🧪", "label": "科学部", "type": "culture", "cost": 1, "time": 1, "tags": ["like_math", "science"], "yearly": { "subj.sci": 4, "subj.math": 1 }, "tourney": true },
-    { "id": "c_pc", "emoji": "💻", "label": "パソコン部", "type": "culture", "cost": 1, "time": 1, "tags": ["like_game", "like_math"], "yearly": { "skill.it": 7, "subj.math": 1 } },
-    { "id": "c_drama", "emoji": "🎭", "label": "演劇部", "type": "culture", "cost": 2, "time": 2, "tags": ["like_book", "entertain"], "yearly": { "skill.speech": 6, "social": 4, "subj.jpn": 2 }, "tourney": true },
-    { "id": "c_calligraphy", "emoji": "🖌️", "label": "書道部", "type": "culture", "cost": 2, "time": 1, "tags": ["like_draw", "like_book"], "yearly": { "skill.art": 4, "subj.jpn": 2, "stress": -2 } },
-    { "id": "c_shogi", "emoji": "♟️", "label": "囲碁・将棋部", "type": "culture", "cost": 1, "time": 1, "tags": ["like_math", "like_game"], "yearly": { "subj.math": 2, "stress": -1 }, "tourney": true },
-    { "id": "c_home", "emoji": "🧁", "label": "家庭科部", "type": "culture", "cost": 2, "time": 1, "tags": ["cook"], "yearly": { "skill.cooking": 6, "social": 2 } },
-    { "id": "c_broadcast", "emoji": "🎙️", "label": "放送部", "type": "culture", "cost": 1, "time": 1, "tags": ["like_book", "entertain"], "yearly": { "skill.speech": 5, "subj.jpn": 2 } },
-    { "id": "c_none", "emoji": "🏠", "label": "帰宅部", "type": "none", "cost": 0, "time": 0, "tags": [], "yearly": { "social": -2 }, "note": "空いた時間は重点方針の効果が×1.2" }
+    {
+      "id": "c_baseball",
+      "emoji": "⚾",
+      "label": "野球部",
+      "type": "sport",
+      "cost": 5,
+      "time": 3,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 8,
+        "subj.pe": 4,
+        "social": 4,
+        "health": 2,
+        "stress": 2
+      },
+      "injury": 2,
+      "tourney": true
+    },
+    {
+      "id": "c_soccer",
+      "emoji": "⚽",
+      "label": "サッカー部",
+      "type": "sport",
+      "cost": 5,
+      "time": 3,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 8,
+        "subj.pe": 4,
+        "social": 4,
+        "health": 2
+      },
+      "injury": 2,
+      "tourney": true
+    },
+    {
+      "id": "c_basket",
+      "emoji": "🏀",
+      "label": "バスケットボール部",
+      "type": "sport",
+      "cost": 4,
+      "time": 3,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 8,
+        "subj.pe": 4,
+        "social": 4
+      },
+      "injury": 2,
+      "tourney": true
+    },
+    {
+      "id": "c_volley",
+      "emoji": "🏐",
+      "label": "バレーボール部",
+      "type": "sport",
+      "cost": 4,
+      "time": 3,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 7,
+        "subj.pe": 4,
+        "social": 4
+      },
+      "injury": 1.5,
+      "tourney": true
+    },
+    {
+      "id": "c_track",
+      "emoji": "🏃",
+      "label": "陸上部",
+      "type": "sport",
+      "cost": 3,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 7,
+        "subj.pe": 4,
+        "health": 3
+      },
+      "injury": 1,
+      "tourney": true
+    },
+    {
+      "id": "c_swim",
+      "emoji": "🏊",
+      "label": "水泳部",
+      "type": "sport",
+      "cost": 3,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 6,
+        "subj.pe": 3,
+        "health": 3
+      },
+      "injury": 0.5,
+      "tourney": true
+    },
+    {
+      "id": "c_tennis",
+      "emoji": "🎾",
+      "label": "ソフトテニス部",
+      "type": "sport",
+      "cost": 4,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 6,
+        "subj.pe": 3,
+        "social": 3
+      },
+      "injury": 1,
+      "tourney": true
+    },
+    {
+      "id": "c_badminton",
+      "emoji": "🏸",
+      "label": "バドミントン部",
+      "type": "sport",
+      "cost": 3,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 6,
+        "subj.pe": 3,
+        "social": 3
+      },
+      "injury": 1,
+      "tourney": true
+    },
+    {
+      "id": "c_tabletennis",
+      "emoji": "🏓",
+      "label": "卓球部",
+      "type": "sport",
+      "cost": 3,
+      "time": 2,
+      "tags": [
+        "like_outdoor",
+        "like_game"
+      ],
+      "yearly": {
+        "skill.sport": 5,
+        "subj.pe": 2,
+        "social": 3
+      },
+      "injury": 0.5,
+      "tourney": true
+    },
+    {
+      "id": "c_kendo",
+      "emoji": "🤺",
+      "label": "剣道部",
+      "type": "sport",
+      "cost": 6,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 6,
+        "subj.pe": 3,
+        "stress": -1
+      },
+      "injury": 1,
+      "tourney": true
+    },
+    {
+      "id": "c_judo",
+      "emoji": "🥋",
+      "label": "柔道部",
+      "type": "sport",
+      "cost": 4,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 6,
+        "subj.pe": 3
+      },
+      "injury": 2,
+      "tourney": true
+    },
+    {
+      "id": "c_dance",
+      "emoji": "💃",
+      "label": "ダンス部",
+      "type": "sport",
+      "cost": 4,
+      "time": 2,
+      "tags": [
+        "like_outdoor",
+        "like_draw"
+      ],
+      "yearly": {
+        "skill.sport": 5,
+        "skill.music": 2,
+        "social": 4
+      },
+      "injury": 1,
+      "tourney": true
+    },
+    {
+      "id": "c_brass",
+      "emoji": "🎺",
+      "label": "吹奏楽部",
+      "type": "culture",
+      "cost": 5,
+      "time": 3,
+      "tags": [
+        "music",
+        "like_draw"
+      ],
+      "yearly": {
+        "skill.music": 8,
+        "subj.art": 3,
+        "social": 4,
+        "stress": 2
+      },
+      "tourney": true
+    },
+    {
+      "id": "c_chorus",
+      "emoji": "🎶",
+      "label": "合唱部",
+      "type": "culture",
+      "cost": 2,
+      "time": 2,
+      "tags": [
+        "music"
+      ],
+      "yearly": {
+        "skill.music": 6,
+        "social": 3
+      },
+      "tourney": true
+    },
+    {
+      "id": "c_art",
+      "emoji": "🎨",
+      "label": "美術部",
+      "type": "culture",
+      "cost": 2,
+      "time": 1,
+      "tags": [
+        "like_draw"
+      ],
+      "yearly": {
+        "skill.art": 7,
+        "subj.art": 4,
+        "stress": -2
+      },
+      "tourney": true
+    },
+    {
+      "id": "c_science",
+      "emoji": "🧪",
+      "label": "科学部",
+      "type": "culture",
+      "cost": 1,
+      "time": 1,
+      "tags": [
+        "like_math",
+        "science"
+      ],
+      "yearly": {
+        "subj.sci": 4,
+        "subj.math": 1
+      },
+      "tourney": true
+    },
+    {
+      "id": "c_pc",
+      "emoji": "💻",
+      "label": "パソコン部",
+      "type": "culture",
+      "cost": 1,
+      "time": 1,
+      "tags": [
+        "like_game",
+        "like_math"
+      ],
+      "yearly": {
+        "skill.it": 7,
+        "subj.math": 1
+      }
+    },
+    {
+      "id": "c_drama",
+      "emoji": "🎭",
+      "label": "演劇部",
+      "type": "culture",
+      "cost": 2,
+      "time": 2,
+      "tags": [
+        "like_book",
+        "entertain"
+      ],
+      "yearly": {
+        "skill.speech": 6,
+        "social": 4,
+        "subj.jpn": 2
+      },
+      "tourney": true
+    },
+    {
+      "id": "c_calligraphy",
+      "emoji": "🖌️",
+      "label": "書道部",
+      "type": "culture",
+      "cost": 2,
+      "time": 1,
+      "tags": [
+        "like_draw",
+        "like_book"
+      ],
+      "yearly": {
+        "skill.art": 4,
+        "subj.jpn": 2,
+        "stress": -2
+      }
+    },
+    {
+      "id": "c_shogi",
+      "emoji": "♟️",
+      "label": "囲碁・将棋部",
+      "type": "culture",
+      "cost": 1,
+      "time": 1,
+      "tags": [
+        "like_math",
+        "like_game"
+      ],
+      "yearly": {
+        "subj.math": 2,
+        "stress": -1
+      },
+      "tourney": true
+    },
+    {
+      "id": "c_home",
+      "emoji": "🧁",
+      "label": "家庭科部",
+      "type": "culture",
+      "cost": 2,
+      "time": 1,
+      "tags": [
+        "cook"
+      ],
+      "yearly": {
+        "skill.cooking": 6,
+        "social": 2
+      }
+    },
+    {
+      "id": "c_broadcast",
+      "emoji": "🎙️",
+      "label": "放送部",
+      "type": "culture",
+      "cost": 1,
+      "time": 1,
+      "tags": [
+        "like_book",
+        "entertain"
+      ],
+      "yearly": {
+        "skill.speech": 5,
+        "subj.jpn": 2
+      }
+    },
+    {
+      "id": "c_none",
+      "emoji": "🏠",
+      "label": "帰宅部",
+      "type": "none",
+      "cost": 0,
+      "time": 0,
+      "tags": [],
+      "yearly": {
+        "social": -2
+      },
+      "note": "空いた時間は重点方針の効果が×1.2"
+    }
   ],
   "hsClubsExtra": [
-    { "id": "c_baseball_hard", "emoji": "⚾", "label": "硬式野球部", "type": "sport", "cost": 15, "time": 3, "tags": ["like_outdoor"], "yearly": { "skill.sport": 10, "subj.pe": 4, "social": 5, "stress": 4, "health": 1 }, "injury": 3, "tourney": "ev_r_koshien", "grantOnAchieve": ["koshien"] },
-    { "id": "c_rugby", "emoji": "🏉", "label": "ラグビー部", "type": "sport", "cost": 6, "time": 3, "tags": ["like_outdoor"], "yearly": { "skill.sport": 9, "subj.pe": 4, "social": 6 }, "injury": 4, "tourney": true },
-    { "id": "c_kyudo", "emoji": "🏹", "label": "弓道部", "type": "sport", "cost": 8, "time": 2, "tags": ["like_outdoor"], "yearly": { "skill.sport": 4, "stress": -3 }, "injury": 0.2, "tourney": true },
-    { "id": "c_lightmusic", "emoji": "🎸", "label": "軽音楽部", "type": "culture", "cost": 8, "time": 2, "tags": ["music", "like_draw"], "yearly": { "skill.music": 7, "social": 5, "happiness": 3 } },
-    { "id": "c_photo", "emoji": "📷", "label": "写真部", "type": "culture", "cost": 5, "time": 1, "tags": ["like_draw"], "yearly": { "skill.art": 5 } },
-    { "id": "c_literature", "emoji": "📖", "label": "文芸部", "type": "culture", "cost": 1, "time": 1, "tags": ["like_book"], "yearly": { "subj.jpn": 4, "skill.speech": 1 } },
-    { "id": "c_esports", "emoji": "🎮", "label": "eスポーツ部", "type": "culture", "cost": 3, "time": 2, "tags": ["like_game"], "yearly": { "skill.it": 4, "social": 3, "happiness": 3 }, "tourney": true },
-    { "id": "c_robot", "emoji": "🤖", "label": "ロボット研究部", "type": "culture", "cost": 3, "time": 2, "tags": ["like_math", "like_game", "engineering"], "yearly": { "skill.it": 6, "subj.sci": 3, "subj.math": 2 }, "tourney": true },
-    { "id": "c_english", "emoji": "🗣️", "label": "英語部（ESS）", "type": "culture", "cost": 1, "time": 1, "tags": ["global"], "yearly": { "subj.eng": 5, "skill.speech": 2 }, "tourney": true },
-    { "id": "c_council", "emoji": "🏛️", "label": "生徒会", "type": "culture", "cost": 0, "time": 1, "tags": ["civil"], "yearly": { "social": 5, "skill.speech": 4, "stress": 2 }, "set": ["student_council"], "recommendBonus": 2 },
-    { "id": "c_volunteer", "emoji": "🤝", "label": "ボランティア部", "type": "culture", "cost": 1, "time": 1, "tags": ["welfare"], "yearly": { "social": 3, "happiness": 2 }, "set": ["volunteer"], "recommendBonus": 1 }
+    {
+      "id": "c_baseball_hard",
+      "emoji": "⚾",
+      "label": "硬式野球部",
+      "type": "sport",
+      "cost": 15,
+      "time": 3,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 10,
+        "subj.pe": 4,
+        "social": 5,
+        "stress": 4,
+        "health": 1
+      },
+      "injury": 3,
+      "tourney": "ev_r_koshien",
+      "grantOnAchieve": [
+        "koshien"
+      ]
+    },
+    {
+      "id": "c_rugby",
+      "emoji": "🏉",
+      "label": "ラグビー部",
+      "type": "sport",
+      "cost": 6,
+      "time": 3,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 9,
+        "subj.pe": 4,
+        "social": 6
+      },
+      "injury": 4,
+      "tourney": true
+    },
+    {
+      "id": "c_kyudo",
+      "emoji": "🏹",
+      "label": "弓道部",
+      "type": "sport",
+      "cost": 8,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 4,
+        "stress": -3
+      },
+      "injury": 0.2,
+      "tourney": true
+    },
+    {
+      "id": "c_lightmusic",
+      "emoji": "🎸",
+      "label": "軽音楽部",
+      "type": "culture",
+      "cost": 8,
+      "time": 2,
+      "tags": [
+        "music",
+        "like_draw"
+      ],
+      "yearly": {
+        "skill.music": 7,
+        "social": 5,
+        "happiness": 3
+      }
+    },
+    {
+      "id": "c_photo",
+      "emoji": "📷",
+      "label": "写真部",
+      "type": "culture",
+      "cost": 5,
+      "time": 1,
+      "tags": [
+        "like_draw"
+      ],
+      "yearly": {
+        "skill.art": 5
+      }
+    },
+    {
+      "id": "c_literature",
+      "emoji": "📖",
+      "label": "文芸部",
+      "type": "culture",
+      "cost": 1,
+      "time": 1,
+      "tags": [
+        "like_book"
+      ],
+      "yearly": {
+        "subj.jpn": 4,
+        "skill.speech": 1
+      }
+    },
+    {
+      "id": "c_esports",
+      "emoji": "🎮",
+      "label": "eスポーツ部",
+      "type": "culture",
+      "cost": 3,
+      "time": 2,
+      "tags": [
+        "like_game"
+      ],
+      "yearly": {
+        "skill.it": 4,
+        "social": 3,
+        "happiness": 3
+      },
+      "tourney": true
+    },
+    {
+      "id": "c_robot",
+      "emoji": "🤖",
+      "label": "ロボット研究部",
+      "type": "culture",
+      "cost": 3,
+      "time": 2,
+      "tags": [
+        "like_math",
+        "like_game",
+        "engineering"
+      ],
+      "yearly": {
+        "skill.it": 6,
+        "subj.sci": 3,
+        "subj.math": 2
+      },
+      "tourney": true
+    },
+    {
+      "id": "c_english",
+      "emoji": "🗣️",
+      "label": "英語部（ESS）",
+      "type": "culture",
+      "cost": 1,
+      "time": 1,
+      "tags": [
+        "global"
+      ],
+      "yearly": {
+        "subj.eng": 5,
+        "skill.speech": 2
+      },
+      "tourney": true
+    },
+    {
+      "id": "c_council",
+      "emoji": "🏛️",
+      "label": "生徒会",
+      "type": "culture",
+      "cost": 0,
+      "time": 1,
+      "tags": [
+        "civil"
+      ],
+      "yearly": {
+        "social": 5,
+        "skill.speech": 4,
+        "stress": 2
+      },
+      "set": [
+        "student_council"
+      ],
+      "recommendBonus": 2
+    },
+    {
+      "id": "c_volunteer",
+      "emoji": "🤝",
+      "label": "ボランティア部",
+      "type": "culture",
+      "cost": 1,
+      "time": 1,
+      "tags": [
+        "welfare"
+      ],
+      "yearly": {
+        "social": 3,
+        "happiness": 2
+      },
+      "set": [
+        "volunteer"
+      ],
+      "recommendBonus": 1
+    }
   ],
   "univCircles": [
-    { "id": "u_tennis", "emoji": "🎾", "label": "テニスサークル", "cost": 6, "time": 1, "tags": ["like_outdoor"], "yearly": { "social": 6, "health": 2, "happiness": 3 }, "loveMul": 1.6 },
-    { "id": "u_allround", "emoji": "🎉", "label": "オールラウンドサークル（イベント・飲み会多め）", "cost": 10, "time": 2, "tags": [], "yearly": { "social": 8, "happiness": 3, "subjAll": -1 }, "loveMul": 1.6, "drinkMul": 2, "riskEvents": ["ev_r_drink_pressure"] },
-    { "id": "u_taiikukai", "emoji": "🏅", "label": "体育会（本格的な運動部）", "cost": 15, "time": 3, "tags": ["like_outdoor", "sport"], "yearly": { "skill.sport": 8, "social": 5, "health": 2, "stress": 3 }, "injury": 2, "jobBonus": { "sales": 5, "finance": 3 }, "tourney": true },
-    { "id": "u_band", "emoji": "🎸", "label": "軽音サークル", "cost": 8, "time": 2, "tags": ["music"], "yearly": { "skill.music": 6, "social": 5, "happiness": 4 } },
-    { "id": "u_dance", "emoji": "🕺", "label": "ダンスサークル", "cost": 6, "time": 2, "tags": ["like_outdoor", "like_draw"], "yearly": { "skill.sport": 4, "social": 6 } },
-    { "id": "u_travel", "emoji": "🧳", "label": "旅行サークル", "cost": 20, "time": 1, "tags": [], "yearly": { "social": 5, "happiness": 5, "stress": -3 } },
-    { "id": "u_volunteer", "emoji": "🤝", "label": "ボランティアサークル", "cost": 2, "time": 1, "tags": ["welfare"], "yearly": { "social": 4, "happiness": 3 }, "set": ["volunteer"], "jobBonus": { "all": 2 } },
-    { "id": "u_intl", "emoji": "🌐", "label": "国際交流サークル", "cost": 4, "time": 1, "tags": ["global"], "yearly": { "subj.eng": 4, "social": 4 }, "abroadMul": 1.5 },
-    { "id": "u_startup", "emoji": "🚀", "label": "学生団体・起業サークル", "cost": 3, "time": 2, "tags": ["startup", "sales"], "yearly": { "skill.speech": 4, "social": 4, "stress": 2 }, "startupMul": 2, "jobBonus": { "all": 3 } },
-    { "id": "u_game", "emoji": "🎮", "label": "ゲーム・アニメ研究会", "cost": 2, "time": 1, "tags": ["like_game", "creative"], "yearly": { "skill.it": 2, "happiness": 5, "social": 3 } },
-    { "id": "u_research", "emoji": "🔬", "label": "研究会・ゼミ活動に打ち込む", "cost": 1, "time": 2, "tags": ["like_book", "like_math", "science"], "yearly": { "subjMajor": 4 }, "gradMul": 1.5 },
-    { "id": "u_media", "emoji": "📸", "label": "写真・映像サークル", "cost": 8, "time": 1, "tags": ["like_draw", "creative"], "yearly": { "skill.art": 5, "social": 3 } },
-    { "id": "u_none", "emoji": "🏠", "label": "サークルに入らない", "cost": 0, "time": 0, "tags": [], "yearly": { "social": -3 }, "note": "バイト・勉強の効果×1.2" }
+    {
+      "id": "u_tennis",
+      "emoji": "🎾",
+      "label": "テニスサークル",
+      "cost": 6,
+      "time": 1,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "social": 6,
+        "health": 2,
+        "happiness": 3
+      },
+      "loveMul": 1.6
+    },
+    {
+      "id": "u_allround",
+      "emoji": "🎉",
+      "label": "オールラウンドサークル（イベント・飲み会多め）",
+      "cost": 10,
+      "time": 2,
+      "tags": [],
+      "yearly": {
+        "social": 8,
+        "happiness": 3,
+        "subjAll": -1
+      },
+      "loveMul": 1.6,
+      "drinkMul": 2,
+      "riskEvents": [
+        "ev_r_drink_pressure"
+      ]
+    },
+    {
+      "id": "u_taiikukai",
+      "emoji": "🏅",
+      "label": "体育会（本格的な運動部）",
+      "cost": 15,
+      "time": 3,
+      "tags": [
+        "like_outdoor",
+        "sport"
+      ],
+      "yearly": {
+        "skill.sport": 8,
+        "social": 5,
+        "health": 2,
+        "stress": 3
+      },
+      "injury": 2,
+      "jobBonus": {
+        "sales": 5,
+        "finance": 3
+      },
+      "tourney": true
+    },
+    {
+      "id": "u_band",
+      "emoji": "🎸",
+      "label": "軽音サークル",
+      "cost": 8,
+      "time": 2,
+      "tags": [
+        "music"
+      ],
+      "yearly": {
+        "skill.music": 6,
+        "social": 5,
+        "happiness": 4
+      }
+    },
+    {
+      "id": "u_dance",
+      "emoji": "🕺",
+      "label": "ダンスサークル",
+      "cost": 6,
+      "time": 2,
+      "tags": [
+        "like_outdoor",
+        "like_draw"
+      ],
+      "yearly": {
+        "skill.sport": 4,
+        "social": 6
+      }
+    },
+    {
+      "id": "u_travel",
+      "emoji": "🧳",
+      "label": "旅行サークル",
+      "cost": 20,
+      "time": 1,
+      "tags": [],
+      "yearly": {
+        "social": 5,
+        "happiness": 5,
+        "stress": -3
+      }
+    },
+    {
+      "id": "u_volunteer",
+      "emoji": "🤝",
+      "label": "ボランティアサークル",
+      "cost": 2,
+      "time": 1,
+      "tags": [
+        "welfare"
+      ],
+      "yearly": {
+        "social": 4,
+        "happiness": 3
+      },
+      "set": [
+        "volunteer"
+      ],
+      "jobBonus": {
+        "all": 2
+      }
+    },
+    {
+      "id": "u_intl",
+      "emoji": "🌐",
+      "label": "国際交流サークル",
+      "cost": 4,
+      "time": 1,
+      "tags": [
+        "global"
+      ],
+      "yearly": {
+        "subj.eng": 4,
+        "social": 4
+      },
+      "abroadMul": 1.5
+    },
+    {
+      "id": "u_startup",
+      "emoji": "🚀",
+      "label": "学生団体・起業サークル",
+      "cost": 3,
+      "time": 2,
+      "tags": [
+        "startup",
+        "sales"
+      ],
+      "yearly": {
+        "skill.speech": 4,
+        "social": 4,
+        "stress": 2
+      },
+      "startupMul": 2,
+      "jobBonus": {
+        "all": 3
+      }
+    },
+    {
+      "id": "u_game",
+      "emoji": "🎮",
+      "label": "ゲーム・アニメ研究会",
+      "cost": 2,
+      "time": 1,
+      "tags": [
+        "like_game",
+        "creative"
+      ],
+      "yearly": {
+        "skill.it": 2,
+        "happiness": 5,
+        "social": 3
+      }
+    },
+    {
+      "id": "u_research",
+      "emoji": "🔬",
+      "label": "研究会・ゼミ活動に打ち込む",
+      "cost": 1,
+      "time": 2,
+      "tags": [
+        "like_book",
+        "like_math",
+        "science"
+      ],
+      "yearly": {
+        "subjMajor": 4
+      },
+      "gradMul": 1.5
+    },
+    {
+      "id": "u_media",
+      "emoji": "📸",
+      "label": "写真・映像サークル",
+      "cost": 8,
+      "time": 1,
+      "tags": [
+        "like_draw",
+        "creative"
+      ],
+      "yearly": {
+        "skill.art": 5,
+        "social": 3
+      }
+    },
+    {
+      "id": "u_none",
+      "emoji": "🏠",
+      "label": "サークルに入らない",
+      "cost": 0,
+      "time": 0,
+      "tags": [],
+      "yearly": {
+        "social": -3
+      },
+      "note": "バイト・勉強の効果×1.2"
+    }
   ],
-  "_hobbyComment": "趣味は『習い事・部活・サークル』とは別の枠（最大3つ）。お金と時間はほとんどかからず、ストレスを下げ満足感を上げる。重点方針『趣味』で効果×1.5。3歳・6歳の『好きなこと』が最初の趣味になる（firstFrom）。time は拘束の目安で、合計 time ≤4 の計算には入れない。",
-  "hobbyRules": { "max": 3, "event": "ev_r_new_hobby", "firstFrom": { "like_outdoor": "h_outdoor", "like_book": "h_reading", "like_draw": "h_drawing", "like_math": "h_puzzle", "like_game": "h_game", "like_none": null } },
+  "_hobbyComment": "趣味は『習い事・部活・サークル』とは別の枠（上限なし。画面には3つまで出し、残りは「+N」。詳細はタップで一覧）。お金と時間はほとんどかからず、ストレスを下げ満足感を上げる。重点方針『趣味』で効果×1.5。3歳・6歳の『好きなこと』が最初の趣味になる（firstFrom）。time は拘束の目安で、合計 time ≤4 の計算には入れない。",
+  "hobbyRules": {
+    "max": null,
+    "event": "ev_r_new_hobby",
+    "firstFrom": {
+      "like_outdoor": "h_outdoor",
+      "like_book": "h_reading",
+      "like_draw": "h_drawing",
+      "like_math": "h_puzzle",
+      "like_game": "h_game",
+      "like_none": null
+    }
+  },
   "hobbies": [
-    { "id": "h_game", "emoji": "🎮", "label": "テレビゲーム", "age": [3, 105], "cost": 3, "tags": ["like_game"], "yearly": { "stress": -4, "happiness": 3, "skill.it": 1 }, "overuse": { "focus_hobby": { "academic": -2, "health": -1 } } },
-    { "id": "h_reading", "emoji": "📖", "label": "読書", "age": [4, 105], "cost": 2, "tags": ["like_book"], "yearly": { "stress": -3, "happiness": 2, "subj.jpn": 1 } },
-    { "id": "h_drawing", "emoji": "🖍️", "label": "お絵かき・イラスト", "age": [3, 105], "cost": 1, "tags": ["like_draw"], "yearly": { "stress": -3, "happiness": 3, "skill.art": 2 } },
-    { "id": "h_puzzle", "emoji": "🧩", "label": "パズル・クイズ", "age": [4, 105], "cost": 1, "tags": ["like_math"], "yearly": { "stress": -2, "happiness": 2, "subj.math": 1 } },
-    { "id": "h_outdoor", "emoji": "🛝", "label": "外遊び", "age": [3, 12], "cost": 0, "tags": ["like_outdoor"], "yearly": { "stress": -3, "health": 1, "social": 1 } },
-    { "id": "h_anime", "emoji": "📺", "label": "アニメ・マンガ", "age": [5, 105], "cost": 2, "tags": ["like_draw", "like_book"], "yearly": { "stress": -4, "happiness": 3 } },
-    { "id": "h_music", "emoji": "🎧", "label": "音楽を聴く", "age": [8, 105], "cost": 1, "tags": [], "yearly": { "stress": -3, "happiness": 2 } },
-    { "id": "h_instrument", "emoji": "🎸", "label": "楽器（独学）", "age": [12, 105], "cost": 5, "tags": ["music"], "yearly": { "stress": -2, "happiness": 3, "skill.music": 2 } },
-    { "id": "h_video", "emoji": "📱", "label": "動画を見る", "age": [6, 105], "cost": 0, "tags": ["like_game"], "yearly": { "stress": -3, "happiness": 2, "academic": -1 } },
-    { "id": "h_oshi", "emoji": "💖", "label": "推し活", "age": [10, 105], "cost": 15, "tags": ["entertain"], "yearly": { "stress": -5, "happiness": 5, "social": 1 } },
-    { "id": "h_sports_watch", "emoji": "📣", "label": "スポーツ観戦", "age": [6, 105], "cost": 4, "tags": ["sport"], "yearly": { "stress": -3, "happiness": 3, "social": 1 } },
-    { "id": "h_running", "emoji": "🏃", "label": "ランニング", "age": [12, 90], "cost": 1, "tags": ["like_outdoor"], "yearly": { "stress": -4, "health": 2 }, "chanceSet": { "exercise_habit": 0.3 } },
-    { "id": "h_gym", "emoji": "🏋️", "label": "筋トレ", "age": [15, 90], "cost": 8, "tags": ["sport"], "yearly": { "stress": -3, "health": 2 }, "chanceSet": { "exercise_habit": 0.3 } },
-    { "id": "h_golf", "emoji": "⛳", "label": "ゴルフ", "age": [20, 90], "cost": 20, "tags": ["sport"], "yearly": { "stress": -3, "social": 3, "health": 1 }, "workBonus": 0.03 },
-    { "id": "h_camp", "emoji": "🏕️", "label": "キャンプ・アウトドア", "age": [10, 85], "cost": 10, "tags": ["like_outdoor"], "yearly": { "stress": -5, "happiness": 3, "health": 1 } },
-    { "id": "h_fishing", "emoji": "🎣", "label": "釣り", "age": [8, 95], "cost": 5, "tags": ["like_outdoor"], "yearly": { "stress": -5, "happiness": 2 } },
-    { "id": "h_travel", "emoji": "🧳", "label": "旅行", "age": [18, 95], "cost": 25, "tags": [], "yearly": { "stress": -6, "happiness": 5 } },
-    { "id": "h_cooking", "emoji": "🍳", "label": "料理・お菓子作り", "age": [10, 105], "cost": 3, "tags": ["cook"], "yearly": { "stress": -3, "happiness": 2, "skill.cooking": 2, "health": 1 } },
-    { "id": "h_camera", "emoji": "📷", "label": "カメラ", "age": [12, 95], "cost": 8, "tags": ["like_draw"], "yearly": { "stress": -3, "happiness": 2, "skill.art": 1 } },
-    { "id": "h_garden", "emoji": "🪴", "label": "ガーデニング・家庭菜園", "age": [20, 105], "cost": 3, "tags": ["agri"], "yearly": { "stress": -4, "health": 1 } },
-    { "id": "h_craft", "emoji": "🧶", "label": "手芸・ものづくり", "age": [8, 105], "cost": 3, "tags": ["like_draw", "craft"], "yearly": { "stress": -3, "skill.craft": 2 } },
-    { "id": "h_train", "emoji": "🚃", "label": "鉄道", "age": [4, 105], "cost": 3, "tags": [], "yearly": { "stress": -3, "happiness": 3 } },
-    { "id": "h_programming", "emoji": "⌨️", "label": "プログラミング（自分で）", "age": [9, 90], "cost": 1, "tags": ["like_game", "like_math", "it"], "yearly": { "stress": -1, "skill.it": 3 } },
-    { "id": "h_shogi", "emoji": "♟️", "label": "将棋・囲碁", "age": [6, 105], "cost": 1, "tags": ["like_math"], "yearly": { "stress": -2, "happiness": 2 }, "riskMul": { "dementia": 0.9 } },
-    { "id": "h_karaoke", "emoji": "🎤", "label": "カラオケ", "age": [10, 95], "cost": 3, "tags": ["music"], "yearly": { "stress": -4, "social": 2 } },
-    { "id": "h_sns", "emoji": "💬", "label": "SNS", "age": [12, 95], "cost": 0, "tags": [], "yearly": { "social": 1, "stress": 1, "happiness": 1 } },
-    { "id": "h_volunteer", "emoji": "🤝", "label": "地域の活動", "age": [40, 105], "cost": 1, "tags": ["welfare"], "yearly": { "social": 3, "happiness": 2 }, "riskMul": { "dementia": 0.85 } }
+    {
+      "id": "h_game",
+      "emoji": "🎮",
+      "label": "テレビゲーム",
+      "age": [
+        3,
+        105
+      ],
+      "cost": 3,
+      "tags": [
+        "like_game"
+      ],
+      "yearly": {
+        "stress": -4,
+        "happiness": 3,
+        "skill.it": 1
+      },
+      "overuse": {
+        "focus_hobby": {
+          "academic": -2,
+          "health": -1
+        }
+      }
+    },
+    {
+      "id": "h_reading",
+      "emoji": "📖",
+      "label": "読書",
+      "age": [
+        4,
+        105
+      ],
+      "cost": 2,
+      "tags": [
+        "like_book"
+      ],
+      "yearly": {
+        "stress": -3,
+        "happiness": 2,
+        "subj.jpn": 1
+      }
+    },
+    {
+      "id": "h_drawing",
+      "emoji": "🖍️",
+      "label": "お絵かき・イラスト",
+      "age": [
+        3,
+        105
+      ],
+      "cost": 1,
+      "tags": [
+        "like_draw"
+      ],
+      "yearly": {
+        "stress": -3,
+        "happiness": 3,
+        "skill.art": 2
+      }
+    },
+    {
+      "id": "h_puzzle",
+      "emoji": "🧩",
+      "label": "パズル・クイズ",
+      "age": [
+        4,
+        105
+      ],
+      "cost": 1,
+      "tags": [
+        "like_math"
+      ],
+      "yearly": {
+        "stress": -2,
+        "happiness": 2,
+        "subj.math": 1
+      }
+    },
+    {
+      "id": "h_outdoor",
+      "emoji": "🛝",
+      "label": "外遊び",
+      "age": [
+        3,
+        12
+      ],
+      "cost": 0,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "stress": -3,
+        "health": 1,
+        "social": 1
+      }
+    },
+    {
+      "id": "h_anime",
+      "emoji": "📺",
+      "label": "アニメ・マンガ",
+      "age": [
+        5,
+        105
+      ],
+      "cost": 2,
+      "tags": [
+        "like_draw",
+        "like_book"
+      ],
+      "yearly": {
+        "stress": -4,
+        "happiness": 3
+      }
+    },
+    {
+      "id": "h_music",
+      "emoji": "🎧",
+      "label": "音楽を聴く",
+      "age": [
+        8,
+        105
+      ],
+      "cost": 1,
+      "tags": [],
+      "yearly": {
+        "stress": -3,
+        "happiness": 2
+      }
+    },
+    {
+      "id": "h_instrument",
+      "emoji": "🎸",
+      "label": "楽器（独学）",
+      "age": [
+        12,
+        105
+      ],
+      "cost": 5,
+      "tags": [
+        "music"
+      ],
+      "yearly": {
+        "stress": -2,
+        "happiness": 3,
+        "skill.music": 2
+      }
+    },
+    {
+      "id": "h_video",
+      "emoji": "📱",
+      "label": "動画を見る",
+      "age": [
+        6,
+        105
+      ],
+      "cost": 0,
+      "tags": [
+        "like_game"
+      ],
+      "yearly": {
+        "stress": -3,
+        "happiness": 2,
+        "academic": -1
+      }
+    },
+    {
+      "id": "h_oshi",
+      "emoji": "💖",
+      "label": "推し活",
+      "age": [
+        10,
+        105
+      ],
+      "cost": 15,
+      "tags": [
+        "entertain"
+      ],
+      "yearly": {
+        "stress": -5,
+        "happiness": 5,
+        "social": 1
+      }
+    },
+    {
+      "id": "h_sports_watch",
+      "emoji": "📣",
+      "label": "スポーツ観戦",
+      "age": [
+        6,
+        105
+      ],
+      "cost": 4,
+      "tags": [
+        "sport"
+      ],
+      "yearly": {
+        "stress": -3,
+        "happiness": 3,
+        "social": 1
+      }
+    },
+    {
+      "id": "h_running",
+      "emoji": "🏃",
+      "label": "ランニング",
+      "age": [
+        12,
+        90
+      ],
+      "cost": 1,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "stress": -4,
+        "health": 2
+      },
+      "chanceSet": {
+        "exercise_habit": 0.3
+      }
+    },
+    {
+      "id": "h_gym",
+      "emoji": "🏋️",
+      "label": "筋トレ",
+      "age": [
+        15,
+        90
+      ],
+      "cost": 8,
+      "tags": [
+        "sport"
+      ],
+      "yearly": {
+        "stress": -3,
+        "health": 2
+      },
+      "chanceSet": {
+        "exercise_habit": 0.3
+      }
+    },
+    {
+      "id": "h_golf",
+      "emoji": "⛳",
+      "label": "ゴルフ",
+      "age": [
+        20,
+        90
+      ],
+      "cost": 20,
+      "tags": [
+        "sport"
+      ],
+      "yearly": {
+        "stress": -3,
+        "social": 3,
+        "health": 1
+      },
+      "workBonus": 0.03
+    },
+    {
+      "id": "h_camp",
+      "emoji": "🏕️",
+      "label": "キャンプ・アウトドア",
+      "age": [
+        10,
+        85
+      ],
+      "cost": 10,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "stress": -5,
+        "happiness": 3,
+        "health": 1
+      }
+    },
+    {
+      "id": "h_fishing",
+      "emoji": "🎣",
+      "label": "釣り",
+      "age": [
+        8,
+        95
+      ],
+      "cost": 5,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "stress": -5,
+        "happiness": 2
+      }
+    },
+    {
+      "id": "h_travel",
+      "emoji": "🧳",
+      "label": "旅行",
+      "age": [
+        18,
+        95
+      ],
+      "cost": 25,
+      "tags": [],
+      "yearly": {
+        "stress": -6,
+        "happiness": 5
+      }
+    },
+    {
+      "id": "h_cooking",
+      "emoji": "🍳",
+      "label": "料理・お菓子作り",
+      "age": [
+        10,
+        105
+      ],
+      "cost": 3,
+      "tags": [
+        "cook"
+      ],
+      "yearly": {
+        "stress": -3,
+        "happiness": 2,
+        "skill.cooking": 2,
+        "health": 1
+      }
+    },
+    {
+      "id": "h_camera",
+      "emoji": "📷",
+      "label": "カメラ",
+      "age": [
+        12,
+        95
+      ],
+      "cost": 8,
+      "tags": [
+        "like_draw"
+      ],
+      "yearly": {
+        "stress": -3,
+        "happiness": 2,
+        "skill.art": 1
+      }
+    },
+    {
+      "id": "h_garden",
+      "emoji": "🪴",
+      "label": "ガーデニング・家庭菜園",
+      "age": [
+        20,
+        105
+      ],
+      "cost": 3,
+      "tags": [
+        "agri"
+      ],
+      "yearly": {
+        "stress": -4,
+        "health": 1
+      }
+    },
+    {
+      "id": "h_craft",
+      "emoji": "🧶",
+      "label": "手芸・ものづくり",
+      "age": [
+        8,
+        105
+      ],
+      "cost": 3,
+      "tags": [
+        "like_draw",
+        "craft"
+      ],
+      "yearly": {
+        "stress": -3,
+        "skill.craft": 2
+      }
+    },
+    {
+      "id": "h_train",
+      "emoji": "🚃",
+      "label": "鉄道",
+      "age": [
+        4,
+        105
+      ],
+      "cost": 3,
+      "tags": [],
+      "yearly": {
+        "stress": -3,
+        "happiness": 3
+      }
+    },
+    {
+      "id": "h_programming",
+      "emoji": "⌨️",
+      "label": "プログラミング（自分で）",
+      "age": [
+        9,
+        90
+      ],
+      "cost": 1,
+      "tags": [
+        "like_game",
+        "like_math",
+        "it"
+      ],
+      "yearly": {
+        "stress": -1,
+        "skill.it": 3
+      }
+    },
+    {
+      "id": "h_shogi",
+      "emoji": "♟️",
+      "label": "将棋・囲碁",
+      "age": [
+        6,
+        105
+      ],
+      "cost": 1,
+      "tags": [
+        "like_math"
+      ],
+      "yearly": {
+        "stress": -2,
+        "happiness": 2
+      },
+      "riskMul": {
+        "dementia": 0.9
+      }
+    },
+    {
+      "id": "h_karaoke",
+      "emoji": "🎤",
+      "label": "カラオケ",
+      "age": [
+        10,
+        95
+      ],
+      "cost": 3,
+      "tags": [
+        "music"
+      ],
+      "yearly": {
+        "stress": -4,
+        "social": 2
+      }
+    },
+    {
+      "id": "h_sns",
+      "emoji": "💬",
+      "label": "SNS",
+      "age": [
+        12,
+        95
+      ],
+      "cost": 0,
+      "tags": [],
+      "yearly": {
+        "social": 1,
+        "stress": 1,
+        "happiness": 1
+      }
+    },
+    {
+      "id": "h_volunteer",
+      "emoji": "🤝",
+      "label": "地域の活動",
+      "age": [
+        40,
+        105
+      ],
+      "cost": 1,
+      "tags": [
+        "welfare"
+      ],
+      "yearly": {
+        "social": 3,
+        "happiness": 2
+      },
+      "riskMul": {
+        "dementia": 0.85
+      }
+    }
   ]
 }

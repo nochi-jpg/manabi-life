@@ -173,7 +173,7 @@
 | 📓 | `ev_r_ending_note` | 70〜105歳 |  | 「もしものとき」のことを考えておく？ | 📓 エンディングノート・遺言を書く<br>🙂 まだ考えたくない |
 | 🍻 | `ev_r_reunion` | 25〜80歳 |  | {schoolName}の同窓会のお知らせが届いた。 | 🍻 行く<br>🙅 行かない |
 | 🏢 | `ev_r_hq_transfer` | 30〜58歳 | 除外:hq_assign / 雇用:seishain/civil_servant | {hqName}への異動の話が来た。現場をはなれ、全体の計画や管理をする仕事になる。 | 🏢 本社（本部）で働く<br>🔧 現場に残りたいと伝える |
-| ✨ | `ev_r_new_hobby` | 6〜105歳 |  | {hobbyTrigger}がきっかけで、新しいことをやってみたくなった。（趣味は3つまで） | ［候補リスト:clubs.hobbies］<br>🙂 今の趣味で十分 |
+| ✨ | `ev_r_new_hobby` | 6〜105歳 |  | {hobbyTrigger}がきっかけで、新しいことをやってみたくなった。 | ［候補リスト:clubs.hobbies］<br>🙂 今の趣味で十分 |
 | 🏥 | `ev_r_spouse_illness` |  | 必要:married / 人物:spouse | {spouse}が病気で入院した。 | 🏥 仕事を調整して付き添う<br>💼 仕事を続け、できる範囲で支える |
 
 ## 流れるだけイベント（62件）

@@ -294,7 +294,7 @@
     "tryYears": "子どもを望んでからの年数",
     "kenshinFlag": "健診で要再検査が出た",
     "will": "遺言・エンディングノートがある",
-    "hobbies": "趣味のIDのリスト（最大3つ。clubs.hobbies）"
+    "hobbies": "趣味のIDのリスト（上限なし。clubs.hobbies）"
   },
   "personOps": [
     "add",

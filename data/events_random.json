@@ -946,9 +946,9 @@
     { "id": "ev_r_new_hobby", "kind": "choice", "emoji": "✨", "cat": "life",
       "when": { "age": [6, 105], "cooldownYears": 2 },
       "weight": { "base": 2, "mul": [["focus_hobby", 2.5], ["stress>=70", 1.3], ["retired_flag", 1.5]] },
-      "text": "{hobbyTrigger}がきっかけで、新しいことをやってみたくなった。（趣味は3つまで）",
+      "text": "{hobbyTrigger}がきっかけで、新しいことをやってみたくなった。",
       "choices": [
-        { "menu": { "source": "clubs.hobbies", "page": 5, "filter": "age" }, "effects": { "hobby": { "add": "$pick", "ifFull": "askReplace" } } },
+        { "menu": { "source": "clubs.hobbies", "page": 5, "filter": "age" }, "effects": { "hobby": { "add": "$pick" } } },
         { "label": "🙂 今の趣味で十分", "effects": {} }
       ] },
 

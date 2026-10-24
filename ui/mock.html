@@ -53,8 +53,13 @@ button:active{transform:translateY(3px) scale(.98)}
   background:linear-gradient(90deg,#fff,#e9f5ff);clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%);box-shadow:inset 0 -4px 0 var(--cyan)}
 .pname small{font-size:16px;color:var(--ink2)}
 .sp{flex:1}
-#speed{display:flex;gap:8px}
-#speed button{width:62px;height:42px;font-size:17px;padding:0}
+.ctrl{flex:1;height:50px;display:flex;align-items:center;gap:10px;padding:0 6px 0 14px;border-radius:999px;
+  background:rgba(8,14,40,.6);border:2px solid rgba(255,255,255,.22);font-size:16px}
+.ctrl .lb2{white-space:nowrap}
+.ctrl .lifebar{display:block;flex:1;height:14px;min-width:60px}
+.ctrl .ln{font-variant-numeric:tabular-nums;white-space:nowrap}
+#speed{display:flex;gap:6px}
+#speed button{width:54px;height:38px;font-size:16px;padding:0}
 #speed .pz{display:inline-block;width:14px;height:16px;border-left:5px solid #fff;border-right:5px solid #fff;vertical-align:middle}
 #speed .pl{display:inline-block;border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px;vertical-align:middle}
 #speed button.on{--b1:#21e0d6;--b2:#0bb6cc;--b3:#0894c4;--b4:#24a6d8}
@@ -84,9 +89,9 @@ button:active{transform:translateY(3px) scale(.98)}
 #focus{height:46px;width:316px;font-size:19px;display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:999px;box-shadow:0 4px 0 #b9c6e2,0 8px 14px rgba(10,20,60,.25)}
 #focus .k{color:var(--ink2);font-size:15px}
 #focus .arw{margin-left:auto;color:var(--cyan2)}
-.seasons{display:flex;gap:6px;padding:4px 10px;height:46px;align-items:center;border-radius:999px;background:rgba(8,14,40,.55);border:2px solid rgba(255,255,255,.2)}
-.seasons span{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;opacity:.35;transition:.2s}
-.seasons span.on{opacity:1;background:#fff;box-shadow:0 0 0 3px var(--cyan),0 0 12px var(--cyan)}
+.seasons{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:4px 8px;height:46px;align-items:center;border-radius:999px;background:rgba(8,14,40,.55);border:2px solid rgba(255,255,255,.2)}
+.seasons span{height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:17px;opacity:.4;transition:.2s}
+.seasons span.on{opacity:1;background:#fff;color:var(--ink);box-shadow:0 0 0 3px var(--cyan),0 0 12px var(--cyan)}
 .life{flex:1;height:46px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:999px;background:rgba(8,14,40,.55);border:2px solid rgba(255,255,255,.2);font-size:16px}
 .life .bar{flex:1;height:14px}
 
@@ -98,10 +103,11 @@ button:active{transform:translateY(3px) scale(.98)}
 #tl .hd::after{content:'';flex:1;height:2px;background:linear-gradient(90deg,rgba(30,200,234,.6),transparent)}
 #feed{height:276px;overflow-y:auto;scrollbar-width:none;padding-right:4px;mask-image:linear-gradient(180deg,#000 85%,transparent)}
 #feed::-webkit-scrollbar{display:none}
-.post{display:grid;grid-template-columns:116px 40px 1fr;align-items:center;column-gap:8px;min-height:48px;padding:6px 10px;margin-bottom:6px;
+.post{display:grid;grid-template-columns:52px 36px 48px 40px 1fr;align-items:center;column-gap:8px;min-height:48px;padding:6px 10px;margin-bottom:6px;
   border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:18px;line-height:1.4;animation:drop .35s cubic-bezier(.34,1.5,.5,1)}
-.post .d{font-size:14px;color:#9fb4dc;white-space:nowrap}
-.post .d b{color:#fff;font-size:15px}
+.post{font-variant-numeric:tabular-nums}
+.post .y,.post .m{font-size:15px;color:#fff;white-space:nowrap}.post .m{text-align:right}
+.post .a{font-size:14px;color:#9fb4dc;text-align:right;padding-right:6px;white-space:nowrap}
 .post .e{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:24px}
 .post.choice{background:linear-gradient(90deg,rgba(255,207,63,.22),rgba(255,207,63,.04));border-color:rgba(255,207,63,.5)}
 .post.big{background:linear-gradient(90deg,rgba(255,111,168,.25),rgba(255,111,168,.04));border-color:rgba(255,111,168,.5)}
@@ -128,6 +134,7 @@ button:active{transform:translateY(3px) scale(.98)}
 .kv .k{color:var(--ink2);font-size:15px;display:flex;align-items:center;gap:4px}
 .chips{display:flex;flex-wrap:nowrap;gap:4px;padding:3px 0;overflow:hidden}
 .chip{display:inline-flex;align-items:center;gap:3px;height:26px;padding:0 8px;white-space:nowrap;border-radius:999px;background:#fff;box-shadow:0 2px 0 #d9cdb5;font-size:14px}
+.chip.more{background:var(--cyan2);color:#fff;box-shadow:0 2px 0 #06628f}
 .chip.no{color:#a7aec4;background:#f2ede4;box-shadow:none}
 .fam{display:grid;grid-template-columns:44px 64px 1fr;align-items:center;min-height:46px;border-bottom:2px dashed #ecdcc2;font-size:16px}
 .fam .av{width:36px;height:36px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 0 #d9cdb5}
@@ -176,13 +183,13 @@ button:active{transform:translateY(3px) scale(.98)}
   <div id="head">
     <div class="date"><span class="ssn" id="ssnIc">🌸</span><span id="date">2032年 4月</span></div>
     <div class="pname">🙂 さくら <small id="age">10歳</small></div>
-    <div class="sp"></div>
+    <div class="ctrl"><span class="lb2">🕰️ 人生</span><span class="bar c-mint lifebar"><i id="lifebar" style="--w:12%"></i></span>
     <div id="speed">
       <button class="gl g-navy" data-s="0"><span class="pz"></span></button>
       <button class="gl g-navy on" data-s="1"><span class="pl"></span></button>
       <button class="gl g-navy" data-s="2">×2</button>
       <button class="gl g-navy" data-s="4">×4</button>
-    </div>
+    </div></div>
   </div>
 
   <div class="pearl" id="face">
@@ -211,8 +218,7 @@ button:active{transform:translateY(3px) scale(.98)}
 
   <div id="mid">
     <button id="focus"><span class="k">重点方針</span>📚 勉強<span class="arw">▼</span></button>
-    <div class="seasons" id="ssn"><span class="on">🌸</span><span>🌻</span><span>🍁</span><span>⛄</span></div>
-    <div class="life">🕰️ 人生<span class="bar c-mint"><i id="lifebar" style="--w:12%"></i></span><span id="lifeN">10 / 約85年</span></div>
+    <div class="seasons" id="ssn"><span class="on">🌸 春</span><span>🌻 夏</span><span>🍁 秋</span><span>⛄ 冬</span></div>
   </div>
 
   <div id="tl">
@@ -233,7 +239,7 @@ button:active{transform:translateY(3px) scale(.98)}
     <div class="page on" id="p1">
       <div class="kv"><span class="k">📍 住まい</span><span>神奈川県（実家）</span></div>
       <div class="kv"><span class="k">🎒 習い事</span><span class="chips"><span class="chip">🎹 ピアノ</span><span class="chip">🏊 スイミング</span></span></div>
-      <div class="kv"><span class="k">✨ 趣味 <small style="font-size:12px">2/3</small></span><span class="chips"><span class="chip">🎮 テレビゲーム</span><span class="chip">🖍️ お絵かき</span></span></div>
+      <div class="kv"><span class="k">✨ 趣味</span><span class="chips"><span class="chip">🎮 テレビゲーム</span><span class="chip">🖍️ お絵かき</span><span class="chip more">+3</span></span></div>
       <div class="kv"><span class="k">💕 恋愛</span><span class="chips"><span class="chip no">なし</span></span></div>
       <div class="kv"><span class="k">📜 資格</span><span class="chips"><span class="chip no">なし</span></span></div>
       <div class="kv"><span class="k">🏥 病気</span><span class="chips"><span class="chip no">なし</span></span></div>
@@ -309,7 +315,7 @@ document.querySelectorAll('#speed button').forEach(b=>b.onclick=()=>{
 const SS=['🌸','🌻','🍁','⛄'],MON=[4,7,10,1];
 const demo=[
   ['🎨','図工の時間に、先生に「色づかいがすてきね」とほめられた。'],
-  ['🏃','運動会のリレーで、アンカーをまかされた。'],
+  ['🏃','運動会のリレーで、アンカーをまかされた。最後の直線で2人を追いぬき、クラスのみんなが走ってきて、もみくちゃにされた。'],
   ['🌻','夏休み。家族で海に行った。'],
   ['🎹','ピアノの発表会。少しまちがえたけど、最後までひけた。'],
   ['🍁','学級委員に推薦され、引き受けることにした。','choice'],
@@ -324,7 +330,7 @@ let y=2032,q=0,i=0,age=10;
 const feed=document.getElementById('feed');
 function post(e,t,kind){
   const d=document.createElement('div');d.className='post'+(kind?' '+kind:'');
-  const m=MON[q];d.innerHTML=`<span class="d"><b>${q===3?y+1:y}年${m}月</b> ${age}歳</span><span class="e">${e}</span><span class="t">${t}${kind==='choice'?'<small>選んだ</small>':''}</span>`;
+  const m=MON[q];d.innerHTML=`<span class="y">${q===3?y+1:y}年</span><span class="m">${m}月</span><span class="a">${age}歳</span><span class="e">${e}</span><span class="t">${t}${kind==='choice'?'<small>選んだ</small>':''}</span>`;
   feed.prepend(d);
 }
 function tick(){
@@ -332,7 +338,7 @@ function tick(){
   const [e,t,k]=demo[i%demo.length];
   if(k==='big'){openChoice();i++;return}
   post(e,t,k);i++;
-  q=(q+1)%4;if(q===0){y++;age++;document.getElementById('age').textContent=age+'歳';document.getElementById('lifeN').textContent=age+' / 約85年';
+  q=(q+1)%4;if(q===0){y++;age++;document.getElementById('age').textContent=age+'歳';
     document.getElementById('lifebar').style.setProperty('--w',(age/85*100)+'%')}
   document.getElementById('date').textContent=`${q===3?y+1:y}年 ${MON[q]}月`;
   document.getElementById('ssnIc').textContent=SS[q];
