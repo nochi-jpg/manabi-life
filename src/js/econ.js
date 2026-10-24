@@ -289,7 +289,7 @@ const Econ = (() => {
       Fam.notice('🙂', 'お金に少し余裕ができたので、生活レベルを「ふつう」にもどした。', 'money');
     }
     // 記録
-    G.lastDelta = { v: Math.round(G.cash - before), bonus: Math.round(bonus) };
+    G.lastDelta = { v: Math.round(G.cash - before), bonus: Math.round(bonus), inc: Math.round(inc), out: Math.round(out) };
     if (q === 3) yearRecord(gross + side, taxes, pen);
   }
   // 生活保護の支給（季節）

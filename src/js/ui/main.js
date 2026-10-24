@@ -154,8 +154,15 @@ const Main = (() => {
   function pageMoney() {
     const on = G.age >= 16;
     const d = G.lastDelta;
-    let delta = '';
-    if (on && d && Math.abs(d.v) >= 1) delta = d.bonus >= 5 ? `<span class="delta bonus">💰+${man(d.v)}</span>` : d.v > 0 ? `<span class="delta inc">+${man(d.v)}</span>` : `<span class="delta exp">${man(d.v)}</span>`;
+    // 3か月のお金の動き：「💰 お金」の右に文で出す
+    let dmsg = '';
+    if (on && d && Math.abs(d.v) >= 1) {
+      const sg = (v) => (v >= 0 ? '＋' : '−') + man(Math.abs(v)) + '万';
+      const cls = d.bonus >= 5 ? 'bonus' : d.v > 0 ? 'inc' : 'exp';
+      const body = d.bonus >= 5 ? `ボーナス${sg(d.bonus)}！ この3か月で${sg(d.v)}` : d.inc != null ? `この3か月 収入${man(d.inc)}万−支出${man(d.out)}万＝${sg(d.v)}` : `この3か月で${sg(d.v)}`;
+      dmsg = `<span class="dmsg ${cls}">${body}</span>`;
+    }
+    const delta = '';
     G.lastDelta = null;
     const debt = Econ.totalDebt();
     const tile = (cls, lb, v, extra = '') => `<div class="tile ${cls}"><small>${lb}</small><b class="num">${v}${extra}</b></div>`;
@@ -167,7 +174,7 @@ const Main = (() => {
     const ins = G.flags.cancer_insurance ? 'がん保険・医療保険' : G.flags.life_insurance ? '医療保険' : G.age < 22 && !G.job ? '親の健康保険（扶養）' : '公的な健康保険のみ';
     const ex = Econ.expenses();
     const tax = Object.entries(G.tax).filter(([k]) => k !== 'socialInsurance').reduce((a, [, v]) => a + v, 0);
-    $('#pM', el).innerHTML = `<h3>💰 お金</h3><div class="tiles">${tiles}</div>
+    $('#pM', el).innerHTML = `<h3>💰 お金${dmsg}</h3><div class="tiles">${tiles}</div>
       <div class="kv"><span class="k">🏠 世帯年収</span><span class="tx1 num">${incRow}</span></div>
       <div class="kv"><span class="k">${asRow ? '🏦 世帯の資産' : '🛡️ 保険'}</span><span class="tx1 num">${asRow || ins}</span></div>
       <div class="kv ${on ? 'link' : ''}" id="exRow"><span class="k">🧾 月の支出</span><span class="tx1 num">${on ? `${round1(ex.total / 12)}万円 ・ 生活レベル ${Econ.LEVELS[Econ.lifeLevel()].l}` : '— （16歳から）'}</span></div>
@@ -221,7 +228,7 @@ const Main = (() => {
   function handle(r) {
     const after = () => {
       if (r.posts && r.posts.length) postQ.push(...r.posts);
-      if (r.end) { refresh(); flushPosts(); setTimeout(() => Popup.death(deathInfo(), () => Screens.result.finish()), 900); return; }
+      if (r.end) { refresh(); flushPosts(); setTimeout(() => Popup.death(deathInfo(), () => LifeMovie.show(() => Screens.result.finish())), 900); return; }
       if (r.choice) {
         // 前の投稿を見せてから、ポップアップ
         flushPosts();
