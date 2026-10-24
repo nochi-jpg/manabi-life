@@ -23,6 +23,14 @@
 | `data/events_flow.json` | 流れるだけイベント（才能のヒント・家族の出来事など） |
 | `tools/validate.js` | データの整合性チェック |
 
+## 動かす・ビルドする
+
+```
+node tools/build.js        # data を src/js/data.gen.js にまとめる → src/index.html をブラウザで開く
+node tools/build.js dist   # 1つのHTMLに（dist/index.html と play/index.html）
+node tools/sim.js 300      # 画面なしで300人分の人生を流して統計とエラーを見る
+```
+
 ## データを直したら
 
 ```
