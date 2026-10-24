@@ -143,7 +143,7 @@ function testKey(k, v, ctx) {
     case 'jobId': return !!G.job && v.includes(G.job.id);
     case 'careerEnd': { const j = G.job && Menu.job(G.job.id); return !!j && !!j.careerEndAge && G.age >= j.careerEndAge + (G.vars.careerExtra || 0); }
     case 'debtOverIncome': return Econ.totalDebt(true) > Math.max(50, Econ.annualIncome()) * v;
-    case 'incomeBelowMinimum': return Econ.annualIncome() < 120;
+    case 'incomeBelowMinimum': return Econ.annualIncome() < 160 + (G.flags.married ? 80 : 0);
     case 'income': return matchSpec(Econ.annualIncome(), v, ctx);
     case 'notMax': return !G.flags[v];
     case 'counterIncreasedThisYear': return (G.counterYear || {})[v] === G.year;

@@ -28,7 +28,7 @@ const Text = (() => {
       case 'partnerSurname': return G.vars.partnerSurname || (person('partner') || person('spouse') || {}).surname || '';
       case 'partnerYears': { const p = person('partner'); return p ? Math.max(1, G.year - (p.since || G.year)) : 1; }
       case 'child': return nm(ch || people('child').slice(-1)[0]);
-      case 'school': return schoolLabel(); case 'schoolName': return schoolLabel() || `${Menu.prefShort()}の小学校`;
+      case 'school': return schoolLabel() || G.lastSchool || ''; case 'schoolName': return schoolLabel() || `${Menu.prefShort()}の小学校`;
       case 'target': case 'pick': return ctx.pickName || targetLabel();
       case 'job': case 'jobLabel': return jobLabel();
       case 'club': { const c = G.clubs[0] && Menu.club(G.clubs[0].id); return c ? c.label : '部活'; }
@@ -124,7 +124,7 @@ const Text = (() => {
       case 'age': return G.age;
       case 'who': return ctx.who ? ctx.who.id : null;
       case 'parentId': return ctx.who ? ctx.who.id : (person('father|mother') || {}).id;
-      case 'parentBusinessJob': { const p = people('father|mother').find((x) => x.employment === 'self_employed'); return p && p.job ? p.job : 'j_family_business'; }
+      case 'parentBusinessJob': { const p = people('father|mother').find((x) => x.employment === 'self_employed'); G.vars.nextForm = 'self_employed'; G.vars.familyBiz = true; return p && p.job && Menu.job(p.job) ? p.job : 'j_family_business'; }
       case 'ikkanHigh': { const sc = G.school && G.school.tmpl; const hs = D().schools.ikkanHigh[sc] || 'hs_pub_high'; const o = Menu.inst(Menu.school(hs), 0); const t = Menu.school(hs); const r = { ...o, emoji: t.emoji, name: Menu.schoolName(t), years: 3, cost: t.cost, stage: 'hs' }; Menu.remember(r); return r.id; }
       case 'affilFallback': { const r = { id: 'u_affil#lit', tmpl: 'u_private_mid', h: 52, dept: 'lit', emoji: '📖', name: '系列の私立大学 文学部', years: 4, cost: 100, stage: 'univ' }; Menu.remember(r); return r.id; }
       case 'examFlag': return G.vars.major === 'vo_pt' ? 'lic_pt' : 'lic_beauty';

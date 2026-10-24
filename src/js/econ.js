@@ -104,6 +104,7 @@ const Econ = (() => {
 
   // ---- 生活費（年・万円） ----
   function livingCost() {
+    if (G.flags.welfare) return 140 + (G.flags.married ? 60 : 0); // 生活保護：最低限の生活費（医療費は無料）
     const base = { tokyo: 185, A: 175, B: 160, C: 150 }[tierKey()];
     let v = base * (G.vars.livingCostMul || 1);
     const sp = person('spouse'); if (sp && G.flags.married) v += 85;
@@ -111,6 +112,7 @@ const Econ = (() => {
     const net = (jobGross() + sideGross() + pensionAnnual()) * 0.78 + (sp && G.flags.married ? (sp.income || 0) * 0.78 : 0);
     if (net > 300) v += (net - 300) * 0.6;
     if (G.age >= 65) v += 15; // 医療・介護
+    if (G.cash < 0) v *= 0.8; // お金がないときは節約する
     if (G.flags.lives_with_parents && !G.flags.married) v *= 0.6;
     return v;
   }
@@ -179,7 +181,7 @@ const Econ = (() => {
       if (q === 0 || q === 2) { bonus = monthly * bm / 2; inc += bonus; } // 賞与は6月（春）と12月（秋）
     } else inc += netYear / 4;
     inc += pen / 4;
-    if (G.flags.welfare) inc += 30;
+    if (G.flags.welfare) { const w = Math.max(0, (livingCost() + rentYear()) / 4 - (jobGross() * 0.85 + pensionAnnual()) / 4); inc += w; G.received.welfare = (G.received.welfare || 0) + w; }
     if (G.vars.benefitLeft > 0) { const b = Math.min(G.vars.benefitLeft, G.vars.benefitQ || 0); inc += b; G.vars.benefitLeft -= b; G.received.unemployment = (G.received.unemployment || 0) + b; }
     if (G.flags.married) { const sp = person('spouse'); if (sp && sp.alive) inc += (sp.income || 0) * 0.78 / 4; }
     inc += childAllowanceYear() / 4; G.received.childAllowance = (G.received.childAllowance || 0) + childAllowanceYear() / 4;
@@ -203,7 +205,8 @@ const Econ = (() => {
     // 投資（NISA の積み立て）
     if (G.flags.nisa && G.vars.nisaMonthly) { const m = G.vars.nisaMonthly * 3; out += m; G.assets += m; }
     // マイナスの利息（年15%）
-    if (G.cash < 0) out += (-G.cash * 0.15) / 4;
+    // 借りられるのは年収の3分の1まで（総量規制）。それをこえた分には利息がつかない（返せず、債務整理などの相談になる）
+    if (G.cash < 0) out += (Math.min(-G.cash, Math.max(50, Econ.annualIncome() / 3)) * 0.15) / 4;
     G.cash = G.cash + inc - out;
     // 記録
     G.lastDelta = { v: Math.round(G.cash - before), bonus: Math.round(bonus) };

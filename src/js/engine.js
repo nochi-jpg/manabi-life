@@ -77,11 +77,19 @@ const Engine = (() => {
       for (const e0 of D()[src].events) {
         const e = ev(e0.id);
         if (!e.risk || e.type === 'scheduled' || e.risk === 'death_byPerson' || gentleOut(e.id) || has(e.id)) continue;
+        if (e.id === 'ev_r_care_self' && G.vars.selfCare) continue; // 介護が必要になるのは1回
         if (e.kind === 'choice' && riskChoice) continue;
         const ctx = { ev: e };
         if (!Cond.test(e.when, ctx) || !onceYearOk(e)) continue;
         const p = riskP(e, ctx);
         if (p > 0 && chance(p)) { add(e.id, ctx); if (e.kind === 'choice') riskChoice = true; }
+      }
+    }
+    // お金の非常事態：借金が年収をこえたら債務整理の相談、収入がなく所持金もないなら生活保護の相談（ランダムを待たない）
+    if (G.age >= 18 && !hasChoiceQ(Q)) {
+      for (const id of ['ev_r_debt_crisis', 'ev_r_welfare']) {
+        const e = ev(id); const ctx = { ev: e };
+        if (!gentleOut(id) && onceYearOk(e) && Cond.test(e.when, ctx) && chance(0.5)) { add(id, ctx); break; }
       }
     }
     // 4. 条件がそろったら起きる流れイベント（重みなし）・判定つきの流れイベント
@@ -140,6 +148,7 @@ const Engine = (() => {
     }
     return finishQueue(Q);
   }
+  function hasChoiceQ(Q) { return Q.some((x) => (ev(x.id) || {}).kind === 'choice'); }
   function finishQueue(Q) {
     // 必須の選択肢は最後のほうに（流れるイベントを先に見せる）。通知表は季節の最後
     const rank = (x) => { if (x.id === '__lessons') return 4; const e = ev(x.id); if (x.id === 'ev_m_report_card' || x.id === 'ev_m_focus_adult') return 3; if (e.when && e.when.after) return 2; return e.kind === 'choice' ? 1 : 0; };
@@ -445,7 +454,7 @@ const Engine = (() => {
     G.randomChoicesYear = 0;
     if (G.school) G.school.yearIn++;
     if (G.job) G.jobYears++;
-    if (G.vars.recurring) { G.vars.recurring.forEach((r) => { G.cash += r.v; r.left--; }); G.vars.recurring = G.vars.recurring.filter((r) => r.left > 0); }
+    if (G.vars.recurring) { G.vars.recurring = G.vars.recurring.filter((r) => !r.who || (G.people.find((p) => p.id === r.who) || {}).alive); G.vars.recurring.forEach((r) => { if (G.age >= 16) G.cash += r.v; else G.household.cash = (G.household.cash ?? 100) + r.v; r.left--; }); G.vars.recurring = G.vars.recurring.filter((r) => r.left > 0); }
     Econ.yearAssets();
     agePeople();
     deathCheck();
@@ -619,6 +628,8 @@ const Engine = (() => {
     if (G.flags.has_partner && !people('partner').length) delete G.flags.has_partner;
     // I-6：介護の対象
     if (G.flags.caregiving) { const t = G.people.find((p) => p.id === G.vars.careTarget); if (t && !t.alive) delete G.flags.caregiving; }
+    // 生活保護は、収入や貯金が最低生活費をこえたら終わる
+    if (G.flags.welfare && (G.cash > 60 || Econ.annualIncome() > 180 + (G.flags.married ? 80 : 0))) delete G.flags.welfare;
     // I-13
     if (G.cash < 0 && G.age >= 16) G.flags.debt_card = G.flags.debt_card || false; // フラグは ev_f_cash_negative で付く
     // I-9：本業は1つ

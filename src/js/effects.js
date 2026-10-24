@@ -42,7 +42,7 @@ const Effects = (() => {
         case 'cash': G.cash += num(v, ctx); break;
         case 'cash_household': G.household.cash = (G.household.cash ?? 100) + num(v, ctx); if (num(v, ctx) < -50) G.talents.familyWealth = Math.max(0, G.talents.familyWealth - 1); break;
         case 'cash_child': if (G.age >= 16) G.cash += num(v, ctx); else G.vars.childSavings = (G.vars.childSavings || 0) + num(v, ctx); break;
-        case 'cashYearly': G.vars.recurring = G.vars.recurring || []; G.vars.recurring.push({ v: num(v, ctx), left: ef.yearsOf || 99, from: ctx.ev && ctx.ev.id }); break;
+        case 'cashYearly': G.vars.recurring = G.vars.recurring || []; G.vars.recurring.push({ v: num(v, ctx), left: ef.yearsOf || (ctx.who ? 15 : 4), from: ctx.ev && ctx.ev.id, who: ctx.who ? ctx.who.id : null }); break;
         case 'yearsOf': break;
         case 'debt': if (v === '=0') { G.loans = (G.loans || []).filter((l) => l.type === 'mortgage' && !ef.assetsSeize); if (G.cash < 0) G.cash = 0; } else Econ.addLoan('startup', num(v, ctx), 0.03).yearly = num(v, ctx) / 7; break;
         case 'debtMul': for (const l of G.loans || []) if (l.type !== 'mortgage') { l.left *= v; } if (G.cash < 0) G.cash *= v; break;
@@ -219,7 +219,8 @@ const Work = {
       if (Menu.isStudent() || form === 'student_part') { G.job = G.job && !G.job.part ? { ...G.job, part: id } : { id: null, part: id, form: 'student_part' }; if (!G.job.id) G.employment = 'student_part'; return; }
     }
     const old = G.job && G.job.id;
-    let f = form || j.form || 'seishain';
+    let f = form || (G.vars.nextForm && id !== 'j_parttime_general' ? G.vars.nextForm : null) || j.form || 'seishain';
+    G.vars.nextForm = null;
     if (!form && !j.form && j.nonRegularRate && chance(j.nonRegularRate * 0.6)) f = chance(0.5) ? 'keiyaku' : 'haken';
     if (j.id === 'j_parttime_general') f = 'part';
     // 出世の段：同じ track なら1段下げて引きつぐ

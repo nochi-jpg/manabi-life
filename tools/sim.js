@@ -70,7 +70,7 @@ for (let n = 0; n < N; n++) {
     if (G.vars.marriageNo) stats.married++;
     stats.kids += api.people('child', false).length;
     for (const p of G.log) fired[p.id] = (fired[p.id] || 0) + 1;
-    stats.cash.push(Math.round(G.cash));
+    stats.cash.push(Math.round(G.cash)); if (G.cash < (stats.minCash ?? 0)) { stats.minCash = G.cash; stats.worst = { cash: G.hist.cash, income: G.hist.income, flags: Object.keys(G.flags).join(','), emp: G.employment, job: G.job && G.job.id, loans: G.loans, rec: G.vars.recurring, kids: api.people('child', false).length, log: G.log.filter((p) => p.cat === 'money' || p.kind === 'choice').slice(-25).map((p) => p.age + ' ' + p.t + (p.chosen ? ' ▶' + p.chosen : '')) }; }
     for (const a of [25, 30, 45, 60, 75]) { if (G.hist.cash[a] != null) { (stats['c' + a] = stats['c' + a] || []).push(G.hist.cash[a]); (stats['i' + a] = stats['i' + a] || []).push(G.hist.income[a]); } } stats.happy.push(G.hist.happiness.reduce((a, b) => a + b, 0) / Math.max(1, G.hist.happiness.length));
   } catch (e) { stats.errors.push(e.stack.split('\n').slice(0, 4).join(' | ')); }
 }
@@ -80,6 +80,8 @@ console.log(`=== ${N}人の人生（${MODE}） ===`);
 console.log(`寿命 平均${avg(stats.ages)}歳 / 選択の回数 平均${avg(stats.choices)} / 最期の所持金 中央値${med(stats.cash)}万 / 満足感の平均 ${avg(stats.happy)}`);
 console.log(`寿命 男${avg(stats.agesM || [])} 女${avg(stats.agesF || [])}`);
 console.log('所持金の中央値（年齢別）', [25, 30, 45, 60, 75].map((a) => `${a}歳:${med(stats['c' + a] || [0])}万/年収${med(stats['i' + a] || [0])}`).join(' '));
+console.log(`いちばん低い最期の所持金 ${Math.round(stats.minCash)}万`);
+if (process.argv.includes('--worst')) console.log(JSON.stringify(stats.worst, null, 0));
 console.log('死因', JSON.stringify(stats.causes));
 console.log('学歴', stats.edu);
 console.log(`結婚 ${(stats.married / N * 100).toFixed(0)}% / 子ども 平均${(stats.kids / N).toFixed(2)}人 / 終わらなかった ${stats.stuck}`);

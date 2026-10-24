@@ -88,12 +88,14 @@ function newLife({ gender, surname, given, kana, happinessType, mode }) {
   const withFather = !single || chance(0.15);
   if (withFather) {
     const fj = parentJob(single ? inc : inc * 0.7, 'M');
-    g.people.push(newPerson('father', { name: pick(givenM)[0], gender: 'M', age: dadAge, job: fj.id, jobLabel: fj.label, jobEmoji: fj.emoji, income: Math.round(single ? inc : inc * 0.7) }));
+    const selfF = !!fj.selfEmployOk && chance(0.6);
+    g.people.push(newPerson('father', { name: pick(givenM)[0], gender: 'M', age: dadAge, job: fj.id, jobLabel: fj.label + (selfF ? '（自営）' : ''), jobEmoji: fj.emoji, income: Math.round(single ? inc : inc * 0.7), employment: selfF ? 'self_employed' : 'seishain' }));
   }
   if (!single || !withFather) {
     const work = single || chance(0.7);
     const mj = work ? parentJob(single ? inc : inc * 0.3, 'F') : null;
-    g.people.push(newPerson('mother', { name: pick(givenF)[0], gender: 'F', age: momAge, job: mj ? mj.id : 'homemaker', jobLabel: mj ? (single ? mj.label : mj.label + '（パート）') : '専業主婦', jobEmoji: mj ? mj.emoji : '🏠', income: Math.round(single ? inc : inc * 0.3), partTime: !single && !!mj }));
+    const selfM = !!mj && !!mj.selfEmployOk && chance(0.5);
+    g.people.push(newPerson('mother', { name: pick(givenF)[0], gender: 'F', age: momAge, job: mj ? mj.id : 'homemaker', jobLabel: mj ? (selfM ? mj.label + '（自営）' : single ? mj.label : mj.label + '（パート）') : '専業主婦', jobEmoji: mj ? mj.emoji : '🏠', income: Math.round(single ? inc : inc * 0.3), partTime: !single && !!mj && !selfM, employment: selfM ? 'self_employed' : mj ? (single ? 'seishain' : 'part') : 'homemaker' }));
   }
   // きょうだい 0人30%/1人50%/2人以上20%
   const nSib = (() => { const r = rnd(); return r < 0.3 ? 0 : r < 0.8 ? 1 : 2; })();
