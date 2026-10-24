@@ -1,0 +1,87 @@
+/* まなびライフ 共通スタイル（白×青）
+   docs/12 で決定：本編・ポップアップもタイトル/オプションと同じ部品にする。
+   間かく：8の倍数（--sp1〜--sp5）。部品どうし16px、かたまりどうし24px、わくの内側32px以上。 */
+@font-face{font-family:"MBRound";font-weight:700;src:url("../../ui/fonts/MPLUSRounded1c-Bold.woff") format("woff")}
+@font-face{font-family:"MBRound";font-weight:800 900;src:url("../../ui/fonts/MPLUSRounded1c-ExtraBold.woff") format("woff")}
+:root{
+  --sp1:8px;--sp2:16px;--sp3:24px;--sp4:32px;--sp5:40px;
+  --f:"MBRound","BIZ UDPGothic","Hiragino Maru Gothic ProN","Meiryo",sans-serif;
+  --ink:#23305a;--ink2:#5d6b8f;--ink3:#9aa6c0;
+  --blue:#2f6aa8;--blue2:#1f4f82;--blue3:#0a8fd1;
+  --line:#dfe7f3;--line2:#c9d7ea;--soft:#f5f8fd;--soft2:#eef4ff;--soft3:#e3ebf6;
+  --bg:#fdfdfb;--panel:#fff;
+  --gold:#f0a81c;--pink:#d64a86;--red:#e44d62;--green:#2fbf86;
+  --shadow:0 10px 30px rgba(47,106,168,.12);
+  --shadow2:0 16px 40px rgba(47,106,168,.18);
+  --safeL:env(safe-area-inset-left,0px);--safeR:env(safe-area-inset-right,0px);
+  --safeT:env(safe-area-inset-top,0px);--safeB:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;height:100dvh;overflow:hidden;background:var(--bg);overscroll-behavior:none;touch-action:manipulation}
+body{font-family:var(--f);font-weight:700;letter-spacing:.02em;color:var(--ink);user-select:none;-webkit-user-select:none;
+  word-break:auto-phrase;line-break:strict;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center;overflow:hidden;background:var(--bg)}
+
+/* ---------- ボタン ---------- */
+button{font-family:var(--f);font-weight:800;cursor:pointer;color:var(--blue);background:#fff;border:2px solid var(--line2);border-radius:999px;
+  box-shadow:0 3px 0 var(--line);transition:transform .08s,background .12s,border-color .12s;display:inline-flex;align-items:center;justify-content:center;gap:var(--sp1)}
+button:hover{border-color:var(--blue)}
+button:active{transform:translateY(2px)}
+button:disabled{opacity:.45;cursor:default;transform:none}
+button.main,button.on{color:#fff;background:var(--blue);border-color:var(--blue);box-shadow:0 3px 0 var(--blue2)}
+button.flat{box-shadow:none}
+button.sq{border-radius:16px}
+
+/* ---------- パネル ---------- */
+.panel{position:absolute;color:var(--ink);background:var(--panel);border:2px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+.panel h3,.hd{font-size:15px;color:var(--blue);display:flex;align-items:center;gap:6px}
+.panel h3::after,.hd::after{content:'';flex:1;height:2px;background:#eef3fa}
+
+/* ---------- ゲージ ---------- */
+.bar{display:block;height:14px;background:var(--soft3);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;width:var(--w,0%);border-radius:999px;background:linear-gradient(90deg,var(--c1),var(--c2));transition:width .6s}
+.c-blue{--c1:#3d8bff;--c2:#7fc0ff}.c-red{--c1:#ff5a6e;--c2:#ffb04d}.c-mint{--c1:#3fe0a4;--c2:#7cf7c9}.c-pink{--c1:#ff6fa8;--c2:#ffb3d3}
+.c-gold{--c1:#ffcf3f;--c2:#fff09a}.c-gray{--c1:#c9d7ea;--c2:#c9d7ea}.c-purple{--c1:#9b6cff;--c2:#d1b8ff}
+
+/* ---------- チップ ---------- */
+.chip{display:inline-flex;align-items:center;gap:3px;height:26px;padding:0 10px;white-space:nowrap;border-radius:999px;background:var(--soft2);color:var(--blue);font-size:14px}
+.chip.more{background:var(--blue);color:#fff;cursor:pointer}
+.chip.no{background:#f3f5f9;color:var(--ink3)}
+
+/* ---------- ポップアップ ---------- */
+.ov{position:absolute;inset:0;background:rgba(253,253,251,.85);display:none;align-items:center;justify-content:center;z-index:20}
+.ov.on{display:flex}
+.box{position:relative;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:24px;box-shadow:var(--shadow2);animation:pop .22s ease-out}
+.cs{position:absolute;left:24px;top:-20px;height:38px;padding:0 16px;border-radius:999px;display:flex;align-items:center;gap:6px;font-size:16px;color:#fff;background:var(--blue)}
+
+/* ---------- データ表示（出典） ---------- */
+.src{display:grid;grid-template-columns:22px 1fr;column-gap:6px;font-size:13px;line-height:1.5;color:var(--ink2)}
+.src small{color:var(--ink3)}
+
+/* ---------- 行のそろえ ---------- */
+.kv{display:grid;grid-template-columns:96px 1fr;align-items:center;min-height:36px;border-bottom:2px dashed var(--soft3);font-size:16px}
+.kv .k{color:var(--ink2);font-size:15px;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- 画面の切りかえ ---------- */
+.scr{position:absolute;inset:0;display:none}
+.scr.on{display:block;animation:fade .25s}
+
+/* ---------- スクロール（ログだけ） ---------- */
+.scroll{overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(35,48,90,.25) transparent}
+.scroll::-webkit-scrollbar{width:6px}.scroll::-webkit-scrollbar-track{background:transparent}
+.scroll::-webkit-scrollbar-thumb{background:rgba(35,48,90,.25);border-radius:3px}
+
+/* ---------- 横向き案内（縦向きのとき） ---------- */
+#rotate{position:fixed;inset:0;z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;background:var(--bg);color:var(--blue);font-size:22px;text-align:center}
+#rotate .ic{font-size:72px;animation:rot 1.6s ease-in-out infinite}
+@media (orientation:portrait) and (max-width:900px){#rotate.mobile{display:flex}}
+
+/* ---------- トースト ---------- */
+#toast{position:absolute;left:50%;bottom:32px;transform:translateX(-50%);padding:0 24px;height:48px;display:none;align-items:center;border-radius:999px;background:var(--blue);color:#fff;font-size:17px;z-index:60}
+#toast.on{display:flex;animation:pop .2s}
+
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
+@keyframes popin{from{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rot{0%,20%{transform:rotate(0)}50%,70%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
