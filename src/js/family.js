@@ -66,9 +66,10 @@ const Fam = (() => {
   function jobIncome(p) {
     if (!isWorking(p) || !p.job) return 0;
     const j = Menu.job(p.job); if (!j || !j.salary) return Math.max(0, p.income || 0);
-    const f = D().jobs.forms[p.employment] || D().jobs.forms.seishain || { salaryMul: 1 };
+    const form = p.employment === 'leave' ? p.formBeforeLeave || 'seishain' : p.employment; // 育休中は、もとの働き方で計算
+    const f = D().jobs.forms[form] || D().jobs.forms.seishain || { salaryMul: 1 };
     let v = Econ.salaryCurve(j, p.age, p.jobStart ?? 23) * ((prefOf(p.jobPref || p.pref) || pref()).wage || 1) * (f.salaryMul ?? 1);
-    if (p.employment === 'part') v *= 0.45;
+    if (form === 'part') v *= 0.45;
     if (p.employment === 'leave') v *= 0.67;
     if (p.reemployed) v *= 0.6;
     return Math.max(0, Math.round(v * (p.mul || 1)));

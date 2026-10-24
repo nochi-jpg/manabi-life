@@ -306,6 +306,7 @@
 .dbox .chip.ok{background:#e4f8ee;color:#1f9d6a}.dbox .chip.ng{background:#ffe8eb;color:#d0384f}
 .drate{margin-top:var(--sp2);height:64px;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--sp3);background:var(--green);color:#fff}
 .drate.mid{background:var(--gold)}.drate.lo{background:var(--red)}
+.dbox .drate,.dbox .drate.mid,.dbox .drate.lo{color:#fff}.drate b,.drate span{color:inherit}
 .drate span{font-size:16px}.drate b{font-size:34px}
 .dbox .ai{margin-top:var(--sp1);height:40px;border-radius:12px;background:var(--soft2);display:flex;align-items:center;gap:6px;padding:0 var(--sp2);font-size:14px}
 .dbox .sec{background:var(--soft);border-radius:16px;padding:10px var(--sp2);margin-bottom:12px}

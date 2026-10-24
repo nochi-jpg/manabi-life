@@ -241,6 +241,7 @@
   },
   "byJobOverride": {
     "j_nursery": "bg_nursery",
+    "j_juku": "bg_hq",
     "j_teacher_elem": "bg_elem",
     "j_professor": "bg_univ",
     "j_civil_national": "bg_hq",
