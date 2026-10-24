@@ -227,6 +227,7 @@ const School = {
     G.lastSchool = G.school.name;
     G.school = null; G.stage = 'none';
     G.clubs = G.clubs.filter((c) => (Menu.club(c.id) || {}).age); // 部活は学校を出たら終わり（習い事は残す）
+    if (G.job && G.job.id && G.job.part) School.dropPart('卒業したので'); // 内定先があるなら、バイトは卒業でやめる
     if (G.job && G.job.form === 'student_part') { G.job = null; G.employment = 'none'; }
   },
   // 留年・退学したら、決まっていた内定は取り消し
@@ -248,6 +249,12 @@ const School = {
     if (st === 'hikikomori') { G.stage = 'hikikomori'; return; }
     G.stage = st;
     School.dropYobiko();
+  },
+  // 学生のバイトをやめる（就職・卒業のとき）。方針が「バイト」のままなら「仕事」に
+  dropPart(why) {
+    const had = G.job && G.job.part;
+    if (had) { if (G.job.id) delete G.job.part; else { G.job = null; if (G.employment === 'student_part') G.employment = 'none'; } Fam.notice('💴', `${why}、バイトはやめた。`, 'work'); }
+    if (G.focus === 'focus_parttime') Engine.setFocus(Menu.isStudent() ? 'focus_study' : G.job && G.job.id ? 'focus_work' : 'focus_hobby', true);
   },
   // 大学などに進学・就職したら、予備校は自動でやめる
   dropYobiko() {
@@ -285,6 +292,8 @@ const Work = {
     if (j.id === 'j_parttime_general') f = 'part';
     // 出世の段：同じ track なら1段下げて引きつぐ
     const oldTrack = Econ.rankTrack();
+    if (G.job && G.job.part) School.dropPart('就職したので');
+    else if (G.focus === 'focus_parttime') Engine.setFocus(Menu.isStudent() ? 'focus_study' : 'focus_work', true);
     G.job = { id, form: f, startAge: Math.min(G.age, (G.job && G.job.startAge) ?? G.age), since: G.year, mul: 1, pref: G.pref };
     School.dropYobiko();
     delete G.flags.long_commute;
