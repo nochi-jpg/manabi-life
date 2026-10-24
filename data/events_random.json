@@ -385,7 +385,7 @@
       "text": "車があったら便利だな……。",
       "choices": [
         { "label": "🚙 中古車を買う（80万）", "when": { "money": { "cash": [">=", 80] } }, "effects": { "cash": -80, "set": ["owns_car"], "stats": { "happiness": 4 } } },
-        { "label": "🚗 新車をローンで買う（250万・5年ローン）", "effects": { "loan": { "type": "car", "amount": 250, "years": 5, "rate": 0.03 }, "set": ["owns_car"], "stats": { "happiness": 6 } } },
+        { "label": "🚗 新車をローンで買う（250万・5年ローン）", "when": { "none": ["blacklisted", "bankruptcy"] }, "effects": { "loan": { "type": "car", "amount": 250, "years": 5, "rate": 0.03 }, "set": ["owns_car"], "stats": { "happiness": 6 } } },
         { "label": "🚲 なくても生活できる", "effects": {} }
       ] },
 
@@ -698,15 +698,35 @@
       "note": "1等7億円の当選確率は2000万分の1。期待値は購入額の約45%。小学生に『期待値』を体感させる" },
 
     { "id": "ev_r_debt_crisis", "kind": "choice", "emoji": "💳", "cat": "money",
-      "when": { "age": [20, 90], "debtOverIncome": 1.0, "cooldownYears": 3 },
-      "weight": { "base": 5 },
-      "text": "借金が{debt}万円にふくらみ、返せなくなってきた。",
+      "when": { "age": [20, 90], "consumerDebt": [">=", 1], "cooldownYears": 3 },
+      "text": "1年ずっと赤字が続いて、借金（{debtNoHouse}万円）が返せなくなってきた。",
       "choices": [
         { "label": "📉 投資を売って返す", "when": { "assets": [">=", 30] }, "showResult": true, "effects": { "sellAssetsForDebt": true, "stats": { "stress": -6 } } },
-        { "label": "🏛️ 法テラス・弁護士に相談して債務整理", "showResult": true, "effects": { "set": ["debt_consolidation", "blacklisted"], "debtSettle": 0.5, "stats": { "stress": -8 } } },
-        { "label": "⚖️ 自己破産する", "when": { "debtOverIncome": 2.0 }, "showResult": true, "effects": { "bankrupt": true, "set": ["bankruptcy", "blacklisted"], "debt": "=0", "assetsSeize": true, "clear": ["owns_house", "mortgage", "owns_car"], "stats": { "stress": -10, "happiness": -10 } } },
+        { "label": "🏛️ 法テラス・弁護士に相談して債務整理", "showResult": true, "effects": { "set": ["debt_consolidation", "blacklisted"], "blacklistYears": 5, "debtSettle": 0.5, "stats": { "stress": -8 } } },
+        { "label": "⚖️ 自己破産する", "when": { "debtOverIncome": 2.0 }, "showResult": true, "effects": { "bankrupt": true, "set": ["bankruptcy", "blacklisted"], "blacklistYears": 7, "debt": "=0", "assetsSeize": true, "clear": ["owns_house", "mortgage", "owns_car"], "stats": { "stress": -10, "happiness": -10 } } },
         { "label": "👨‍👩‍👧 家族に相談する", "when": { "familyCanHelp": true }, "roll": { "base": 0.75 }, "success": { "familyBailout": true, "personRelation": { "father": -5, "mother": -5, "spouse": -5 } }, "fail": { "stats": { "stress": 4 }, "log": "😞 「自分でなんとかしなさい」と言われてしまった。" } },
         { "label": "💳 別のところから借りて返す", "showResult": true, "effects": { "debtMul": 1.2, "stats": { "stress": 10 }, "log": "💳 別のところから借りて返した。でも借金は2割ふえ、利息もかさんでいく……。" } }
+      ] },
+
+    { "id": "ev_m_asset_sell", "kind": "choice", "emoji": "🏦", "cat": "money",
+      "when": { "age": [20, 105], "cooldownYears": 2 },
+      "text": "1年ずっと赤字が続いている。資産を整理しないと、月々の支払いが厳しい。（借金：{debtAll}万円）何を手放す？",
+      "fact": { "text": "住宅ローンが払えなくなったときは、家を売ってローンを返す「任意売却」という方法もある。早めに銀行に相談するのが大切。", "src": "住宅金融支援機構" },
+      "choices": [
+        { "label": "📉 投資を売って、借金を返す（{assetsNow}万円）", "when": { "assets": [">=", 1] }, "showResult": true, "effects": { "sellAssetsForDebt": true, "stats": { "stress": -6 } } },
+        { "label": "🏠 家を売って、賃貸にうつる（{houseValueNow}万円・ローン残り{mortgageLeft}万円）", "when": { "all": ["owns_house"], "none": ["lives_with_parents"] }, "showResult": true, "effects": { "sellHouse": true, "rentMonthly": "$rentAfterDivorce", "payDebtsFromCash": true, "stats": { "stress": -8, "happiness": -4 }, "log": "🏠 家を売って、賃貸にうつった" } },
+        { "label": "🏢 貸している部屋を売る（{rentalValueNow}万円）", "when": { "all": ["owns_rental"] }, "showResult": true, "effects": { "sellRental": true, "payDebtsFromCash": true, "stats": { "stress": -5 }, "log": "🏢 貸している部屋を売った" } },
+        { "label": "🚗 車を手放す（中古で約30万円）", "when": { "all": ["owns_car"] }, "showResult": true, "effects": { "clear": ["owns_car"], "cash": 30, "payDebtsFromCash": true, "stats": { "happiness": -3 }, "log": "🚗 車を売った" } },
+        { "label": "🏛️ 法テラス・弁護士に相談して債務整理", "when": { "consumerDebt": [">=", 1] }, "showResult": true, "effects": { "set": ["debt_consolidation", "blacklisted"], "blacklistYears": 5, "debtSettle": 0.5, "stats": { "stress": -8 } } },
+        { "label": "🪙 生活レベルを「節約」にして、がんばって払う", "effects": { "lifeLevel": "save", "stats": { "stress": 6 }, "log": "🪙 生活レベルを「節約」にした" } }
+      ] },
+
+    { "id": "ev_m_budget_review", "kind": "choice", "emoji": "🧾", "cat": "money",
+      "when": { "age": [18, 105], "cooldownYears": 15 },
+      "text": "この3か月は赤字だった。（収入{qInc}万円・支出{qOut}万円）生活水準や趣味を見直してみようか……",
+      "choices": [
+        { "label": "🧾 支出を見直す（生活レベル・趣味・保険）", "effects": { "openUi": "expenses" } },
+        { "label": "🙂 今はこのままでいい", "effects": {} }
       ] },
 
     { "id": "ev_r_welfare", "kind": "choice", "emoji": "🏛️", "cat": "money",
@@ -929,7 +949,7 @@
     { "id": "ev_r_reunion", "kind": "choice", "emoji": "🍻", "cat": "life",
       "when": { "age": [25, 80], "cooldownYears": 8 },
       "weight": { "base": 1.05 },
-      "text": "{schoolName}の同窓会のお知らせが届いた。",
+      "text": "{reunionSchool}の同窓会のお知らせが届いた。",
       "choices": [
         { "label": "🍻 行く", "effects": { "stats": { "social": 5, "happiness": 4 }, "cash": -1 } },
         { "label": "🙅 行かない", "effects": {} }
@@ -947,7 +967,7 @@
 
     { "id": "ev_r_new_hobby", "kind": "choice", "emoji": "✨", "cat": "life",
       "when": { "age": [6, 105], "cooldownYears": 4 },
-      "weight": { "base": 1.3, "mul": [["focus_hobby", 2.5], ["stress>=70", 1.3], ["retired_flag", 1.5]] },
+      "weight": { "base": 1, "mul": [["focus_hobby", 2.5], ["stress>=70", 1.3], ["retired_flag", 1.5]] },
       "text": "{hobbyTrigger}がきっかけで、新しいことをやってみたくなった。",
       "choices": [
         { "menu": { "source": "clubs.hobbies", "page": 5, "filter": "age" }, "effects": { "hobby": { "add": "$pick" } } },
@@ -1023,7 +1043,7 @@
       "text": "{child}が大学に合格！入学金と前期の授業料で、まず{entranceFee}万円を3月中に払わないといけない。",
       "choices": [
         { "label": "💴 所持金から払う", "effects": { "cash": "-$entranceFee", "stats": { "happiness": 6 } } },
-        { "label": "🏦 教育ローンを借りる（年2%・10年）", "effects": { "loan": { "type": "education", "amount": "$entranceFee", "years": 10, "rate": 0.02 }, "stats": { "happiness": 4 } } },
+        { "label": "🏦 教育ローンを借りる（年2%・10年）", "when": { "none": ["blacklisted", "bankruptcy"] }, "effects": { "loan": { "type": "education", "amount": "$entranceFee", "years": 10, "rate": 0.02 }, "stats": { "happiness": 4 } } },
         { "label": "👵 祖父母に援助をお願いする", "when": { "person": { "role": "father|mother", "alive": true } }, "roll": { "base": 0.5, "w": { "familyWealth": 0.6 } }, "success": { "stats": { "happiness": 6 }, "log": "👵 祖父母が入学金を出してくれた" }, "fail": { "cash": "-$entranceFee", "log": "🙇 援助はむずかしいと言われ、自分で払った" } }
       ],
       "note": "大学の4年間の学費は国立で約240万、私立文系で約400万。一人暮らしならさらに仕送りが年100万前後" },

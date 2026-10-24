@@ -131,6 +131,7 @@ function testKey(k, v, ctx) {
     case 'var': return Object.entries(v).every(([t, s]) => { let val = G.vars[t]; if (val === undefined) val = t === 'target' || t === 'pendingExam' ? 'none' : (t === 'schoolAway' || t === 'workAway') ? false : val; return matchSpec(val, s, ctx); });
     case 'counter': return Object.entries(v).every(([t, s]) => matchSpec(G.counters[t] || 0, s, ctx));
     case 'stage': return v.includes(G.stage);
+    case 'consumerDebt': return matchSpec(Econ.consumerDebt(), v, ctx); // 住宅・投資・奨学金・整理中のローンをのぞいた借金
     case 'awayFromHome': { const par = people('father|mother').find((p) => p.alive); return (!!par && par.pref !== G.pref) === !!v; } // 親が生きていて、ちがう県に住んでいる
     case 'poorHome': return Engine.poorHome() === !!v; // とても貧しい家（親に「自分で出して」と言われる）
     case 'jukuOk': return Engine.jukuOk() === !!v; // 中学受験の塾に通わせられる家計か（世帯年収）
@@ -140,7 +141,8 @@ function testKey(k, v, ctx) {
     case 'any': return v.some((f) => hasFlag(dyn(f, ctx)));
     case 'cooldownYears': { const last = G.lastFired[ev.id]; return last == null || G.year - last >= v; }
     case 'yearsLeft': return !!G.school && schoolYearsLeft() === v;
-    case 'yearInStage': return !!G.school && G.school.yearIn === v;
+    case 'yearInStage': return !!G.school && (Array.isArray(v) ? inRange(G.school.yearIn, v) : G.school.yearIn === v);
+    case 'noLesson': return !G.clubs.some((c) => c.id === v);
     case 'jobYears': return !!G.job && (Array.isArray(v) ? v.includes(G.jobYears) : G.jobYears === v);
     case 'after': return true; // 並び順だけ（engine で後ろに回す）
     case 'person': {

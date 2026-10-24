@@ -229,6 +229,8 @@ const Main = (() => {
     const after = () => {
       if (r.posts && r.posts.length) postQ.push(...r.posts);
       if (r.end) { refresh(); flushPosts(); setTimeout(() => Popup.death(deathInfo(), () => LifeMovie.show(() => Screens.result.finish())), 900); return; }
+      // 選んだ結果で画面を開く（家計の見直し → 月の支出）
+      if (G.vars.openUi === 'expenses') { G.vars.openUi = null; flushPosts(); refresh(); stop(); Popup.expenses(() => { refresh(); r.choice ? Popup.choice(r.choice, (res) => handle(res)) : kick(); }); return; }
       if (r.choice) {
         // 前の投稿を見せてから、ポップアップ
         flushPosts();

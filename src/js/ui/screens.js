@@ -28,14 +28,32 @@ const Ending = (() => {
       default: return 50;
     }
   }
+  // ボーナス（加点）：子ども・孫・結婚・長生き・晩年の満足感・人とのつながり（合わせて最大15点）
+  function bonusOf(g) {
+    const kids = g.people.filter((p) => p.role === 'child').length, gk = g.people.filter((p) => p.role === 'grandchild').length;
+    const H = g.hist.happiness || [];
+    const late = avg(H.slice(-10)); // 最後の10年の満足感
+    const married = g.vars.marriageNo ? Math.min(40, g.age - Math.max(18, (g.vars.marriedYear ?? 2040) - 2010)) : 0;
+    const L = [];
+    if (kids) L.push(['👶 子ども', Math.min(6, Math.round(kids * 2.5))]);
+    if (gk) L.push(['👼 孫', Math.min(3, gk)]);
+    if (g.vars.marriageNo) L.push(['💍 結婚', married >= 30 ? 3 : 2]);
+    if (g.age >= 80) L.push(['🎂 長生き', g.age >= 90 ? 3 : 2]);
+    if (late >= 60) L.push(['😊 晩年の満足感', late >= 75 ? 4 : 2]);
+    if (g.hobbies.length >= 2) L.push(['✨ 趣味', 1]);
+    let sum = 0; const out = [];
+    for (const [l, v] of L) { const x = Math.min(v, 15 - sum); if (x <= 0) break; sum += x; out.push({ l, v: x }); }
+    return { sum, list: out };
+  }
   function compute(g) {
     const W = D().ending.weights;
-    // 点数はやや甘めに（ふつうの人生で60点台になるくらい）
-    const ha = Math.round(clamp(12 + avg(g.hist.happiness) * 0.92, 0, 100));
-    const cr = Math.round(clamp(18 + criterion(g, g.happinessType) * 0.85, 0, 100));
-    const score = Math.round(ha * W.happinessAvg + cr * W.criterion);
+    // 点数は甘めに（ふつうの人生で70点台、満ち足りた人生なら80点以上）
+    const ha = Math.round(clamp(8 + avg(g.hist.happiness) * 0.92, 0, 100));
+    const cr = Math.round(clamp(20 + criterion(g, g.happinessType) * 0.85, 0, 100));
+    const bonus = bonusOf(g);
+    const score = Math.round(clamp(ha * W.happinessAvg + cr * W.criterion + bonus.sum, 0, 100));
     const rank = D().ending.ranks.find((r) => score >= r.min) || D().ending.ranks[D().ending.ranks.length - 1];
-    return { ha, cr, score, rank };
+    return { ha, cr, bonus: bonus.sum, bonusList: bonus.list, score, rank };
   }
   return { compute, avg };
 })();
@@ -98,6 +116,7 @@ Screens.result = {
         <div class="score num">${e.score}<small>点</small></div>
         <div class="stars">${'⭐'.repeat(stars)}<span style="opacity:.25">${'⭐'.repeat(5 - stars)}</span></div>
         <div class="hp"><span class="ic">💭</span><span><small>幸せの基準</small>${esc(crit.label)}</span><b>${e.cr}点</b></div>
+        ${e.bonus ? `<div class="hp bn"><span class="ic">🎁</span><span><small>ボーナス</small>${esc(e.bonusList.map((x) => x.l.replace(/^\S+\s/, '')).join('・'))}</span><b>＋${e.bonus}点</b></div>` : ''}
         <div class="ep">${esc(ep)}</div>
         <div class="rank">${ranks.map((r) => `<span class="${r.id === e.rank.id ? 'on' : ''}">${({ end_hard: '困難', end_trial: '試行錯誤', end_dramatic: '波乱万丈', end_balance: 'バランス', end_happy: '幸福' })[r.id] || ''}</span>`).join('')}</div>
       </div>
@@ -323,7 +342,9 @@ Screens.options = {
     const fb = $('#fullBtn', el); if (fb) fb.onclick = async () => { await Platform.toggle(); setTimeout(() => { fb.textContent = Platform.isFull() ? '全画面をやめる' : '全画面にする'; }, 300); };
     $('#crBtn', el).onclick = () => credits();
     $('#oBack', el).onclick = () => App.show(from || 'title');
-    $('#gear', el).onclick = () => { taps++; if (taps >= 30) { taps = 0; Debug.open(); } };
+    // スマホ（Android・iPhone）でも数えられるように、タップした瞬間（pointerdown）で数える。素早い連打が click にまとめられても取りこぼさない
+    { const gear = $('#gear', el); const hit = (ev) => { ev.preventDefault(); taps++; if (taps >= 30) { taps = 0; Debug.open(); } };
+      if (window.PointerEvent) gear.addEventListener('pointerdown', hit); else { gear.addEventListener('touchstart', hit, { passive: false }); gear.addEventListener('mousedown', hit); } }
   },
 };
 function credits() {

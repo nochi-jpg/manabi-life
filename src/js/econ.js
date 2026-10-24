@@ -221,6 +221,8 @@ const Econ = (() => {
     return v;
   }
   const loansLeft = (noHouse) => (G.loans || []).filter((l) => !noHouse || (l.type !== 'mortgage' && l.type !== 'investment')).reduce((a, l) => a + Math.max(0, l.left), 0);
+  // 住宅ローン・投資ローン・奨学金・債務整理の分割をのぞいた借金（カードローンをふくむ）
+  const consumerDebt = () => Math.max(0, -G.cash) + (G.loans || []).filter((l) => !['mortgage', 'investment', 'scholar', 'settle'].includes(l.type)).reduce((a, l) => a + Math.max(0, l.left), 0);
   const totalDebt = (noHouse) => Math.max(0, -G.cash) + loansLeft(noHouse);
   // 正味の財産：現金＋資産（投資・家）−借金
   const netWorth = () => Math.round(G.cash + assetsValue() - loansLeft());
@@ -290,6 +292,8 @@ const Econ = (() => {
     }
     // 記録
     G.lastDelta = { v: Math.round(G.cash - before), bonus: Math.round(bonus), inc: Math.round(inc), out: Math.round(out) };
+    // 赤字が続いた季節の数（NISAの積み立ては貯金なので数えない）
+    { const nisaQ = G.flags.nisa && G.vars.nisaMonthly ? G.vars.nisaMonthly * 3 : 0; const flow = G.cash - before + nisaQ; G.vars.defQ = flow < -3 ? (G.vars.defQ || 0) + 1 : 0; G.vars.lastQ = { inc: Math.round(inc), out: Math.round(out - nisaQ) }; }
     if (q === 3) yearRecord(gross + side, taxes, pen);
   }
   // 生活保護の支給（季節）
@@ -342,5 +346,5 @@ const Econ = (() => {
     if (G.assets > 0) G.assets *= 1 + (G.flags.stock_trader || G.flags.crypto ? normal(0.04, 0.15) : normal(0.04, 0.06));
     if (G.flags.owns_rental && G.vars.rentalValue) G.vars.rentalValue *= 1 + (D().housing.investment.priceTrend[tierKey()] || 0);
   }
-  return { myPocket, parentsIncome, homeIncome, childCost1, pocketMoney, jobGross, sideGross, annualIncome, monthlyIncome, hasBonus, salaryPreview, salaryCurve, rankTrack, nextStep, curStep, nextStepRate, steps, overtime, aiRisk, pensionMonthly, pensionAnnual, incomeTaxes, livingCost, childCosts, childAllowanceYear, quarter, addLoan, totalDebt, loansLeft, netWorth, liquid, householdCash, assetsValue, yearAssets, working, tierKey, WORKING, expenses, netIncomeYear, welfareQ, LEVELS, lifeLevel, costKids, childStage, LOAN_L, scholarStart };
+  return { consumerDebt, myPocket, parentsIncome, homeIncome, childCost1, pocketMoney, jobGross, sideGross, annualIncome, monthlyIncome, hasBonus, salaryPreview, salaryCurve, rankTrack, nextStep, curStep, nextStepRate, steps, overtime, aiRisk, pensionMonthly, pensionAnnual, incomeTaxes, livingCost, childCosts, childAllowanceYear, quarter, addLoan, totalDebt, loansLeft, netWorth, liquid, householdCash, assetsValue, yearAssets, working, tierKey, WORKING, expenses, netIncomeYear, welfareQ, LEVELS, lifeLevel, costKids, childStage, LOAN_L, scholarStart };
 })();

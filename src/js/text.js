@@ -96,6 +96,17 @@ const Text = (() => {
       case 'childSchoolKind': return ch && ch.plan === 'voc' ? '専門学校' : '大学';
       case 'rentAfterDivorce': return people('child').some((c) => c.together && c.age < 18) ? rentOf('family') : rentOf('single');
       case 'reportName': return ['univ', 'univ_med', 'junior_college', 'vocational', 'grad_master', 'grad_prof'].includes(G.stage) ? '成績表' : '通知表';
+      case 'debtNoHouse': return man(Econ.consumerDebt());
+      case 'debtAll': return man(Econ.totalDebt());
+      case 'assetsNow': return man(G.assets);
+      case 'houseValueNow': return man(G.vars.houseValue || 0);
+      case 'mortgageLeft': return man((G.loans || []).filter((l) => l.type === 'mortgage').reduce((a, l) => a + Math.max(0, l.left), 0));
+      case 'rentalValueNow': return man(G.vars.rentalValue || 0);
+      case 'qInc': return man((G.vars.lastQ || {}).inc || 0);
+      case 'qOut': return man((G.vars.lastQ || {}).out || 0);
+      case 'schoolYear': return G.school ? G.school.yearIn : 1;
+      case 'roninYear': return G.counters.ronin_years || 1;
+      case 'reunionSchool': { const pn = Fam.prefName(G.birthPref || G.pref).replace(/[都道府県]$/, ''); const k = G.flags.edu_hs_grad ? pick(['小学校', '中学校', '高校']) : pick(['小学校', '中学校']); return `${pn}の${k}`; } // 同窓会は出身県の学校
       case 'cashNow': return man(Math.max(0, G.cash));
       case 'pocket': return round1(Econ.myPocket()).toFixed(1);
       case 'sendMoney': return ch ? String(ch.sendMoney ?? 7) : '7';

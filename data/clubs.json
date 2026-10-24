@@ -272,6 +272,19 @@
       "note": "小4〜小6。合計で約250万。学力の伸び×1.5"
     },
     {
+      "id": "ls_yobiko",
+      "emoji": "🏫",
+      "label": "大学受験予備校",
+      "age": [15, 19],
+      "cost": 60,
+      "time": 3,
+      "tags": ["like_book", "like_math"],
+      "set": ["juku"],
+      "yearly": { "stress": 4, "social": -1 },
+      "viaEventOnly": true,
+      "note": "高1・高2の春に通うか聞かれる。大学などに進学・就職したら自動でやめる。学力の伸び×1.3"
+    },
+    {
       "id": "ls_tutor_online",
       "emoji": "📱",
       "label": "通信教育・タブレット学習",

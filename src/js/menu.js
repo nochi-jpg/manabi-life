@@ -90,7 +90,7 @@ const Menu = (() => {
       case 'jobs.midCareer': return jobMenu('mid', filter);
       case 'jobs.civil': return jobMenu('civil', filter);
       case 'jobs.partTimeJobs': return J().partTimeJobs.filter((p) => G.age >= (p.minAge || 16) && (!p.requires || !p.requires.stage || p.requires.stage.includes(G.stage))).map((p) => item(p, { sub: `時給${p.wage}円・週${p.hoursWeek}時間` }));
-      case 'clubs.lessons': return C().lessons.filter((l) => !l.age || (G.age >= l.age[0] && G.age <= l.age[1])).filter(lessonHere).filter((l) => !G.clubs.some((c) => c.id === l.id)).map((l) => item(l, { sub: `年${l.cost}万円・${Engine.lessonEffText ? Engine.lessonEffText(l) : ''}` }));
+      case 'clubs.lessons': return C().lessons.filter((l) => !l.viaEventOnly).filter((l) => !l.age || (G.age >= l.age[0] && G.age <= l.age[1])).filter((l) => !(l.id === 'ls_juku' && G.age >= 15)).filter(lessonHere).filter((l) => !G.clubs.some((c) => c.id === l.id)).map((l) => item(l, { sub: `年${l.cost}万円・${Engine.lessonEffText ? Engine.lessonEffText(l) : ''}` }));
       case 'clubs.adultLessons': return (C().adultLessons || []).filter((l) => !l.age || (G.age >= l.age[0] && G.age <= l.age[1])).filter((l) => !G.clubs.some((c) => c.id === l.id)).map((l) => item(l, { sub: `年${l.cost}万円` }));
       case 'clubs.jhsClubs': return C().jhsClubs.map((l) => item(l, { sub: clubSub(l) }));
       case 'clubs.hsClubs': return [...C().jhsClubs.filter((c) => !C().hsClubsExtra.some((x) => x.label === c.label)), ...C().hsClubsExtra].map((l) => item(l, { sub: clubSub(l) }));

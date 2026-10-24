@@ -14,7 +14,7 @@
     "mortgage": {
       "years": 35,
       "types": { "variable": { "label": "変動金利", "rate": 0.006, "risk": "金利が上がると返済額が増える" }, "fixed": { "label": "固定金利（35年）", "rate": 0.019 } },
-      "screening": { "maxIncomeMul": 7, "maxRepayRatio": 0.35, "blockFlags": ["blacklisted", "bankruptcy"], "minJobYears": 1, "formsOk": ["seishain", "civil_servant"], "formsHard": ["keiyaku", "haken", "part", "freelance"] },
+      "screening": { "maxIncomeMul": 7, "maxRepayRatio": 0.35, "blockFlags": ["blacklisted"], "minJobYears": 1, "formsOk": ["seishain", "civil_servant"], "formsHard": ["keiyaku", "haken", "part", "freelance"] },
       "danshin": "団体信用生命保険：ローンを借りた人が亡くなると残りのローンはなくなる（配偶者の生活が守られる）",
       "prepay": "まとまったお金でくり上げ返済できる"
     },

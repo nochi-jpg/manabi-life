@@ -309,13 +309,34 @@
       "fail": {
         "text": "🍂 {target}は不合格。どうする？",
         "choices": [
-          { "label": "🔁 浪人してもう1年がんばる（予備校 年80万）", "when": { "counter": { "ronin_years": ["<", 2] } }, "effects": { "var": { "plan": "univ" }, "nextStage": "ronin", "cash_household": -80, "stats": { "stress": 8 } } },
+          { "label": "🔁 浪人してもう1年がんばる（3年まで）", "when": { "counter": { "ronin_years": ["<", 3] } }, "effects": { "var": { "plan": "univ" }, "nextStage": "ronin", "schedule": [ { "event": "ev_m_ronin_yobiko", "inYears": [0, 0] } ], "stats": { "stress": 8 } } },
           { "label": "🏫 合格できそうな学校の二次募集を受ける", "menu": { "source": "schools.postByPlan", "page": 5, "showRate": true, "filter": "lowerTier" }, "roll": { "rate": "$menuRate" }, "success": { "var": { "target": "$pick" }, "set": ["naitei_school"] }, "fail": { "var": { "plan": "work", "target": "j_parttime_general" } } },
           { "label": "🛠️ 専門学校に行く（ほぼ全員合格）", "effects": { "var": { "plan": "voc" }, "menuNext": "schools.vocational" } },
           { "label": "💼 就職する", "effects": { "var": { "plan": "work", "target": "j_parttime_general" }, "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0], "season": "Q1" } ] } },
           { "label": "🧳 ワーキングホリデーに行く", "when": { "age": [18, 30] }, "effects": { "var": { "plan": "abroad", "target": "ab_wh" } } }
         ]
       }
+    },
+    {
+      "id": "ev_m_yobiko_ask", "kind": "choice", "emoji": "🏫", "counselor": "parents",
+      "when": { "season": ["Q1"], "stage": ["hs"], "yearInStage": [1, 2], "noLesson": "ls_yobiko", "none": ["naitei"] },
+      "text": "高校{schoolYear}年生。まわりで大学受験の予備校に通う人が出てきた。",
+      "fact": { "text": "大学受験の予備校・塾の費用は、高校生で年50〜100万円くらい。高3から通う人がいちばん多い。", "src": "文部科学省 子供の学習費調査" },
+      "choices": [
+        { "label": "🙂 今は通わない（自分で勉強する）", "effects": {} },
+        { "label": "🏫 予備校に通う（年60万円・塾のわく）", "when": { "jukuOk": true }, "effects": { "club": { "join": "ls_yobiko" }, "stats": { "stress": 3 }, "log": "🏫 大学受験の予備校に通い始めた" } },
+        { "label": "💸 家計が苦しく、予備校には通えない", "when": { "jukuOk": false }, "effects": { "stats": { "stress": 2 } } }
+      ]
+    },
+    {
+      "id": "ev_m_ronin_yobiko", "kind": "choice", "emoji": "📚", "counselor": "parents", "type": "scheduled",
+      "when": { "stage": ["ronin"] },
+      "text": "浪人{roninYear}年目。どうやって勉強する？",
+      "fact": { "text": "浪人生の予備校の費用は、1年で70〜100万円くらい。自宅で勉強する「宅浪」は費用は少ないが、ペースを保つのがむずかしい。", "src": "文部科学省・各予備校の公表資料" },
+      "choices": [
+        { "label": "🙏 親に頼んで、予備校に通わせてもらう（年80万円）", "when": { "jukuOk": true }, "effects": { "cash_household": -80, "stats": { "stress": 4 }, "log": "📚 予備校に通って、もう1年がんばる" } },
+        { "label": "🏠 家で勉強する（宅浪・お金はかからない）", "effects": { "roninSelf": true, "stats": { "stress": 6 }, "log": "🏠 家で勉強して、もう1年がんばる" } }
+      ]
     },
     {
       "id": "ev_m_hs_grad", "kind": "flow", "emoji": "🎓",
@@ -328,7 +349,7 @@
       "when": { "season": ["Q4"], "stage": ["hs", "hs_corr", "hs_night"], "yearsLeft": 1, "var": { "plan": ["undecided"] }, "none": ["naitei", "naitei_school"] },
       "text": "卒業が近いのに、進路が決まっていない……。",
       "choices": [
-        { "label": "🔁 1年浪人して大学をめざす", "effects": { "var": { "plan": "univ" }, "nextStage": "ronin" } },
+        { "label": "🔁 1年浪人して大学をめざす", "effects": { "var": { "plan": "univ" }, "nextStage": "ronin", "schedule": [ { "event": "ev_m_ronin_yobiko", "inYears": [0, 0] } ] } },
         { "label": "🧺 フリーターとして働きながら考える", "effects": { "var": { "target": "j_parttime_general" } } },
         { "label": "🛠️ 専門学校に行く", "effects": { "var": { "plan": "voc" }, "menuNext": "schools.vocational" } }
       ]
@@ -526,7 +547,7 @@
     },
     {
       "id": "ev_m_job_review", "kind": "choice", "emoji": "🔄", "counselor": "self",
-      "when": { "season": ["Q1"], "jobYears": [5, 15, 25], "employment": ["seishain", "keiyaku", "civil_servant", "freelance", "self_employed"], "age": [22, 59] },
+      "when": { "season": ["Q1"], "jobYears": [8, 20], "employment": ["seishain", "keiyaku", "civil_servant", "freelance", "self_employed"], "age": [22, 59] },
       "text": "今の仕事について{jobYears}年。給料{income}万円、満足感{jobSat}。このままでいい？",
       "choices": [
         { "label": "🙂 今の仕事を続ける", "effects": { "stats": { "happiness": 1 } } },

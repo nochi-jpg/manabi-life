@@ -61,6 +61,7 @@ const Effects = (() => {
         case 'focus': { const f = resolve(v, ctx); if (f) Engine.setFocus(f, true); break; }
         case 'school': School.apply(v, ctx); break;
         case 'nextStage': School.setStage(v); break;
+        case 'roninSelf': if (G.school && G.stage === 'ronin') { G.school.name = '自宅で勉強'; G.school.emoji = '🏠'; G.school.quality = 0.95; G.school.cost = 0; } break;
         case 'extendStage': if (G.school) { G.school.years += v; School.cancelNaitei(logs, '留年'); } break;
         case 'queueNow': G.queue = G.queue || []; G.queue.unshift({ id: v, ctx: {} }); break;
         case 'job': Work.apply(v, ctx); break;
@@ -107,6 +108,12 @@ const Effects = (() => {
         case 'debtSettle': { const before = Math.round(Econ.totalDebt(true)); const card = Math.max(0, -G.cash); G.cash = Math.max(0, G.cash); let left = 0; for (const l of G.loans || []) if (l.type !== 'mortgage' && l.type !== 'investment' && l.left > 0) { l.left *= v; left += l.left; } const cut = card * v; if (cut > 0) { const l = Econ.addLoan('settle', cut, 0); l.yearly = Math.round((cut / 5) * 10) / 10; } const after = Math.round(left + cut); logs.push(`⚖️ 債務整理で、借金が${man(before)}万円から${man(after)}万円にへった。のこりは5年の分割（月${round1(after / 60)}万円）で返す。信用情報に5年間のるので、ローンやカードは作れない。`); break; }
         case 'bankrupt': { const before = Math.round(Econ.totalDebt()); logs.push(`⚖️ 自己破産の手続きをした。${man(before)}万円の借金はなくなったが、家・車・投資など財産のほとんどを手放した。7〜10年はローンやカードが作れない。`); break; }
         case 'familyBailout': { const need = Math.round(Econ.totalDebt(true)); const r = Fam.bailout(need * 0.6); if (r.amt > 0) { G.cash += r.amt; if (G.cash > 0) { let x = G.cash; for (const l of G.loans || []) if (l.type !== 'mortgage' && l.left > 0 && x > 0) { const pay = Math.min(l.left, x); l.left -= pay; x -= pay; } G.cash = x; } logs.push(`👨‍👩‍👧 ${r.who.join('・')}が${man(r.amt)}万円を出してくれて、借金の一部を返せた（家族の貯金はその分へった）。`); } else logs.push('👨‍👩‍👧 家族にも、出せるお金はなかった。'); break; }
+        case 'blacklistYears': G.vars.blackUntil = Math.max(G.vars.blackUntil || 0, G.year + num(v, ctx)); break;
+        case 'lifeLevel': G.vars.lifeLevel = v; G.vars.autoSave = false; break;
+        case 'openUi': G.vars.openUi = v; break;
+        case 'sellRental': if (G.flags.owns_rental) { const l = (G.loans || []).find((x) => x.type === 'investment' && x.left > 0); const val = G.vars.rentalValue || 0; G.cash += val - (l ? l.left : 0); if (l) l.left = 0; setFlag('owns_rental', false); G.vars.rentalValue = 0; G.vars.rentIncomeMonthly = 0; logs.push(`🏢 貸している部屋を${man(val)}万円で売った${l ? '（投資のローンを返した）' : ''}。`); } break;
+        // 手元の現金で、利息の高い借金から返す（生活費として3か月分はのこす）
+        case 'payDebtsFromCash': { const keep = Econ.expenses().total / 4; let x = Math.max(0, G.cash - keep); const before = Econ.consumerDebt(); const L = (G.loans || []).filter((l) => l.left > 0 && !['mortgage', 'investment', 'scholar'].includes(l.type)).sort((a, b) => (b.rate || 0) - (a.rate || 0)); for (const l of L) { if (x <= 0) break; const pay = Math.min(l.left, x); l.left -= pay; x -= pay; G.cash -= pay; } const paid = before - Econ.consumerDebt(); if (paid >= 1) logs.push(`💴 そのお金で、借金を${man(paid)}万円返した。`); break; }
         case 'sellAssetsForDebt': { const debt = Econ.totalDebt(true); const s = Math.min(G.assets, debt); G.assets -= s; G.cash += s; let x = Math.max(0, G.cash); for (const l of G.loans || []) if (l.type !== 'mortgage' && l.left > 0 && x > 0) { const pay = Math.min(l.left, x); l.left -= pay; x -= pay; } G.cash = Math.min(G.cash, x); logs.push(`📉 投資を${man(s)}万円分売って、借金を返した。`); break; }
         // 子どもの進路を決める（wish＝本人の希望どおり）。進学なら学費の相談、ひとり暮らし・留学なら仕送りの相談へ
         case 'childPath': { const c = ctx.child; if (!c) break; let k = v === 'wish' ? c.wish || 'local' : v;
@@ -194,6 +201,8 @@ const School = {
     G.school = { id, tmpl: tmplId, pick: id, name, emoji: t.emoji || (p && p.emoji) || '🏫', years, yearIn: 1, quality: t.quality || 1, cost: (p && p.cost) ?? t.cost ?? 0, h: p ? p.h : null };
     G.stage = stage;
     if (stage === 'jhs') { G.clubs = G.clubs.filter((c) => c.id !== 'ls_juken_juku'); }
+    // 高校に入ったら学習塾は終わり（高校は予備校）
+    if (['hs', 'hs_corr', 'hs_night', 'kosen'].includes(stage) && G.clubs.some((c) => c.id === 'ls_juku')) { G.clubs = G.clubs.filter((c) => c.id !== 'ls_juku'); Fam.notice('✏️', '高校に入ったので、学習塾はやめた（高校では予備校に通える）。', 'school'); }
     (t.grant || []).forEach((f) => Effects.setFlag(f, true));
     // ほかの県の学校：その県に引っ越して、ひとり暮らし
     if (p && p.pref && p.pref !== G.pref) { Life.move(p.pref, ctx, {}); Effects.setFlag('living_alone', true); Effects.setFlag('lives_with_parents', false); for (const x of people('father|mother|sibling')) x.together = false; }
@@ -234,6 +243,14 @@ const School = {
     if (st === 'ronin') { if (G.school) this.leave('graduate'); G.stage = 'ronin'; G.counters.ronin_years = (G.counters.ronin_years || 0) + 1; G.school = { id: 'ronin', tmpl: 'ronin', name: '予備校', emoji: '📚', years: 1, yearIn: 1, quality: 1.05, cost: 80 }; return; }
     if (st === 'hikikomori') { G.stage = 'hikikomori'; return; }
     G.stage = st;
+    School.dropYobiko();
+  },
+  // 大学などに進学・就職したら、予備校は自動でやめる
+  dropYobiko() {
+    if (!G.clubs.some((c) => c.id === 'ls_yobiko')) return;
+    if (['hs', 'hs_corr', 'hs_night', 'kosen', 'ronin'].includes(G.stage) && !(G.job && G.job.id)) return;
+    G.clubs = G.clubs.filter((c) => c.id !== 'ls_yobiko');
+    Fam.notice('🏫', G.job && G.job.id ? '働き始めたので、予備校はやめた。' : '進学したので、予備校はやめた。', 'school');
   },
 };
 
@@ -253,6 +270,7 @@ const Work = {
   },
   hire(id, form, ctx) {
     const j = Menu.job(id); if (!j) return;
+
     if (j.wage) { // 学生アルバイト（本業とは別）
       if (Menu.isStudent() || form === 'student_part') { G.job = G.job && !G.job.part ? { ...G.job, part: id } : { id: null, part: id, form: 'student_part' }; if (!G.job.id) G.employment = 'student_part'; return; }
     }
@@ -264,6 +282,7 @@ const Work = {
     // 出世の段：同じ track なら1段下げて引きつぐ
     const oldTrack = Econ.rankTrack();
     G.job = { id, form: f, startAge: Math.min(G.age, (G.job && G.job.startAge) ?? G.age), since: G.year, mul: 1, pref: G.pref };
+    School.dropYobiko();
     delete G.flags.long_commute;
     const nt = Econ.rankTrack();
     G.rank = oldTrack && nt && oldTrack.id === nt.id ? Math.max(0, (G.rank || 0) - 1) : 0;

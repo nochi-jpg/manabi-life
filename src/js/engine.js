@@ -88,12 +88,20 @@ const Engine = (() => {
         if (p > 0 && chance(p)) { add(e.id, ctx); if (e.kind === 'choice') riskChoice = true; }
       }
     }
-    // お金の非常事態：借金が年収をこえたら債務整理の相談、収入がなく所持金もないなら生活保護の相談（ランダムを待たない）
-    if (G.age >= 18 && !hasChoiceQ(Q)) {
-      for (const id of ['ev_r_debt_crisis', 'ev_r_welfare']) {
-        const e = ev(id); const ctx = { ev: e };
-        if (!gentleOut(id) && onceYearOk(e) && Cond.test(e.when, ctx) && chance(0.5)) { add(id, ctx); break; }
-      }
+    // お金の非常事態（ランダムを待たない）
+    //  ・借金がある状態で1年（4季節）赤字が続いた → 資産があれば「資産を整理しないと…」、なければ「借金が返せなくなってきた」
+    //  ・収入がなく所持金もない → 生活保護の相談
+    //  ・3か月赤字だった → 「生活水準や趣味を見直してみようか……」
+    if (G.age >= 18 && !Menu.isStudent() && !hasChoiceQ(Q)) {
+      const tryAdd = (id) => { const e = ev(id); const ctx = { ev: e }; if (e && !gentleOut(id) && onceYearOk(e) && Cond.test(e.when, ctx)) { add(id, ctx); return true; } return false; };
+      const hasAssets = G.assets >= 1 || (G.flags.owns_house && !G.flags.lives_with_parents) || G.flags.owns_rental || G.flags.owns_car;
+      const defQ = G.vars.defQ || 0;
+      const yearOut = Econ.expenses().total;
+      const lowCash = G.cash < yearOut / 2; // 現金が半年分ない
+      let done = false;
+      if (defQ >= 4 && lowCash && Econ.totalDebt() >= 1) done = hasAssets ? tryAdd('ev_m_asset_sell') : Econ.consumerDebt() >= 1 && tryAdd('ev_r_debt_crisis');
+      if (!done && chance(0.5)) done = tryAdd('ev_r_welfare');
+      if (!done && defQ >= 1 && defQ < 4 && G.cash < yearOut * 2 && Econ.lifeLevel() !== 'save' && !G.flags.welfare) tryAdd('ev_m_budget_review'); // 貯金が2年分あれば、少しの赤字は気にしない
     }
     // プロポーズ：付き合って2年以上たったら、毎年40%（45歳からは12%）で「する」か「される」が来る（ランダムを待たない）
     if (G.q === 1 && G.age >= 22 && G.flags.has_partner && !G.flags.married && !hasChoiceQ(Q) && chance(G.age < 45 ? 0.4 : 0.12)) {
@@ -117,7 +125,7 @@ const Engine = (() => {
     const hasChoice = () => Q.some((x) => (ev(x.id) || {}).kind === 'choice');
     if (!hasChoice() && (G.randomChoicesYear || 0) < 2) {
       const hit = [];
-      const k = G.age < 6 ? 0.005 : G.age >= 30 ? 0.0055 : 0.0065;
+      const k = G.age < 6 ? 0.005 : G.age >= 30 ? 0.0049 : 0.006;
       for (const e0 of [...D().events_random.events, ...FAM]) {
         const e = ev(e0.id);
         if (e.kind !== 'choice' || !e.weight || e.type === 'scheduled' || e.risk || gentleOut(e.id)) continue;
@@ -427,7 +435,8 @@ const Engine = (() => {
       let pq = qc.byLesson[c.id] ?? (changed ? qc.atStage[stageNow] ?? qc.default : qc.default * 0.5);
       if (G.age > d.age[1]) pq = Math.max(pq, 0.85);
       if (G.age >= 22 && c.id.startsWith('ls_')) pq = Math.max(pq, 0.8); // 大人になってからも続ける人は少数派
-      const out = G.age > d.age[1] || (c.id === 'ls_juken_juku' && G.stage !== 'elem');
+      const HS = ['hs', 'hs_corr', 'hs_night', 'kosen'];
+      const out = G.age > d.age[1] || (c.id === 'ls_juken_juku' && G.stage !== 'elem') || (c.id === 'ls_juku' && HS.includes(G.stage)) || (c.id === 'ls_yobiko' && !HS.includes(G.stage) && G.stage !== 'ronin');
       return { ...lessonItem(c), quit: out, lock: out ? '年齢・学年で終わり' : null };
     }).filter(Boolean);
     // 家計が苦しくなったら、高いものから続けられなくなる
@@ -447,10 +456,11 @@ const Engine = (() => {
   const hhIncome = () => { try { return Fam.householdIncome().total || 0; } catch (e) { return 0; } };
   function lessonCap() { const w = G.talents.familyWealth; const base = w < 15 ? 8 : w < 35 ? 16 : w < 65 ? 32 : w < 85 ? 64 : 120; return Math.round(Math.max(base, hhIncome() * 0.15)); }
   // 中学受験の塾だけは別わく：世帯年収が500万円以上（または家のくらしがふつう以上）なら、上限とは別に出せる
-  const JUKU = 'ls_juken_juku';
+  // 中学受験の塾・学習塾・予備校は別わく（ただし家計が苦しいと別わくにならない）
+  const JUKU = ['ls_juken_juku', 'ls_juku', 'ls_yobiko'];
   function poorHome() { return G.talents.familyWealth < 15 && Econ.parentsIncome() < 350; }
   function jukuOk() { return hhIncome() >= 500 || G.talents.familyWealth >= 35; }
-  const capCost = (id, cost) => (id === JUKU && jukuOk() ? 0 : cost || 0);
+  const capCost = (id, cost) => (JUKU.includes(id) && jukuOk() ? 0 : cost || 0);
   // 習い事を増やす（上限4つ）。ことわられたら msg を返す
   function addLesson(id, keep) {
     const d = Menu.club(id); if (!d) return { ok: false, msg: '' };
@@ -554,6 +564,8 @@ const Engine = (() => {
   function newYear() {
     G.age++;
     G.randomChoicesYear = 0;
+    // 信用情報（債務整理5年・自己破産7年）が消えたら、またローンが組める
+    if (G.flags.blacklisted && G.vars.blackUntil && G.year >= G.vars.blackUntil) { delete G.flags.blacklisted; G.vars.blackUntil = 0; Fam.notice('📄', '信用情報の記録が消えて、またローンやカードが作れるようになった。', 'money'); }
     if (G.school) G.school.yearIn++;
     if (G.job) G.jobYears++;
     if (G.vars.recurring) { G.vars.recurring = G.vars.recurring.filter((r) => !r.who || (G.people.find((p) => p.id === r.who) || {}).alive); G.vars.recurring.forEach((r) => { if (G.age >= 16) G.cash += r.v; else G.household.cash = (G.household.cash ?? 100) + r.v; r.left--; }); G.vars.recurring = G.vars.recurring.filter((r) => r.left > 0); }
@@ -616,7 +628,7 @@ const Engine = (() => {
       const h = G.stats.health;
       p *= h < 20 ? 4 : h < 35 ? 2 : h < 45 ? 1.3 : h > 75 ? 0.8 : 1;
       p *= G.vars.deathRiskMul || 1;
-      p *= G.gender === 'M' ? 0.66 : 0.47; // 統計の平均寿命（男81歳・女87歳）に合わせる
+      p *= G.gender === 'M' ? 0.62 : 0.47; // 統計の平均寿命（男81歳・女87歳）に合わせる
       if (['dz_cancer_lung', 'dz_cancer_stomach', 'dz_cancer_colon', 'dz_cancer_breast'].some((f) => G.flags[f])) p += 0.05 * (G.vars.cancerStage || 2) / 2;
       if (G.flags.dz_heart || G.flags.dz_stroke_after) p *= 1.2;
       if (G.age < 35) p = Math.min(p, 0.003);
