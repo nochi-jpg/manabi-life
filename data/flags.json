@@ -70,7 +70,7 @@
     "repeat_years": "留年年数",
     "hodou_count": "補導回数",
     "hospital_count": "入院回数",
-    "promotion_level": "役職（0一般 1主任 2係長 3課長 4部長 5役員）",
+    "promotion_level": "役職の段（data/ranks.json の track の何段目か。0が入社時）",
     "moves": "引っ越し回数",
     "lottery_spent": "宝くじに使った額"
   },
@@ -294,7 +294,8 @@
     "tryYears": "子どもを望んでからの年数",
     "kenshinFlag": "健診で要再検査が出た",
     "will": "遺言・エンディングノートがある",
-    "hobbies": "趣味のIDのリスト（上限なし。clubs.hobbies）"
+    "hobbies": "趣味のIDのリスト（上限なし。clubs.hobbies）",
+    "declinedExam": "昇任・管理職試験を見送った回数"
   },
   "personOps": [
     "add",

@@ -237,6 +237,13 @@ const facts = D('facts.json').facts;
 for (const id of Object.keys(facts)) { if (!EVENT_IDS.has(id)) err('facts', `イベントがない「${id}」`); if (!facts[id].src) err('facts.' + id, '出典(src)がない'); }
 const noFact = allEvents.filter((e) => e.kind === 'choice' && !facts[e.id]).map((e) => e.id);
 if (noFact.length) warn('facts', `データ表示のない選択肢イベント ${noFact.length}件: ${noFact.join(', ')}`);
+const ranks = D('ranks.json');
+const ranked = new Map();
+for (const t of ranks.tracks) for (const j of t.jobs) { if (!JOB_IDS.has(j)) err('ranks.' + t.id, `未定義の職業「${j}」`); if (ranked.has(j)) err('ranks', `「${j}」が2つの track に入っている`); ranked.set(j, t.id);
+  for (const k of ['steps', 'officerSteps']) (t[k] || []).forEach((st, i) => { if (i > 0 && !(st.y >= 0 && st.p > 0)) err(`ranks.${t.id}.${k}[${i}]`, '勤続年数y・確率pがない'); if (i > 0 && st.y < (t[k][i - 1].y || 0)) err(`ranks.${t.id}.${k}[${i}]`, '勤続年数が前の段より少ない'); }); }
+for (const j of ranks.noRank.jobs) { if (ranked.has(j)) err('ranks.noRank', `「${j}」は track にもある`); ranked.set(j, 'none'); }
+for (const j of jobs.jobs) if (!ranked.has(j.id)) err('ranks', `「${j.id}」の出世のはしごがない（noRank にも入っていない）`);
+for (const c of new Set(jobs.jobs.map((j) => j.cat))) if (!ranks.industry[c]) err('ranks.industry', `業界名がない「${c}」`);
 for (let a = 0; a <= 120; a++) if (vis.portraits.ages.filter((p) => a >= p.from && a <= p.to).length !== 1) err('visuals.portraits', `${a}歳の顔グラが0枚または重複`);
 for (const g of ps.graduate) if (g.requires) { checkFlags(`graduate.${g.id}`, g.requires); if (g.stage === 'grad_doctor' && !g.requires.includes('edu_master_grad')) err(`graduate.${g.id}`, 'I-8違反：博士は修士修了が必要'); }
 for (const c of [...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles]) {

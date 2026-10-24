@@ -2,7 +2,7 @@
 
 > このファイルは `node tools/catalog.js` で `data/events_*.json` から生成しています。直接編集せず、JSONを直してから再生成してください。
 
-## 必須イベント（条件を満たすと必ず起こる）（64件）
+## 必須イベント（条件を満たすと必ず起こる）（65件）
 
 | | ID | 時期 | 条件 | 文章 | 選択肢 |
 |---|---|---|---|---|---|
@@ -59,7 +59,8 @@
 | 🏢 | `ev_m_first_job` | 春 | 在籍:none / 必要:naitei | 社会人1年目。{job}として働き始めた。初任給は{income}万円。 |  |
 | 📄 | `ev_m_scholar_repay` | 夏 | 在籍:none / 必要:scholarship_loan / 除外:scholarship_loan_repaying | 奨学金の返済が始まった。毎月{repay}万円、{repayYears}年間。 |  |
 | 🔄 | `ev_m_job_review` | 22〜59歳 春 | 雇用:seishain/keiyaku/civil_servant/freelance/self_employed / 勤続5/10/15/20/25/30年 | 今の仕事について{jobYears}年。給料{income}万円、満足感{jobSat}。このままでいい？ | 🙂 今の仕事を続ける<br>［候補リスト:jobs.midCareer］<br>📖 資格をとって仕事を変える<br>🚀 独立・起業する<br>🧺 仕事をゆるめる（パート・アルバイトに）<br>😌 一度やめて休む |
-| 📈 | `ev_m_promotion` | 28〜58歳 春 | 雇用:seishain/civil_servant | 📈 昇進した！{newTitle}になった。 |  |
+| 📈 | `ev_m_promotion` | 春 | 雇用:seishain/civil_servant/part | 📈 {jobLabel}として{newTitle}になった！ |  |
+| 📝 | `ev_m_promotion_exam` | 夏 | 雇用:seishain/civil_servant | {nextTitle}になるための{examName}を受けることができる。受かれば給料は上がるが、責任も重くなる。 | 📝 試験を受ける<br>🙂 今の立場で、目の前の仕事を続けたい |
 | 📄 | `ev_m_contract_end` | 冬 | 雇用:keiyaku/haken | 契約期間が終わる。どうなる？ | 🙏 正社員にしてもらえないか相談する<br>［候補リスト:jobs.midCareer］<br>📄 同じ形で更新する |
 | 🔍 | `ev_m_unemployed` | 18〜64歳 春・秋 | 在籍:none / 除外:welfare / 雇用:unemployed/none | 今は仕事がない。（失業手当：{benefitLeft}）どうする？ | ［候補リスト:jobs.midCareer］<br>🧺 まずはアルバイトで働く<br>🏫 職業訓練校で技術を身につける（無料・半年）<br>😌 もう少し休む |
 | 👶 | `ev_m_child_plan` | 春 | 必要:married / 除外:no_children_choice,wants_children / 人物:spouse | 結婚して1年。{spouse}と子どものことを話し合った。 | 👶 子どもがほしい<br>⏳ もう少し2人で過ごしたい<br>🙅 子どもは持たない |

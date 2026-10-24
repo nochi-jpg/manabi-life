@@ -476,10 +476,20 @@
     },
     {
       "id": "ev_m_promotion", "kind": "flow", "emoji": "📈",
-      "when": { "season": ["Q1"], "employment": ["seishain", "civil_servant"], "age": [28, 58], "cooldownYears": 4, "counter": { "promotion_level": ["<", 5] } },
-      "roll": { "base": 0.3, "w": { "t_comm": 0.4, "academic": 0.2, "social": 0.3 }, "focusBonus": { "focus_work": 0.15, "focus_family": -0.1 } },
-      "success": { "text": "📈 昇進した！{newTitle}になった。", "effects": { "counter": { "promotion_level": 1 }, "stats": { "happiness": 4, "stress": 4 }, "setIfLevel": { "3": ["manager"] } } },
-      "fail": { "text": "今年の昇進は見送りだった。", "effects": { "stats": { "happiness": -1 } } }
+      "when": { "season": ["Q1"], "employment": ["seishain", "civil_servant", "part"], "hasRankTrack": true, "nextStepExam": false, "nextStepYearsMet": true },
+      "roll": { "rate": "$nextStepRate", "w": "ranks.rules.rollWeights", "focusBonus": { "focus_work": 0.15, "focus_family": -0.1 } },
+      "success": { "text": "📈 {jobLabel}として{newTitle}になった！", "effects": { "rankUp": true, "counter": { "promotion_level": 1 }, "stats": { "happiness": 4 }, "log": "📈 {newTitle}に昇進" } },
+      "fail": { "text": "", "effects": { "silent": true } },
+      "note": "昇進先は data/ranks.json の track で決まる。教師に課長はなく、警察は巡査→巡査部長…。mgr の段になったら manager フラグ"
+    },
+    {
+      "id": "ev_m_promotion_exam", "kind": "choice", "emoji": "📝", "counselor": "self",
+      "when": { "season": ["Q2"], "employment": ["seishain", "civil_servant"], "hasRankTrack": true, "nextStepExam": true, "nextStepYearsMet": true, "cooldownYears": 1 },
+      "text": "{nextTitle}になるための{examName}を受けることができる。受かれば給料は上がるが、責任も重くなる。",
+      "choices": [
+        { "label": "📝 試験を受ける", "showRate": true, "roll": { "rate": "$nextStepRate", "w": "ranks.rules.examWeights" }, "success": { "rankUp": true, "counter": { "promotion_level": 1 }, "stats": { "happiness": 5, "stress": 3 }, "log": "📝 試験に合格し、{newTitle}になった" }, "fail": { "stats": { "happiness": -2 }, "log": "🍂 {examName}は不合格。来年また受けられる" } },
+        { "label": "🙂 今の立場で、目の前の仕事を続けたい", "effects": { "stats": { "stress": -2 }, "var": { "declinedExam": "+1" } } }
+      ]
     },
     {
       "id": "ev_m_contract_end", "kind": "choice", "emoji": "📄", "counselor": "self",
