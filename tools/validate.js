@@ -8,7 +8,7 @@ const path = require('path');
 const D = (f) => JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', f), 'utf8'));
 
 const flagsDoc = D('flags.json');
-const files = ['events_mandatory.json', 'events_random.json', 'events_flow.json'];
+const files = ['events_mandatory.json', 'events_random.json', 'events_flow.json', 'events_world.json'];
 const eventsByFile = Object.fromEntries(files.map((f) => [f, D(f).events]));
 const schools = D('schools.json');
 const jobs = D('jobs.json');
@@ -244,6 +244,11 @@ for (const t of ranks.tracks) for (const j of t.jobs) { if (!JOB_IDS.has(j)) err
 for (const j of ranks.noRank.jobs) { if (ranked.has(j)) err('ranks.noRank', `「${j}」は track にもある`); ranked.set(j, 'none'); }
 for (const j of jobs.jobs) if (!ranked.has(j.id)) err('ranks', `「${j.id}」の出世のはしごがない（noRank にも入っていない）`);
 for (const c of new Set(jobs.jobs.map((j) => j.cat))) if (!ranks.industry[c]) err('ranks.industry', `業界名がない「${c}」`);
+const ai = D('ai_impact.json');
+const aiSrc = new Set(ai.sources.map((x) => x.id));
+for (const j of jobs.jobs) { const r = ai.jobs[j.id]; if (!r) { err('ai_impact', `「${j.id}」のAI影響度がない`); continue; } if (!(r.risk >= 0 && r.risk <= 1)) err('ai_impact.' + j.id, 'risk は0〜1'); (r.src || []).forEach((x) => { if (!aiSrc.has(x)) err('ai_impact.' + j.id, `未定義の出典「${x}」`); }); }
+for (const id of Object.keys(ai.jobs)) if (!JOB_IDS.has(id)) err('ai_impact', `未定義の職業「${id}」`);
+ai.rules.growthJobs.forEach((j) => { if (!JOB_IDS.has(j)) err('ai_impact.growthJobs', `未定義の職業「${j}」`); });
 for (let a = 0; a <= 120; a++) if (vis.portraits.ages.filter((p) => a >= p.from && a <= p.to).length !== 1) err('visuals.portraits', `${a}歳の顔グラが0枚または重複`);
 for (const g of ps.graduate) if (g.requires) { checkFlags(`graduate.${g.id}`, g.requires); if (g.stage === 'grad_doctor' && !g.requires.includes('edu_master_grad')) err(`graduate.${g.id}`, 'I-8違反：博士は修士修了が必要'); }
 for (const c of [...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles]) {
@@ -281,7 +286,7 @@ for (const f of FLAGS) if (!setSomewhere.has(f) && !used.has(f)) warn('未使用
 const count = (f) => eventsByFile[f].length;
 const choiceN = allEvents.filter((e) => e.kind === 'choice').length;
 console.log('=== まなびライフ データ検証 ===');
-console.log(`イベント: 必須 ${count('events_mandatory.json')} / ランダム ${count('events_random.json')} / 流れる ${count('events_flow.json')}（選択肢あり ${choiceN}）`);
+console.log(`イベント: 必須 ${count('events_mandatory.json')} / ランダム ${count('events_random.json')} / 流れる ${count('events_flow.json')} / 世の中 ${count('events_world.json')}（選択肢あり ${choiceN}）`);
 console.log(`フラグ ${FLAGS.size} / 職業 ${jobs.jobs.length} / バイト ${jobs.partTimeJobs.length} / 学校テンプレ ${SCHOOL_IDS.size} / 学部 ${DEPT_IDS.size} / 部活・習い事・サークル ${CLUB_IDS.size} / 資格 ${QUAL_IDS.size} / 都道府県 ${prefs.prefectures.length}（人口計 ${popSum}万）`);
 warns.forEach((w) => console.log(w));
 errors.forEach((e) => console.log(e));

@@ -34,13 +34,14 @@ const sections = [
   ['events_mandatory.json', '必須イベント（条件を満たすと必ず起こる）'],
   ['events_random.json', 'ランダム選択肢イベント'],
   ['events_flow.json', '流れるだけイベント'],
+  ['events_world.json', '世の中の出来事（2010年スタート）'],
 ];
 for (const [f, title] of sections) {
   const evs = load(f);
   md += `## ${title}（${evs.length}件）\n\n| | ID | 時期 | 条件 | 文章 | 選択肢 |\n|---|---|---|---|---|---|\n`;
   for (const e of evs) {
     const w = e.when || {};
-    const when = [age(w), season(w), e.risk ? `確率:${e.risk}` : ''].filter(Boolean).join(' ');
+    const when = [w.date || '', age(w), season(w), e.risk ? `確率:${e.risk}` : ''].filter(Boolean).join(' ');
     const text = e.text || (e.success && e.success.text) || '';
     md += `| ${e.emoji || ''} | \`${e.id}\` | ${esc(when)} | ${esc(cond(w))} | ${esc(text)} | ${esc(choices(e))} |\n`;
   }

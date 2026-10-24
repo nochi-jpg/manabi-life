@@ -1,0 +1,57 @@
+{
+  "_comment": "世の中の出来事（全員に同じ年に起こる）。ゲームは2010年スタート（プレイヤーは2010年生まれ）。when.date は西暦の年-月。2025年までは実際の出来事、2026年以降は研究をもとにした『ゲームの中の未来』で、テキストにもそう書く。",
+  "startYear": 2010,
+  "events": [
+    { "id": "ev_w_311", "kind": "flow", "emoji": "🌊", "cat": "world",
+      "when": { "date": "2011-03", "once": true },
+      "text": "東日本大震災が起きた。テレビでは、津波の映像が何度も流れた。（{name}はまだ赤ちゃんだった）",
+      "byRegion": {
+        "東北": { "text": "東日本大震災。{pref}も大きくゆれ、停電や断水がしばらく続いた。家の仕事にも影響が出て、収入が少し減った。（{name}はまだ赤ちゃんだった）", "effects": { "wealthDelta": -3, "householdStress": 3 } },
+        "関東": { "text": "東日本大震災。{pref}も大きくゆれ、電車が止まり、計画停電もあった。（{name}はまだ赤ちゃんだった）" }
+      } },
+    { "id": "ev_w_covid", "kind": "flow", "emoji": "😷", "cat": "world",
+      "when": { "date": "2020-04", "once": true },
+      "text": "新型コロナウイルスが世界中に広がり、緊急事態宣言が出た。学校は休校になり、家でオンライン授業を受けた。",
+      "effects": { "stats": { "social": -2, "stress": 2 } } },
+    { "id": "ev_w_olympics", "kind": "flow", "emoji": "🏅", "cat": "world",
+      "when": { "date": "2021-07", "once": true },
+      "text": "1年おくれで、東京オリンピック・パラリンピックが開かれた。会場にお客さんは入れなかった。" },
+    { "id": "ev_w_covid_end", "kind": "flow", "emoji": "🙂", "cat": "world",
+      "when": { "date": "2023-05", "once": true },
+      "text": "新型コロナが季節性インフルエンザと同じあつかいになった。マスクを外す人が少しずつ増えてきた。" },
+    { "id": "ev_w_noto", "kind": "flow", "emoji": "🏚️", "cat": "world",
+      "when": { "date": "2024-01", "once": true },
+      "text": "元日に、能登半島で大きな地震が起きた。",
+      "byPref": { "ishikawa": { "text": "元日に能登半島地震。{pref}は大きな被害を受け、家族で避難所に身を寄せた日もあった。", "effects": { "wealthDelta": -2, "householdStress": 3 } } } },
+    { "id": "ev_w_expo", "kind": "flow", "emoji": "🌐", "cat": "world",
+      "when": { "date": "2025-04", "once": true },
+      "text": "大阪・関西万博が開幕した。空飛ぶクルマのデモ飛行がニュースになった。" },
+
+    { "id": "ev_w_ai_dawn", "kind": "flow", "emoji": "🤖", "cat": "world",
+      "when": { "date": "2035-04", "once": true },
+      "text": "（ゲームの中の未来）AIが人と同じように考え、仕事をこなす時代がやってきた。ニュースでは毎日のように『AIに置きかわる仕事』が話題になっている。" },
+    { "id": "ev_w_auto_drive", "kind": "flow", "emoji": "🚘", "cat": "world",
+      "when": { "date": "2038-04", "once": true },
+      "text": "（ゲームの中の未来）運転手のいない自動運転タクシーが、街を走りはじめた。" },
+
+    { "id": "ev_w_ai_restructure", "kind": "choice", "emoji": "🤖", "cat": "work",
+      "when": { "year": [2035, 2100], "employment": ["seishain", "keiyaku", "haken", "part", "civil_servant"], "aiRisk": [">=", 0.7], "aiWavePassed": true, "cooldownYears": 3 },
+      "risk": "aiRestructure",
+      "text": "（ゲームの中の未来）会社がAIを導入し、{jobLabel}の仕事の多くが自動化された。{name}の部署はなくなることになった。",
+      "choices": [
+        { "label": "🔄 会社の中の別の部署に移る（学び直しが必要）", "showRate": true, "roll": { "base": 0.4, "w": { "academic": 0.3, "t_comm": 0.3 }, "ageMinus": 0.01 }, "success": { "job": { "hire": "$sameCompanyLowAi" }, "skill": { "it": 5 }, "stats": { "stress": 6 }, "log": "🔄 社内の別の部署に移った" }, "fail": { "job": { "quit": "fired" }, "set": ["unemployment_exp"], "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0] } ], "log": "📉 移れる部署がなく、退職することになった" } },
+        { "label": "🔍 AIに置きかわりにくい仕事に転職する", "menu": { "source": "jobs.midCareer", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "job": { "hire": "$pick" }, "counter": { "job_changes": 1 } }, "fail": { "job": { "quit": "fired" }, "set": ["unemployment_exp"], "stats": { "stress": 8 } } },
+        { "label": "🏫 職業訓練でスキルを学び直す（半年・無料）", "effects": { "job": { "quit": "fired" }, "set": ["unemployment_exp"], "skill": { "it": 12, "craft": 8 }, "benefit": true, "schedule": [ { "event": "ev_r_qualify", "inYears": [0, 0] }, { "event": "ev_r_job_search", "inYears": [0, 1] } ] } },
+        { "label": "🌴 早期退職に応じる（退職金が上乗せ）", "when": { "age": [50, 64] }, "effects": { "job": { "quit": "early_retire" }, "cash": "$earlyRetireBonus", "set": ["retired_flag"] } }
+      ],
+      "note": "aiRisk は data/ai_impact.json。wave をすぎた high の職業は、就職・転職の候補に出ない（filter: eligible がこれを見る）" },
+    { "id": "ev_w_ai_pressure", "kind": "flow", "emoji": "📉", "cat": "work",
+      "when": { "year": [2035, 2100], "employment": ["seishain", "keiyaku", "haken", "part", "civil_servant", "freelance"], "aiRisk": [">=", 0.45], "aiRiskMax": 0.7, "aiWavePassed": true, "once": true },
+      "text": "（ゲームの中の未来）AIのおかげで{jobLabel}の仕事は速くなった。でも、そのぶん給料は上がりにくくなった。",
+      "effects": { "raiseMul": 0.5, "skill": { "it": 3 } } },
+    { "id": "ev_w_ai_growth", "kind": "flow", "emoji": "📈", "cat": "work",
+      "when": { "year": [2035, 2100], "jobId": ["j_data_scientist", "j_it_engineer"], "once": true },
+      "text": "（ゲームの中の未来）AIを使いこなせる人の取り合いになり、{jobLabel}の給料が上がった。",
+      "effects": { "incomeMul": 1.1 } }
+  ]
+}
