@@ -1,0 +1,575 @@
+{
+  "_comment": "必須イベント。条件を満たすと必ず起こる（その枠の最優先）。counselor=進路を示す人（UIで『◯◯から提案』と表示）。menu の候補はデータから自動生成し5件ずつ表示、6件目に『別の候補を見る▶』。",
+  "events": [
+    {
+      "id": "ev_m_birth", "kind": "flow", "emoji": "👶",
+      "when": { "age": [0, 0], "season": ["Q1"], "once": true },
+      "text": "{year}年、{pref}で{name}が生まれた。家族は{family}。",
+      "effects": { "log": "👶 {pref}で誕生" }
+    },
+    {
+      "id": "ev_m_preschool", "kind": "choice", "emoji": "🧸", "counselor": "parents",
+      "when": { "age": [3, 3], "season": ["Q1"], "once": true },
+      "text": "{name}も3歳。保育園や幼稚園をどうするか、家族で話し合っている。",
+      "choices": [
+        { "menu": { "source": "schools.preschool", "page": 5 }, "effects": { "school": { "enter": "$pick" } } }
+      ]
+    },
+    {
+      "id": "ev_m_like_3", "kind": "choice", "emoji": "🧒", "counselor": "self",
+      "when": { "age": [3, 3], "season": ["Q3"], "once": true },
+      "text": "{name}は、どんなことをしているときが一番楽しそう？",
+      "choices": [
+        { "label": "🏃 外で遊ぶ", "effects": { "var": { "like3": "like_outdoor" } } },
+        { "label": "📖 本を読む", "effects": { "var": { "like3": "like_book" } } },
+        { "label": "🎨 絵をかく", "effects": { "var": { "like3": "like_draw" } } },
+        { "label": "🔢 数をかぞえる・パズル", "effects": { "var": { "like3": "like_math" } } },
+        { "label": "🎮 テレビゲーム", "effects": { "var": { "like3": "like_game" } } },
+        { "label": "🙂 とくに決まっていない", "effects": { "var": { "like3": "like_none" } } }
+      ]
+    },
+    {
+      "id": "ev_m_lesson_start", "kind": "choice", "emoji": "🎒", "counselor": "parents",
+      "when": { "age": [4, 4], "season": ["Q3"], "once": true },
+      "text": "近所の子が習い事を始めたらしい。{name}にも何かやらせてみる？",
+      "choices": [
+        { "menu": { "source": "clubs.lessons", "page": 5, "filter": "age" }, "effects": { "club": { "join": "$pick" } } },
+        { "label": "🏠 今はまだいい", "effects": { "stats": { "stress": -2 } } }
+      ]
+    },
+    {
+      "id": "ev_m_ojuken", "kind": "choice", "emoji": "🎩", "counselor": "parents",
+      "when": { "age": [5, 5], "season": ["Q1"], "region": ["A", "B"], "talent": { "familyWealth": [">=", 65] }, "once": true },
+      "text": "「私立や国立の小学校を受けてみない？」と親が考えている。",
+      "choices": [
+        { "label": "🎩 お受験の準備をする（家計−60万）", "effects": { "cash_household": -60, "var": { "ojuken": true }, "stats": { "stress": 5 }, "schedule": [ { "event": "ev_m_elem_exam", "inYears": [0, 0], "season": "Q3" } ] } },
+        { "label": "🏫 近所の公立小学校に通う", "effects": { "var": { "ojuken": false } } }
+      ]
+    },
+    {
+      "id": "ev_m_elem_exam", "kind": "choice", "emoji": "📝", "type": "scheduled", "counselor": "parents",
+      "when": { "age": [5, 5], "season": ["Q3"], "var": { "ojuken": [true] }, "once": true },
+      "text": "小学校受験の日。受ける学校を選ぼう。",
+      "choices": [
+        { "menu": { "source": "schools.elementary", "page": 5, "showRate": true, "filter": "exam" }, "roll": { "rate": "$menuRate" }, "success": { "var": { "target": "$pick" }, "log": "🌸 {target}に合格！" }, "fail": { "var": { "target": "el_public" }, "log": "🍂 残念、不合格。公立小学校へ" } }
+      ]
+    },
+    {
+      "id": "ev_m_elem_entry", "kind": "flow", "emoji": "🌸",
+      "when": { "age": [6, 6], "season": ["Q1"], "once": true },
+      "text": "ピカピカの1年生！{school}に入学した。",
+      "effects": { "school": { "enter": "$targetOrDefault:el_public" }, "log": "🌸 小学校に入学" }
+    },
+    {
+      "id": "ev_m_like_6", "kind": "choice", "emoji": "🧒", "counselor": "self",
+      "when": { "age": [6, 6], "season": ["Q2"], "stage": ["elem", "free_school"], "once": true },
+      "text": "小学校にも慣れてきた。{name}が夢中になっているのは？",
+      "choices": [
+        { "label": "🏃 外で遊ぶ・体を動かす", "effects": { "var": { "like6": "like_outdoor" } } },
+        { "label": "📖 本を読む", "effects": { "var": { "like6": "like_book" } } },
+        { "label": "🎨 絵をかく・工作", "effects": { "var": { "like6": "like_draw" } } },
+        { "label": "🔢 計算・パズル", "effects": { "var": { "like6": "like_math" } } },
+        { "label": "🎮 テレビゲーム", "effects": { "var": { "like6": "like_game" } } },
+        { "label": "🙂 とくになし", "effects": { "var": { "like6": "like_none" } } }
+      ]
+    },
+    {
+      "id": "ev_m_report_card", "kind": "choice", "emoji": "📋", "counselor": "self",
+      "when": { "season": ["Q4"], "stage": ["elem", "jhs", "hs", "hs_corr", "hs_night", "kosen", "free_school"] },
+      "popup": "reportCard",
+      "text": "{year}年3月。通知表が配られた。来年度は何を大事にする？",
+      "choices": [
+        { "menu": { "source": "focus", "filter": "stage" }, "effects": { "focus": "$pick" } }
+      ]
+    },
+    {
+      "id": "ev_m_focus_adult", "kind": "choice", "emoji": "🧭", "counselor": "self",
+      "when": { "season": ["Q4"], "stage": ["univ", "univ_med", "junior_college", "vocational", "grad_master", "grad_doctor", "grad_prof", "ronin", "none", "hikikomori"], "cooldownYears": 1 },
+      "text": "{year}年。新しい1年、どんなことを大事にする？",
+      "choices": [
+        { "menu": { "source": "focus", "filter": "stage" }, "effects": { "focus": "$pick" } }
+      ]
+    },
+    {
+      "id": "ev_m_juken_decide", "kind": "choice", "emoji": "📝", "counselor": "parents",
+      "when": { "age": [9, 9], "season": ["Q1"], "stage": ["elem"], "region": ["A", "B"], "none": ["edu_elem_private"], "once": true },
+      "text": "小学4年生。クラスで中学受験の塾に通い始める子が増えてきた。",
+      "choices": [
+        { "label": "📝 中学受験の塾に通う（3年で約250万）", "when": { "talent": { "familyWealth": [">=", 35] } }, "effects": { "club": { "join": "ls_juken_juku" }, "set": ["juken_track"], "stats": { "stress": 5 } } },
+        { "label": "📘 公立中高一貫校の適性検査だけ受ける", "effects": { "set": ["juken_track"], "var": { "ikkanOnly": true } } },
+        { "label": "🏫 地元の公立中学に行く", "effects": { "stats": { "stress": -2, "happiness": 2 } } }
+      ]
+    },
+    {
+      "id": "ev_m_jhs_exam", "kind": "choice", "emoji": "✏️", "counselor": "parents_teacher",
+      "when": { "age": [11, 11], "season": ["Q4"], "stage": ["elem"], "all": ["juken_track"], "once": true },
+      "text": "いよいよ中学受験本番。受ける学校を選ぼう。（合格したら進学先になります）",
+      "choices": [
+        { "menu": { "source": "schools.juniorHigh", "page": 5, "showRate": true, "filter": "exam" }, "roll": { "rate": "$menuRate" }, "success": { "var": { "target": "$pick" }, "set": ["edu_jhs_exam"], "stats": { "happiness": 8 }, "log": "🌸 {target}に合格！" }, "fail": { "var": { "target": "jh_public" }, "set": ["edu_jhs_exam"], "stats": { "happiness": -6, "stress": 4 }, "log": "🍂 不合格…地元の中学へ" } },
+        { "label": "🏳️ やっぱり受験はやめる", "effects": { "var": { "target": "jh_public" }, "stats": { "stress": -6 } } }
+      ]
+    },
+    {
+      "id": "ev_m_jhs_entry", "kind": "flow", "emoji": "🎒",
+      "when": { "age": [12, 12], "season": ["Q1"], "stage": ["elem", "free_school"], "once": true },
+      "text": "中学生になった。{school}に入学。",
+      "effects": { "school": { "enter": "$targetOrDefault:jh_public" }, "clear": ["juken_track"], "log": "🎒 中学校に入学" }
+    },
+    {
+      "id": "ev_m_club_jhs", "kind": "choice", "emoji": "🏸", "counselor": "self",
+      "when": { "age": [12, 12], "season": ["Q1"], "stage": ["jhs"], "once": true },
+      "text": "部活動の見学期間。どの部に入る？",
+      "choices": [
+        { "menu": { "source": "clubs.jhsClubs", "page": 5 }, "effects": { "club": { "join": "$pick" } } }
+      ]
+    },
+    {
+      "id": "ev_m_hs_target", "kind": "choice", "emoji": "🎯", "counselor": "parents_teacher",
+      "when": { "age": [14, 14], "season": ["Q3"], "stage": ["jhs", "free_school"], "once": true },
+      "text": "中3の秋。三者面談で、先生と親から志望校の候補を出された。",
+      "choices": [
+        { "menu": { "source": "schools.highSchool", "page": 5, "showRate": true, "filter": "eligible" }, "effects": { "var": { "target": "$pick" } } },
+        { "label": "🔧 高校には行かず働く", "effects": { "var": { "target": "none", "plan": "work" } } }
+      ]
+    },
+    {
+      "id": "ev_m_hs_exam", "kind": "choice", "emoji": "✏️", "counselor": "self",
+      "when": { "age": [14, 14], "season": ["Q4"], "stage": ["jhs", "free_school"], "once": true },
+      "text": "高校入試の結果発表……",
+      "auto": { "roll": { "rate": "$targetRate" } },
+      "success": { "text": "🌸 {target}に合格！", "effects": { "stats": { "happiness": 8 } } },
+      "fail": {
+        "text": "🍂 {target}は不合格だった。どうする？",
+        "choices": [
+          { "label": "🏫 すべり止めの私立高校に行く", "when": { "talent": { "familyWealth": [">=", 20] } }, "effects": { "var": { "target": "hs_priv_easy" } } },
+          { "label": "📕 公立の二次募集を受ける（合格率70%）", "roll": { "base": 0.7 }, "success": { "var": { "target": "hs_pub_low" } }, "fail": { "var": { "target": "hs_corr" }, "log": "🍂 二次募集もだめだった。通信制高校へ" } },
+          { "label": "💻 通信制高校に行く", "effects": { "var": { "target": "hs_corr" } } },
+          { "label": "🌙 定時制高校に行って昼は働く", "effects": { "var": { "target": "hs_night" } } },
+          { "label": "🔧 高校に行かず働く", "effects": { "var": { "target": "none", "plan": "work" } } }
+        ]
+      }
+    },
+    {
+      "id": "ev_m_jhs_grad", "kind": "flow", "emoji": "🎓",
+      "when": { "age": [14, 14], "season": ["Q4"], "stage": ["jhs", "free_school"], "once": true, "after": "ev_m_hs_exam" },
+      "text": "中学校を卒業した。",
+      "effects": { "set": ["edu_jhs_grad"], "school": { "leave": "graduate" } }
+    },
+    {
+      "id": "ev_m_hs_entry", "kind": "flow", "emoji": "🏫",
+      "when": { "age": [15, 15], "season": ["Q1"], "all": ["edu_jhs_grad"], "stage": ["none"], "var": { "target": ["!none"] }, "once": true },
+      "text": "高校生になった！{school}に入学。",
+      "effects": { "school": { "enter": "$target" }, "log": "🏫 高校に入学" }
+    },
+    {
+      "id": "ev_m_after_jhs_work", "kind": "choice", "emoji": "🔧", "counselor": "parents",
+      "when": { "age": [15, 15], "season": ["Q1"], "all": ["edu_jhs_grad"], "stage": ["none"], "var": { "target": ["none"] }, "once": true },
+      "text": "中学を出て、働くことにした。どこで働く？（中卒で応募できる仕事）",
+      "choices": [
+        { "menu": { "source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "job": { "hire": "$pick" } }, "fail": { "job": { "hire": "j_parttime_general" }, "log": "🍂 不採用。まずはアルバイトから" } },
+        { "label": "🏮 家の手伝いをする", "when": { "person": { "role": "father", "jobIn": ["j_farmer", "j_fisher", "j_family_business", "j_carpenter", "j_cook"] } }, "effects": { "job": { "hire": "j_family_business" } } }
+      ]
+    },
+    {
+      "id": "ev_m_club_hs", "kind": "choice", "emoji": "🏉", "counselor": "self",
+      "when": { "age": [15, 15], "season": ["Q1"], "stage": ["hs", "kosen", "hs_night"], "once": true },
+      "text": "高校の部活。どうする？",
+      "choices": [
+        { "menu": { "source": "clubs.hsClubs", "page": 5 }, "effects": { "club": { "join": "$pick" } } }
+      ]
+    },
+    {
+      "id": "ev_m_bunri", "kind": "choice", "emoji": "🔀", "counselor": "parents_teacher",
+      "when": { "age": [15, 15], "season": ["Q3"], "stage": ["hs"], "none": ["track_rikei", "track_bunkei"], "once": true },
+      "text": "高1の秋。来年からの文系・理系を決める時期だ。",
+      "choices": [
+        { "label": "📖 文系（法・経済・文・外国語・教育など）", "effects": { "set": ["track_bunkei"] } },
+        { "label": "🔭 理系（理・工・情報・医・薬・看護など）", "effects": { "set": ["track_rikei"] } }
+      ]
+    },
+    {
+      "id": "ev_m_cash_start", "kind": "flow", "emoji": "👛",
+      "when": { "age": [16, 16], "season": ["Q1"], "once": true },
+      "text": "16歳。自分のお金を自分で管理するようになった。おこづかい：月{allowance}万円。",
+      "effects": { "showCash": true, "log": "👛 所持金の表示が始まった" }
+    },
+    {
+      "id": "ev_m_parttime_start", "kind": "choice", "emoji": "🏪", "counselor": "self",
+      "when": { "age": [16, 16], "season": ["Q1"], "stage": ["hs", "hs_corr", "hs_night", "kosen"], "once": true },
+      "text": "友だちがアルバイトを始めた。自分はどうする？",
+      "choices": [
+        { "menu": { "source": "jobs.partTimeJobs", "page": 5, "filter": "age" }, "effects": { "job": { "hire": "$pick", "form": "student_part" } } },
+        { "label": "📚 バイトはしない（勉強・部活に集中）", "effects": { "stats": { "stress": -1 } } }
+      ]
+    },
+    {
+      "id": "ev_m_hs_plan", "kind": "choice", "emoji": "🧭", "counselor": "parents_teacher",
+      "when": { "age": [16, 16], "season": ["Q3"], "stage": ["hs", "hs_corr", "hs_night"], "once": true },
+      "text": "高2の秋。進路希望調査の紙が配られた。卒業後はどうしたい？",
+      "choices": [
+        { "label": "🎓 大学に行きたい", "effects": { "var": { "plan": "univ" } } },
+        { "label": "📚 短大に行きたい", "effects": { "var": { "plan": "jc" } } },
+        { "label": "🛠️ 専門学校で技術や資格を身につけたい", "effects": { "var": { "plan": "voc" } } },
+        { "label": "💼 就職したい", "effects": { "var": { "plan": "work" } } },
+        { "label": "✈️ 海外の大学に行きたい", "when": { "subj": { "eng": [">=", 60] } }, "effects": { "var": { "plan": "abroad" } } },
+        { "label": "🤔 まだ決められない", "effects": { "var": { "plan": "undecided" }, "stats": { "stress": 2 } } }
+      ]
+    },
+    {
+      "id": "ev_m_post_target", "kind": "choice", "emoji": "🎯", "counselor": "parents_teacher",
+      "when": { "age": [17, 17], "season": ["Q2"], "stage": ["hs", "hs_corr", "hs_night"], "var": { "plan": ["univ", "jc", "voc", "abroad", "undecided"] }, "once": true },
+      "text": "高3の夏。先生と親が、成績と家計に合わせて候補を出してくれた。",
+      "choices": [
+        { "menu": { "source": "schools.postByPlan", "page": 5, "showRate": true, "filter": "eligible" }, "effects": { "var": { "target": "$pick" } } },
+        { "label": "💼 やっぱり就職する", "effects": { "var": { "plan": "work" } } }
+      ]
+    },
+    {
+      "id": "ev_m_scholarship", "kind": "choice", "emoji": "💴", "counselor": "parents",
+      "when": { "age": [17, 17], "season": ["Q3"], "stage": ["hs", "hs_corr", "hs_night"], "var": { "plan": ["univ", "jc", "voc", "abroad"] }, "once": true },
+      "text": "進学にかかるお金の話を家族でした。学費は{tuition}万円/年。家は{householdComment}",
+      "choices": [
+        { "label": "👨‍👩‍👧 親に出してもらう", "when": { "talent": { "familyWealth": [">=", 50] } }, "effects": { "stats": { "happiness": 2 } } },
+        { "label": "📄 貸与型の奨学金を借りる（月5万・卒業後に返す）", "effects": { "set": ["scholarship_loan"], "stats": { "stress": 3 } } },
+        { "label": "🏅 給付型奨学金に申し込む（返さなくていい）", "when": { "talent": { "familyWealth": ["<", 50] } }, "showRate": true, "roll": { "base": 0.35, "w": { "academic": 0.8 } }, "success": { "set": ["scholarship_grant"], "stats": { "happiness": 6 }, "log": "🏅 給付型奨学金が決まった" }, "fail": { "set": ["scholarship_loan"], "log": "🍂 給付型は通らず、貸与型を借りることに" } },
+        { "label": "💪 バイトして自分でなんとかする", "effects": { "focus": "focus_parttime", "stats": { "stress": 5 } } },
+        { "label": "💼 お金のことを考えて就職に切りかえる", "effects": { "var": { "plan": "work" }, "stats": { "happiness": -3 } } }
+      ]
+    },
+    {
+      "id": "ev_m_hs_job_hunt", "kind": "choice", "emoji": "💼", "counselor": "teacher",
+      "when": { "age": [17, 17], "season": ["Q3"], "stage": ["hs", "hs_corr", "hs_night"], "var": { "plan": ["work"] }, "once": true },
+      "text": "9月、高卒の採用試験が始まる。学校に来た求人から応募先を選ぼう（はじめは1人1社）。",
+      "choices": [
+        { "menu": { "source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "set": ["naitei"], "var": { "target": "$pick" }, "log": "🌸 {target}から内定！" }, "fail": { "schedule": [ { "event": "ev_m_hs_job_hunt2", "inYears": [0, 0], "season": "Q4" } ], "log": "🍂 不採用…" } }
+      ]
+    },
+    {
+      "id": "ev_m_hs_job_hunt2", "kind": "choice", "emoji": "💼", "type": "scheduled", "counselor": "teacher",
+      "when": { "age": [17, 17], "season": ["Q4"], "none": ["naitei"] },
+      "text": "まだ就職先が決まっていない。卒業までにどうする？",
+      "choices": [
+        { "menu": { "source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate+5" }, "success": { "set": ["naitei"], "var": { "target": "$pick" } }, "fail": { "var": { "target": "j_parttime_general" }, "log": "🍂 決まらず、アルバイトで働くことに" } },
+        { "label": "🛠️ 専門学校に切りかえる", "effects": { "var": { "plan": "voc" }, "schedule": [ { "event": "ev_m_post_exam", "inYears": [0, 0], "season": "Q4" } ] } }
+      ]
+    },
+    {
+      "id": "ev_m_post_exam", "kind": "choice", "emoji": "🌸", "counselor": "self",
+      "when": { "season": ["Q4"], "stage": ["hs", "hs_corr", "hs_night", "ronin"], "var": { "plan": ["univ", "jc", "voc", "abroad", "undecided"], "target": ["!none"] } },
+      "text": "合格発表の日……",
+      "auto": { "roll": { "rate": "$targetRate" } },
+      "success": { "text": "🌸 {target}に合格！", "effects": { "stats": { "happiness": 10 }, "set": ["naitei_school"] } },
+      "fail": {
+        "text": "🍂 {target}は不合格。どうする？",
+        "choices": [
+          { "label": "🔁 浪人してもう1年がんばる（予備校 年80万）", "when": { "counter": { "ronin_years": ["<", 2] } }, "effects": { "var": { "plan": "univ" }, "nextStage": "ronin", "cash_household": -80, "stats": { "stress": 8 } } },
+          { "label": "🏫 合格できそうな学校の二次募集を受ける", "menu": { "source": "schools.postByPlan", "page": 5, "showRate": true, "filter": "lowerTier" }, "roll": { "rate": "$menuRate" }, "success": { "var": { "target": "$pick" }, "set": ["naitei_school"] }, "fail": { "var": { "plan": "work", "target": "j_parttime_general" } } },
+          { "label": "🛠️ 専門学校に行く（ほぼ全員合格）", "effects": { "var": { "plan": "voc" }, "menuNext": "schools.vocational" } },
+          { "label": "💼 就職する", "effects": { "var": { "plan": "work", "target": "j_parttime_general" }, "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0], "season": "Q1" } ] } },
+          { "label": "🧳 ワーキングホリデーに行く", "when": { "age": [18, 30] }, "effects": { "var": { "plan": "abroad", "target": "ab_wh" } } }
+        ]
+      }
+    },
+    {
+      "id": "ev_m_hs_grad", "kind": "flow", "emoji": "🎓",
+      "when": { "season": ["Q4"], "stage": ["hs", "hs_corr", "hs_night"], "yearsLeft": 1, "after": "ev_m_post_exam|ev_m_hs_job_hunt|ev_m_hs_job_hunt2" },
+      "text": "高校を卒業した。{gradComment}",
+      "effects": { "set": ["edu_hs_grad"], "school": { "leave": "graduate" }, "clear": ["naitei"] }
+    },
+    {
+      "id": "ev_m_hs_unknown_path", "kind": "choice", "emoji": "🤔", "counselor": "parents_teacher",
+      "when": { "season": ["Q4"], "stage": ["hs", "hs_corr", "hs_night"], "yearsLeft": 1, "var": { "plan": ["undecided"] }, "none": ["naitei", "naitei_school"] },
+      "text": "卒業が近いのに、進路が決まっていない……。",
+      "choices": [
+        { "label": "🔁 1年浪人して大学をめざす", "effects": { "var": { "plan": "univ" }, "nextStage": "ronin" } },
+        { "label": "🧺 フリーターとして働きながら考える", "effects": { "var": { "target": "j_parttime_general" } } },
+        { "label": "🛠️ 専門学校に行く", "effects": { "var": { "plan": "voc" }, "menuNext": "schools.vocational" } }
+      ]
+    },
+    {
+      "id": "ev_m_post_entry", "kind": "flow", "emoji": "🌸",
+      "when": { "season": ["Q1"], "all": ["naitei_school"], "stage": ["none", "ronin"] },
+      "text": "{school}に入学！新しい生活が始まった。",
+      "effects": { "school": { "enter": "$target" }, "clear": ["naitei_school"], "counter": {}, "log": "🌸 {school}に入学" }
+    },
+    {
+      "id": "ev_m_living", "kind": "choice", "emoji": "🏠", "counselor": "parents",
+      "when": { "season": ["Q1"], "stage": ["univ", "univ_med", "junior_college", "vocational"], "yearInStage": 1, "once": true },
+      "text": "学校まで{commute}。どこに住む？",
+      "choices": [
+        { "label": "🏠 実家から通う", "when": { "var": { "schoolAway": [false] } }, "effects": { "set": ["lives_with_parents"] } },
+        { "label": "🔑 ひとり暮らし（仕送り・家賃 年120万）", "effects": { "set": ["living_alone"], "clear": ["lives_with_parents"], "stats": { "social": -5, "happiness": 4 } } },
+        { "label": "🏢 学生寮（年50万）", "effects": { "set": ["lives_dorm"], "clear": ["lives_with_parents"], "stats": { "social": 4 } } }
+      ],
+      "note": "schoolAway=true（地元以外の学校）のときは実家の選択肢が出ない。都市の学校で地方出身なら moved_to_tokyo 等をエンジンが付与"
+    },
+    {
+      "id": "ev_m_circle", "kind": "choice", "emoji": "🎾", "counselor": "self",
+      "when": { "season": ["Q1"], "stage": ["univ", "univ_med", "junior_college"], "yearInStage": 1, "once": true },
+      "text": "新歓の季節。たくさんのサークルから勧誘された。",
+      "choices": [
+        { "menu": { "source": "clubs.univCircles", "page": 5 }, "effects": { "club": { "join": "$pick" } } }
+      ]
+    },
+    {
+      "id": "ev_m_teacher_course", "kind": "choice", "emoji": "🍎", "counselor": "self",
+      "when": { "season": ["Q1"], "stage": ["univ"], "yearInStage": 1, "none": ["teacher_course"], "once": true },
+      "text": "大学で教職課程（先生の免許をとる授業）を取ることができる。授業は増えるけど……。",
+      "choices": [
+        { "label": "🍎 教職課程をとる", "effects": { "set": ["teacher_course"], "stats": { "stress": 3 } } },
+        { "label": "🙅 とらない", "effects": {} }
+      ]
+    },
+    {
+      "id": "ev_m_seijin", "kind": "flow", "emoji": "👘",
+      "when": { "age": [20, 20], "season": ["Q4"], "once": true },
+      "text": "二十歳のつどい（成人式）。{seijinComment}",
+      "effects": { "stats": { "social": 2, "happiness": 3 } }
+    },
+    {
+      "id": "ev_m_career_plan", "kind": "choice", "emoji": "🧭", "counselor": "self",
+      "when": { "season": ["Q4"], "stage": ["univ", "junior_college", "vocational", "kosen"], "yearsLeft": 2, "once": true },
+      "text": "卒業まであと1年ちょっと。この先どうする？",
+      "choices": [
+        { "label": "💼 民間企業に就職活動をする", "effects": { "var": { "plan": "work" }, "set": ["job_hunting"] } },
+        { "label": "🏛️ 公務員試験を受ける", "effects": { "var": { "plan": "civil" }, "focus": "focus_study" } },
+        { "label": "🍎 教員採用試験を受ける", "when": { "all": ["teacher_course"] }, "effects": { "var": { "plan": "teacher" } } },
+        { "label": "🔬 大学院に進む", "when": { "stage": ["univ"] }, "effects": { "var": { "plan": "grad" } } },
+        { "label": "🎓 大学3年に編入する", "when": { "stage": ["kosen", "junior_college"] }, "effects": { "var": { "plan": "univ" } } },
+        { "label": "🚀 起業・フリーランスをめざす", "effects": { "var": { "plan": "startup" }, "stats": { "stress": 4 } } },
+        { "label": "🤔 まだ考えたい", "effects": { "var": { "plan": "undecided" } } }
+      ]
+    },
+    {
+      "id": "ev_m_job_hunt", "kind": "choice", "emoji": "👔", "counselor": "self",
+      "when": { "season": ["Q1"], "yearsLeft": 1, "stage": ["univ", "univ_med", "junior_college", "vocational", "kosen", "grad_master", "grad_doctor", "grad_prof"], "var": { "plan": ["work", "undecided"] }, "none": ["naitei"] },
+      "text": "就職活動の本番。エントリーする会社を選ぼう。（落ちても秋にもう一度チャンスがある）",
+      "choices": [
+        { "menu": { "source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "set": ["naitei"], "clear": ["job_hunting"], "var": { "target": "$pick" }, "stats": { "happiness": 8 }, "log": "🌸 {target}から内定！" }, "fail": { "stats": { "stress": 6, "happiness": -4 }, "schedule": [ { "event": "ev_m_job_hunt_autumn", "inYears": [0, 0], "season": "Q3" } ], "log": "🍂 お祈りメールが届いた…" } }
+      ]
+    },
+    {
+      "id": "ev_m_job_hunt_autumn", "kind": "choice", "emoji": "🍁", "type": "scheduled", "counselor": "self",
+      "when": { "season": ["Q3"], "none": ["naitei"], "yearsLeft": 1 },
+      "text": "まだ内定がない。秋の採用でどうする？",
+      "choices": [
+        { "menu": { "source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate+3" }, "success": { "set": ["naitei"], "var": { "target": "$pick" } }, "fail": { "var": { "target": "j_parttime_general" }, "log": "🍂 内定ゼロで卒業へ…" } },
+        { "label": "📅 わざと留年して来年もう一度（学費1年分）", "when": { "stage": ["univ"] }, "effects": { "counter": { "repeat_years": 1 }, "extendStage": 1 } },
+        { "label": "🔬 大学院に進む", "when": { "stage": ["univ"] }, "effects": { "var": { "plan": "grad" } } },
+        { "label": "🧺 卒業してアルバイトをしながら探す（既卒）", "effects": { "var": { "target": "j_parttime_general" } } }
+      ]
+    },
+    {
+      "id": "ev_m_grad_school_exam", "kind": "choice", "emoji": "🔬", "counselor": "teacher",
+      "when": { "season": ["Q2"], "yearsLeft": 1, "stage": ["univ", "grad_master"], "var": { "plan": ["grad"] } },
+      "text": "大学院の入試。どこを受ける？",
+      "choices": [
+        { "menu": { "source": "schools.graduate", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "set": ["naitei_school"], "var": { "target": "$pick" } }, "fail": { "var": { "plan": "work" }, "log": "🍂 院試に落ちた。就職に切りかえる" } }
+      ]
+    },
+    {
+      "id": "ev_m_civil_exam", "kind": "choice", "emoji": "🏛️", "counselor": "self",
+      "when": { "season": ["Q2"], "age": [17, 35], "var": { "plan": ["civil"] }, "none": ["arrest", "naitei"] },
+      "text": "公務員試験。どの試験を受ける？",
+      "choices": [
+        { "menu": { "source": "jobs.civil", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "set": ["naitei"], "var": { "target": "$pick" }, "log": "🌸 公務員試験に合格！" }, "fail": { "stats": { "stress": 5 }, "log": "🍂 不合格。来年もう一度か、民間か…" } }
+      ]
+    },
+    {
+      "id": "ev_m_kyosai", "kind": "choice", "emoji": "🍎", "counselor": "self",
+      "when": { "season": ["Q2"], "age": [21, 45], "var": { "plan": ["teacher"] }, "any": ["teacher_course", "lic_teacher_elem", "lic_teacher_sec"], "none": ["arrest", "naitei"] },
+      "text": "教員採用試験の日。（合格率は全国平均で約3〜4倍の倍率）",
+      "choices": [
+        { "label": "🧑‍🏫 小学校の先生", "showRate": true, "roll": { "base": 0.4, "w": { "academic": 0.5, "t_comm": 0.5 } }, "success": { "set": ["naitei"], "var": { "target": "j_teacher_elem" } }, "fail": { "var": { "target": "j_juku" }, "log": "🍂 不合格。講師（臨時の先生）として働きながら再挑戦できる" } },
+        { "label": "🧑‍🏫 中学・高校の先生", "showRate": true, "roll": { "base": 0.3, "w": { "academic": 0.7, "t_comm": 0.4 } }, "success": { "set": ["naitei"], "var": { "target": "j_teacher_sec" } }, "fail": { "var": { "target": "j_juku" } } }
+      ]
+    },
+    {
+      "id": "ev_m_kokushi_doctor", "kind": "choice", "emoji": "🩺", "counselor": "self",
+      "when": { "season": ["Q4"], "stage": ["univ_med"], "yearsLeft": 1, "var": { "major": ["med"] } },
+      "text": "医師国家試験（合格率 約92%）",
+      "choices": [
+        { "label": "✍️ 受験する", "showRate": true, "roll": { "base": 0.85, "w": { "academic": 0.3 } }, "success": { "set": ["lic_doctor"], "log": "🩺 医師免許を取得！" }, "fail": { "var": { "pendingExam": "ev_m_kokushi_doctor" }, "log": "🍂 不合格…来年もう一度" } }
+      ]
+    },
+    {
+      "id": "ev_m_kokushi_dentist", "kind": "choice", "emoji": "🦷", "counselor": "self",
+      "when": { "season": ["Q4"], "stage": ["univ_med"], "yearsLeft": 1, "var": { "major": ["dent"] } },
+      "text": "歯科医師国家試験（合格率 約65%）",
+      "choices": [
+        { "label": "✍️ 受験する", "showRate": true, "roll": { "base": 0.6, "w": { "academic": 0.5 } }, "success": { "set": ["lic_dentist"] }, "fail": { "var": { "pendingExam": "ev_m_kokushi_dentist" } } }
+      ]
+    },
+    {
+      "id": "ev_m_kokushi_pharm", "kind": "choice", "emoji": "💊", "counselor": "self",
+      "when": { "season": ["Q4"], "stage": ["univ_med"], "yearsLeft": 1, "var": { "major": ["pharm"] } },
+      "text": "薬剤師国家試験（合格率 約70%）",
+      "choices": [
+        { "label": "✍️ 受験する", "showRate": true, "roll": { "base": 0.65, "w": { "academic": 0.5 } }, "success": { "set": ["lic_pharmacist"] }, "fail": { "var": { "pendingExam": "ev_m_kokushi_pharm" } } }
+      ]
+    },
+    {
+      "id": "ev_m_kokushi_nurse", "kind": "choice", "emoji": "🧑‍⚕️", "counselor": "self",
+      "when": { "season": ["Q4"], "stage": ["univ", "vocational"], "yearsLeft": 1, "var": { "major": ["nurse", "vo_nurse"] } },
+      "text": "看護師国家試験（合格率 約90%）",
+      "choices": [
+        { "label": "✍️ 受験する", "showRate": true, "roll": { "base": 0.85, "w": { "academic": 0.3 } }, "success": { "set": ["lic_nurse"] }, "fail": { "var": { "pendingExam": "ev_m_kokushi_nurse" } } }
+      ]
+    },
+    {
+      "id": "ev_m_license_exam", "kind": "choice", "emoji": "📜", "counselor": "self",
+      "when": { "season": ["Q4"], "stage": ["vocational"], "yearsLeft": 1, "var": { "major": ["vo_pt", "vo_beauty"] } },
+      "text": "国家試験の日（{examName}）",
+      "choices": [
+        { "label": "✍️ 受験する", "showRate": true, "roll": { "base": 0.8, "w": { "academic": 0.3, "t_art": 0.2 } }, "success": { "set": ["$examFlag"] }, "fail": { "var": { "pendingExam": "ev_m_license_exam" } } }
+      ]
+    },
+    {
+      "id": "ev_m_exam_retry", "kind": "choice", "emoji": "🔁", "counselor": "self",
+      "when": { "season": ["Q4"], "var": { "pendingExam": ["!none"] }, "stage": ["none", "ronin"] },
+      "text": "去年落ちた国家試験に、もう一度挑戦する？",
+      "choices": [
+        { "label": "✍️ もう一度受ける", "showRate": true, "roll": { "rate": "$pendingRate+5" }, "success": { "set": ["$pendingFlag"], "var": { "pendingExam": "none" } }, "fail": { "counter": { "ronin_years": 1 }, "stats": { "stress": 6 } } },
+        { "label": "🏳️ あきらめて別の仕事を探す", "effects": { "var": { "pendingExam": "none", "plan": "work" } } }
+      ]
+    },
+    {
+      "id": "ev_m_shihou", "kind": "choice", "emoji": "⚖️", "counselor": "self",
+      "when": { "season": ["Q2"], "stage": ["grad_prof", "none"], "var": { "major": ["gr_law"] }, "none": ["lic_lawyer"], "counter": { "examTries": ["<", 5] } },
+      "text": "司法試験（合格率 約40%・受験は5回まで）",
+      "choices": [
+        { "label": "✍️ 受験する", "showRate": true, "roll": { "base": 0.35, "w": { "academic": 0.8 } }, "success": { "set": ["lic_lawyer"], "log": "⚖️ 司法試験に合格！" }, "fail": { "counter": { "examTries": 1 }, "stats": { "stress": 8 } } },
+        { "label": "🏳️ 受験をやめて就職する", "effects": { "var": { "plan": "work" } } }
+      ]
+    },
+    {
+      "id": "ev_m_graduation", "kind": "flow", "emoji": "🎓",
+      "when": { "season": ["Q4"], "yearsLeft": 1, "stage": ["univ", "univ_med", "junior_college", "vocational", "kosen", "grad_master", "grad_doctor", "grad_prof"], "after": "ev_m_kokushi_doctor|ev_m_kokushi_dentist|ev_m_kokushi_pharm|ev_m_kokushi_nurse|ev_m_license_exam|ev_m_job_hunt_autumn|ev_m_grad_school_exam" },
+      "roll": { "base": 0.97, "w": { "academic": 0.1 } },
+      "success": { "text": "{school}を卒業した。", "effects": { "school": { "leave": "graduate" }, "grantGraduateFlags": true, "teacherLicenseIfCourse": true } },
+      "fail": { "text": "📅 単位が足りず、留年が決まった……。", "effects": { "counter": { "repeat_years": 1 }, "extendStage": 1, "stats": { "stress": 8, "happiness": -6 } } }
+    },
+    {
+      "id": "ev_m_first_job", "kind": "flow", "emoji": "🏢",
+      "when": { "season": ["Q1"], "all": ["naitei"], "stage": ["none"] },
+      "text": "社会人1年目。{job}として働き始めた。初任給は{income}万円。",
+      "effects": { "job": { "hire": "$target" }, "clear": ["naitei"], "scholarRepayStartIfLoan": true, "log": "🏢 {job}として就職" }
+    },
+    {
+      "id": "ev_m_scholar_repay", "kind": "flow", "emoji": "📄",
+      "when": { "season": ["Q2"], "all": ["scholarship_loan"], "none": ["scholarship_loan_repaying"], "stage": ["none"], "once": true },
+      "text": "奨学金の返済が始まった。毎月{repay}万円、{repayYears}年間。",
+      "effects": { "set": ["scholarship_loan_repaying"], "clear": ["scholarship_loan"] }
+    },
+    {
+      "id": "ev_m_job_review", "kind": "choice", "emoji": "🔄", "counselor": "self",
+      "when": { "season": ["Q1"], "jobYears": [5, 10, 15, 20, 25, 30], "employment": ["seishain", "keiyaku", "civil_servant", "freelance", "self_employed"], "age": [22, 59] },
+      "text": "今の仕事について{jobYears}年。給料{income}万円、満足感{jobSat}。このままでいい？",
+      "choices": [
+        { "label": "🙂 今の仕事を続ける", "effects": { "stats": { "happiness": 1 } } },
+        { "label": "🔄 転職活動をする", "menu": { "source": "jobs.midCareer", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "job": { "hire": "$pick" }, "counter": { "job_changes": 1 }, "log": "🔄 {pick}に転職" }, "fail": { "stats": { "stress": 3 }, "log": "🍂 転職活動はうまくいかなかった" } },
+        { "label": "📖 資格をとって仕事を変える", "effects": { "focus": "focus_qualify", "schedule": [ { "event": "ev_r_qualify", "inYears": [0, 1] } ] } },
+        { "label": "🚀 独立・起業する", "when": { "money": { "cash": [">=", 100] } }, "effects": { "schedule": [ { "event": "ev_r_startup", "inYears": [0, 0] } ] } },
+        { "label": "🧺 仕事をゆるめる（パート・アルバイトに）", "effects": { "job": { "form": "part" }, "stats": { "stress": -10, "happiness": 2 } } },
+        { "label": "😌 一度やめて休む", "effects": { "job": { "quit": "self" }, "stats": { "stress": -15 }, "set": ["unemployment_exp"] } }
+      ]
+    },
+    {
+      "id": "ev_m_promotion", "kind": "flow", "emoji": "📈",
+      "when": { "season": ["Q1"], "employment": ["seishain", "civil_servant"], "age": [28, 58], "cooldownYears": 4, "counter": { "promotion_level": ["<", 5] } },
+      "roll": { "base": 0.3, "w": { "t_comm": 0.4, "academic": 0.2, "social": 0.3 }, "focusBonus": { "focus_work": 0.15, "focus_family": -0.1 } },
+      "success": { "text": "📈 昇進した！{newTitle}になった。", "effects": { "counter": { "promotion_level": 1 }, "stats": { "happiness": 4, "stress": 4 }, "setIfLevel": { "3": ["manager"] } } },
+      "fail": { "text": "今年の昇進は見送りだった。", "effects": { "stats": { "happiness": -1 } } }
+    },
+    {
+      "id": "ev_m_contract_end", "kind": "choice", "emoji": "📄", "counselor": "self",
+      "when": { "season": ["Q4"], "employment": ["keiyaku", "haken"], "contractEnd": true },
+      "text": "契約期間が終わる。どうなる？",
+      "choices": [
+        { "label": "🙏 正社員にしてもらえないか相談する", "showRate": true, "roll": { "base": 0.25, "w": { "t_comm": 0.3, "social": 0.2 } }, "success": { "job": { "form": "seishain" }, "stats": { "happiness": 8 }, "log": "🌸 正社員に登用された！" }, "fail": { "job": { "quit": "fired" }, "set": ["unemployment_exp"], "log": "🍂 契約終了。次の仕事を探す" } },
+        { "label": "🔄 別の会社で正社員をめざす", "menu": { "source": "jobs.midCareer", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "job": { "hire": "$pick", "form": "seishain" } }, "fail": { "job": { "form": "haken" } } },
+        { "label": "📄 同じ形で更新する", "effects": { "renewContract": true } }
+      ]
+    },
+    {
+      "id": "ev_m_unemployed", "kind": "choice", "emoji": "🔍", "counselor": "self",
+      "when": { "season": ["Q1", "Q3"], "employment": ["unemployed", "none"], "stage": ["none"], "age": [18, 64], "none": ["welfare"] },
+      "text": "今は仕事がない。（失業手当：{benefitLeft}）どうする？",
+      "choices": [
+        { "label": "🔍 ハローワークで仕事を探す", "menu": { "source": "jobs.midCareer", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "job": { "hire": "$pick" } }, "fail": { "stats": { "stress": 5 } } },
+        { "label": "🧺 まずはアルバイトで働く", "effects": { "job": { "hire": "j_parttime_general" } } },
+        { "label": "🏫 職業訓練校で技術を身につける（無料・半年）", "effects": { "skill": { "it": 10, "craft": 10 }, "schedule": [ { "event": "ev_r_qualify", "inYears": [0, 1] } ] } },
+        { "label": "😌 もう少し休む", "effects": { "stats": { "stress": -6, "happiness": -2 } } }
+      ]
+    },
+    {
+      "id": "ev_m_child_plan", "kind": "choice", "emoji": "👶", "counselor": "spouse",
+      "when": { "season": ["Q1"], "all": ["married"], "none": ["no_children_choice", "wants_children"], "person": { "role": "spouse", "alive": true, "fertile": true }, "marriedYears": [1, 1] },
+      "text": "結婚して1年。{spouse}と子どものことを話し合った。",
+      "choices": [
+        { "label": "👶 子どもがほしい", "effects": { "set": ["wants_children"] } },
+        { "label": "⏳ もう少し2人で過ごしたい", "effects": { "schedule": [ { "event": "ev_m_child_plan2", "inYears": [2, 3] } ] } },
+        { "label": "🙅 子どもは持たない", "effects": { "set": ["no_children_choice"] } }
+      ]
+    },
+    {
+      "id": "ev_m_child_plan2", "kind": "choice", "emoji": "👶", "type": "scheduled", "counselor": "spouse",
+      "when": { "all": ["married"], "none": ["no_children_choice", "wants_children"], "person": { "role": "spouse", "alive": true, "fertile": true } },
+      "text": "もう一度、子どものことを話し合った。",
+      "choices": [
+        { "label": "👶 子どもがほしい", "effects": { "set": ["wants_children"] } },
+        { "label": "🙅 子どもは持たない", "effects": { "set": ["no_children_choice"] } }
+      ]
+    },
+    {
+      "id": "ev_m_retire_age", "kind": "choice", "emoji": "🎉", "counselor": "self",
+      "when": { "age": [60, 60], "season": ["Q4"], "employment": ["seishain", "civil_servant"], "once": true },
+      "text": "60歳。定年を迎えた。退職金は{severance}万円。この先どうする？",
+      "choices": [
+        { "label": "🏢 同じ会社で再雇用（65歳まで・給料は約6割）", "effects": { "set": ["reemployed", "retired_flag"], "job": { "reemploy": true }, "cash": "$severance" } },
+        { "label": "🔄 別の仕事を探す", "effects": { "set": ["retired_flag"], "job": { "quit": "retire" }, "cash": "$severance", "schedule": [ { "event": "ev_r_senior_job", "inYears": [0, 0] } ] } },
+        { "label": "🌴 完全に引退する", "effects": { "set": ["retired_flag"], "job": { "retire": true }, "cash": "$severance", "stats": { "stress": -15, "social": -5 } } }
+      ]
+    },
+    {
+      "id": "ev_m_reemploy_end", "kind": "flow", "emoji": "🌴",
+      "when": { "age": [65, 65], "season": ["Q4"], "all": ["reemployed"], "once": true },
+      "text": "再雇用の期間が終わり、仕事を引退した。おつかれさまでした。",
+      "effects": { "job": { "retire": true }, "clear": ["reemployed"], "stats": { "stress": -10 } }
+    },
+    {
+      "id": "ev_m_pension", "kind": "choice", "emoji": "💴", "counselor": "self",
+      "when": { "age": [64, 64], "season": ["Q4"], "none": ["pension_early"], "once": true },
+      "text": "年金をいつから受け取る？（65歳で受け取ると月{pension}万円）",
+      "choices": [
+        { "label": "💴 65歳から受け取る", "effects": { "var": { "pensionAge": 65 } } },
+        { "label": "⏳ 70歳まで待って増やす（月額が約1.4倍）", "effects": { "var": { "pensionAge": 70 }, "set": ["pension_late"] } },
+        { "label": "⏳⏳ 75歳まで待つ（月額が約1.8倍）", "effects": { "var": { "pensionAge": 75 }, "set": ["pension_late"] } }
+      ]
+    },
+    {
+      "id": "ev_m_pension_early", "kind": "choice", "emoji": "💴", "counselor": "self",
+      "when": { "age": [60, 63], "season": ["Q1"], "employment": ["none", "unemployed", "retired", "homemaker"], "money": { "cash": ["<", 200] }, "none": ["pension_early"], "cooldownYears": 2 },
+      "text": "仕事がなく貯金が少ない。年金を早めに受け取る？（月額が減る：1か月早めるごとに0.4%減）",
+      "choices": [
+        { "label": "💴 今から受け取る", "effects": { "set": ["pension_early"], "var": { "pensionAge": "$age" } } },
+        { "label": "🙅 まだ待つ", "effects": {} }
+      ]
+    },
+    {
+      "id": "ev_m_license_return", "kind": "choice", "emoji": "🚗", "counselor": "family",
+      "when": { "age": [75, 100], "season": ["Q1"], "all": ["lic_car"], "none": ["license_returned"], "cooldownYears": 3 },
+      "text": "{age}歳。家族から「運転免許、そろそろ返したら？」と言われた。",
+      "choices": [
+        { "label": "🪪 免許を返納する", "effects": { "set": ["license_returned"], "clear": ["lic_car", "owns_car"], "stats": { "social": -3 } } },
+        { "label": "🚗 まだ運転を続ける", "effects": { "stats": { "happiness": 1 }, "riskMul": { "ev_r_car_accident": 1.5 } } }
+      ]
+    },
+    {
+      "id": "ev_m_death", "kind": "flow", "emoji": "🕊️",
+      "when": { "engine": "death" },
+      "text": "{year}年{month}月。{name}は{age}歳で人生を終えた。{deathCause}",
+      "effects": { "endGame": true }
+    }
+  ]
+}
