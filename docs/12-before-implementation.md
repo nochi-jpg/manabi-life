@@ -27,3 +27,4 @@
 - フリースクールは「小学校で人間関係が低く（25以下）ストレスが高い（65以上）とき、親から提案される道」として残す（`ev_r_free_school_offer` → `el_free`）。いじめ・不登校のイベントは引き続きなし。
 - 専門学校の背景は大きなビルの外観（`bg_hq`）。
 - 画面の色味は最後に決める。候補は `docs/ui/theme-*.png`（`tools/theme-samples.js` で再生成）。
+- **色味は「白×青」に決定**（2026-10-24）。本編・ポップアップもタイトル/オプションと同じ部品にする。見本：`docs/ui/theme-whiteblue*.png`、上書きCSS：`tools/theme-whiteblue.js`（実装時に base.css へ取りこむ）。
