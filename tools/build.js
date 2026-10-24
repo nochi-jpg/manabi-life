@@ -18,7 +18,7 @@ for (const f of fs.readdirSync(P('data')).filter((f) => f.endsWith('.json')).sor
 const dataJs = `// 自動生成（node tools/build.js）。直接編集しないこと。元は data/*.json\nwindow.DATA=${JSON.stringify(data)};\n`;
 fs.writeFileSync(P('src/js/data.gen.js'), dataJs);
 console.log(`data.gen.js: ${Object.keys(data).length} ファイル / ${(dataJs.length / 1024).toFixed(0)}KB`);
-if (process.argv[2] !== 'dist') process.exit(0);
+if (require.main !== module || process.argv[2] !== 'dist') return;
 
 // ---------- 2. 単一HTML ----------
 const has = (cmd) => { try { execFileSync('which', [cmd], { stdio: 'ignore' }); return true; } catch (e) { return false; } };
