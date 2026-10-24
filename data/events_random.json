@@ -952,6 +952,100 @@
         { "label": "🙂 今の趣味で十分", "effects": {} }
       ] },
 
+    { "id": "ev_r_dental", "kind": "choice", "emoji": "🦷", "cat": "health",
+      "when": { "age": [16, 90], "cooldownYears": 6 },
+      "weight": { "base": 1.5, "mul": [["age>=50", 1.5]] },
+      "text": "歯が痛くて歯医者に行ったら、治療が必要と言われた。",
+      "choices": [
+        { "label": "🦷 保険の治療にする（3万円）", "effects": { "cash": -3, "stats": { "health": 1 } } },
+        { "label": "✨ 見た目のいい自費の治療・インプラント（40万円）", "effects": { "cash": -40, "stats": { "health": 2, "happiness": 2 } } },
+        { "label": "🙈 がまんする", "effects": { "stats": { "health": -3, "stress": 3 }, "schedule": [ { "event": "ev_r_dental", "inYears": [1, 2] } ] } }
+      ] },
+
+    { "id": "ev_r_hospital_bill", "kind": "choice", "emoji": "🧾", "cat": "health",
+      "when": { "age": [16, 105], "counterIncreasedThisYear": "hospital_count" },
+      "weight": { "base": 10 },
+      "text": "退院のとき、請求書を見てびっくり。医療費は全部で{billTotal}万円。でも健康保険で3割に、さらに「高額療養費制度」で上限があり、払うのは{billPay}万円になった。",
+      "choices": [
+        { "label": "💴 所持金から払う", "effects": { "cash": "-$billPay" } },
+        { "label": "🛡️ 医療保険・がん保険の給付金を使う", "when": { "any": ["life_insurance", "cancer_insurance"] }, "effects": { "cash": "-$billPay", "insurancePayout": "$billInsurance" } },
+        { "label": "💳 分割で払う（カード）", "effects": { "cash": "-$billPay", "interest": 0.15 } }
+      ],
+      "note": "入院の差額ベッド代・食事代は保険がきかない（1日数千円〜）。仕事を休んだ分の収入減も同時に起こる" },
+
+    { "id": "ev_r_insurance", "kind": "choice", "emoji": "🛡️", "cat": "money",
+      "when": { "age": [22, 55], "none": ["life_insurance"], "cooldownYears": 5 },
+      "weight": { "base": 1.5, "mul": [["married", 2], ["child:any", 2]] },
+      "text": "保険の営業の人に、医療保険や生命保険をすすめられた。（月5千円〜）",
+      "choices": [
+        { "label": "🛡️ 医療保険に入る（月5千円）", "effects": { "set": ["life_insurance"], "cashYearly": -6 } },
+        { "label": "🎗️ がん保険も入る（月8千円）", "effects": { "set": ["life_insurance", "cancer_insurance"], "cashYearly": -10 } },
+        { "label": "🙅 公的な健康保険と貯金で十分", "effects": {} }
+      ] },
+
+    { "id": "ev_r_child_illness", "kind": "choice", "emoji": "🤒", "cat": "family",
+      "when": { "child": { "age": [0, 15], "alive": true }, "cooldownYears": 3 },
+      "weight": { "base": 2 },
+      "text": "{child}が高い熱を出して入院した。",
+      "choices": [
+        { "label": "🏥 仕事を休んで付き添う", "effects": { "stats": { "stress": 5 }, "incomeLossDays": 7, "cash": "-$childMedical", "personRelation": { "child": 6 } } },
+        { "label": "👵 祖父母に頼む", "when": { "person": { "role": "father|mother", "alive": true } }, "effects": { "stats": { "stress": 2 }, "cash": "-$childMedical" } }
+      ],
+      "note": "子どもの医療費は自治体の助成で無料〜数百円のことが多い（$childMedical は都道府県で0〜2万）。かわりに親の仕事が休みになる" },
+
+    { "id": "ev_r_child_juku", "kind": "choice", "emoji": "✏️", "cat": "family",
+      "when": { "child": { "age": [12, 14], "alive": true }, "cooldownYears": 3 },
+      "weight": { "base": 3 },
+      "text": "{child}が「高校受験のために塾に行きたい」と言っている。（年40〜60万円）",
+      "choices": [
+        { "label": "✏️ 通わせる", "effects": { "cashYearly": -50, "yearsOf": 3, "childSet": { "academicBoost": 1.3 }, "personRelation": { "child": 3 } } },
+        { "label": "📱 オンラインの安い教材にする（年6万円）", "effects": { "cashYearly": -6, "yearsOf": 3, "childSet": { "academicBoost": 1.1 } } },
+        { "label": "🙇 家計がきびしいので、ごめんねと伝える", "effects": { "personRelation": { "child": -4 } } }
+      ] },
+
+    { "id": "ev_r_child_private_hs", "kind": "choice", "emoji": "🏫", "cat": "family",
+      "when": { "child": { "age": [14, 14], "alive": true } },
+      "weight": { "base": 4 },
+      "text": "{child}の第一志望の公立高校が不合格。合格した私立高校に行く？（入学金など約30万円＋年に約50万円）",
+      "roll": { "base": 0.3 },
+      "choices": [
+        { "label": "🏫 私立高校に行かせる", "effects": { "cash": -30, "cashYearly": -50, "yearsOf": 3, "personRelation": { "child": 4 } } },
+        { "label": "📕 公立の二次募集を受けさせる", "effects": { "childRoll": "hs_second" } },
+        { "label": "💻 通信制高校にする（年20万円）", "effects": { "cashYearly": -20, "yearsOf": 3 } }
+      ],
+      "note": "高校授業料の支援金（所得による）で私立の授業料は軽くなるが、入学金・施設費・制服などは自己負担" },
+
+    { "id": "ev_r_child_entrance", "kind": "choice", "emoji": "🌸", "cat": "family",
+      "when": { "child": { "age": [17, 17], "alive": true, "plan": "univ" } },
+      "weight": { "base": 8 },
+      "text": "{child}が大学に合格！入学金と前期の授業料で、まず{entranceFee}万円を3月中に払わないといけない。",
+      "choices": [
+        { "label": "💴 所持金から払う", "effects": { "cash": "-$entranceFee", "stats": { "happiness": 6 } } },
+        { "label": "🏦 教育ローンを借りる（年2%・10年）", "effects": { "loan": { "type": "education", "amount": "$entranceFee", "years": 10, "rate": 0.02 }, "stats": { "happiness": 4 } } },
+        { "label": "👵 祖父母に援助をお願いする", "when": { "person": { "role": "father|mother", "alive": true } }, "roll": { "base": 0.5, "w": { "familyWealth": 0.6 } }, "success": { "stats": { "happiness": 6 }, "log": "👵 祖父母が入学金を出してくれた" }, "fail": { "cash": "-$entranceFee", "log": "🙇 援助はむずかしいと言われ、自分で払った" } }
+      ],
+      "note": "大学の4年間の学費は国立で約240万、私立文系で約400万。一人暮らしならさらに仕送りが年100万前後" },
+
+    { "id": "ev_r_child_abroad", "kind": "choice", "emoji": "✈️", "cat": "family",
+      "when": { "child": { "age": [16, 21], "alive": true }, "cooldownYears": 4 },
+      "weight": { "base": 1 },
+      "text": "{child}が「1年間、留学したい」と言っている。（約200万円）",
+      "choices": [
+        { "label": "✈️ 行かせる", "effects": { "cash": -200, "personRelation": { "child": 8 }, "childSet": { "abroad": true } } },
+        { "label": "🏅 奨学金の留学プログラムをいっしょに探す", "roll": { "base": 0.35 }, "success": { "cash": -50, "childSet": { "abroad": true }, "log": "🏅 給付型の留学奨学金に通った" }, "fail": { "personRelation": { "child": -2 } } },
+        { "label": "🙇 今は無理だと伝える", "effects": { "personRelation": { "child": -6 } } }
+      ] },
+
+    { "id": "ev_r_scholar_trouble", "kind": "choice", "emoji": "📄", "cat": "money",
+      "when": { "all": ["scholarship_loan_repaying"], "money": { "cash": ["<", 0] }, "cooldownYears": 2 },
+      "weight": { "base": 6 },
+      "text": "所持金がマイナスで、奨学金の返済（月{repay}万円）がきびしい。",
+      "choices": [
+        { "label": "📮 返還猶予を申請する（返すのを待ってもらう）", "roll": { "base": 0.8, "incomeBelow": 300 }, "success": { "pauseRepay": 1, "log": "📮 1年間、返済を待ってもらえることになった" }, "fail": { "log": "📄 収入の条件に合わず、猶予は通らなかった" } },
+        { "label": "➗ 減額返還を申請する（月の返済を半分に・期間はのびる）", "effects": { "repayMul": 0.5, "repayYearsMul": 2 } },
+        { "label": "🙈 そのまま払わない", "effects": { "set": ["blacklisted"], "stats": { "stress": 10 }, "log": "⚠️ 3か月以上の延滞で、信用情報に記録された（ローンやクレジットカードが作りにくくなる）" } }
+      ] },
+
     { "id": "ev_r_spouse_illness", "kind": "choice", "emoji": "🏥", "cat": "family",
       "when": { "all": ["married"], "person": { "role": "spouse", "alive": true, "age": [45, 110] }, "cooldownYears": 5 },
       "weight": { "base": 1, "mul": [["spouseAge>=65", 2]] },

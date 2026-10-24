@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>まなびライフ リザルト</title>
+<link rel="stylesheet" href="base.css">
+<style>
+#ttl{position:absolute;left:0;right:0;top:22px;text-align:center}
+#ttl .a{font-size:34px;font-weight:900;text-shadow:0 4px 0 rgba(0,0,0,.35)}
+#ttl .b{font-size:16px;color:#9fb4dc;margin-top:2px}
+/* 左：顔とエンディング */
+#me{left:36px;top:110px;width:340px;height:560px;padding:14px;display:flex;flex-direction:column;align-items:center}
+#me .pic{width:304px;height:162px;border-radius:14px;background:url(../assets/faces/F_80.png) center/cover;box-shadow:inset 0 0 0 2px #e6cfa5}
+#me .end{margin-top:14px;padding:6px 18px;border-radius:999px;font-size:18px;color:#fff;background:linear-gradient(180deg,#9b6cff,#6c38e6);box-shadow:0 3px 0 #3a1489}
+#me .score{margin-top:10px;font-size:64px;font-weight:900;line-height:1;color:var(--ink)}
+#me .score small{font-size:22px;color:var(--ink2)}
+#me .stars{font-size:26px;letter-spacing:4px;margin-top:4px}
+#me .ep{margin-top:14px;font-size:16px;line-height:1.7;text-align:center;padding:12px 14px;background:#fbf3e3;border-radius:14px}
+#me .rank{margin-top:auto;width:100%;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+#me .rank span{height:30px;border-radius:8px;background:#efe6d6;color:#a99d86;font-size:12px;display:flex;align-items:center;justify-content:center}
+#me .rank span.on{background:var(--cyan2);color:#fff}
+/* 右：タブ */
+#info{left:396px;top:110px;width:848px;height:500px;padding:12px 18px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.tabs button{height:42px;font-size:17px;padding:0;border-radius:12px;box-shadow:0 3px 0 #c9d4ec}
+.tabs button.on{color:#fff;border:3px solid #0d1530;border-radius:999px;background:linear-gradient(180deg,#21e0d6,#0bb6cc 50%,#0894c4 51%,#24a6d8);box-shadow:0 3px 0 #0d1530;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.page{display:none}.page.on{display:block;animation:pop .2s}
+.g2{display:grid;grid-template-columns:1fr 1fr;column-gap:24px}
+.kv{display:grid;grid-template-columns:128px 1fr;align-items:center;min-height:46px;border-bottom:2px dashed #ecdcc2;font-size:17px}
+.kv .k{color:var(--ink2);font-size:14px}
+.kv small{font-size:13px;color:var(--ink2)}
+.neg{color:var(--red)}
+.tal{display:grid;grid-template-columns:150px 1fr 48px 110px;align-items:center;column-gap:12px;min-height:52px;border-bottom:2px dashed #ecdcc2;font-size:17px}
+.tal .v{text-align:right;font-size:22px}
+.tal .r{font-size:14px;color:var(--ink2)}
+.tal .r b{color:var(--orange)}
+.cm{margin-top:12px;font-size:15px;line-height:1.7;padding:10px 14px;background:#fbf3e3;border-radius:14px}
+svg text{font-family:var(--f);font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.hl{display:grid;grid-template-columns:96px 52px 40px 1fr;align-items:center;column-gap:8px;min-height:50px;border-bottom:2px dashed #ecdcc2;font-size:16px}
+.hl .y{color:var(--ink2);font-size:14px}.hl .a{color:var(--ink2);font-size:14px;text-align:right}
+.hl .e{width:38px;height:38px;border-radius:12px;background:#fff;box-shadow:0 2px 0 #d9cdb5;display:flex;align-items:center;justify-content:center;font-size:22px}
+#bot{position:absolute;left:396px;top:624px;width:848px;height:56px;display:flex;align-items:center;gap:14px}
+#bot .saved{flex:1;font-size:15px;color:#9fb4dc}
+#bot button{width:220px;height:52px;font-size:19px}
+</style></head>
+<body>
+<div id="stage">
+  <div id="ttl"><div class="a">🕊️ さくら の 人生</div><div class="b">2010年4月 神奈川県に生まれる 〜 2094年11月　84歳で人生を終える（老衰）</div></div>
+
+  <div class="pearl" id="me">
+    <div class="pic"></div>
+    <div class="end">✨ バランスのとれた人生</div>
+    <div class="score">72<small>点</small></div>
+    <div class="stars">⭐⭐⭐⭐<span style="opacity:.25">⭐</span></div>
+    <div class="ep">子どもたちに先生と呼ばれ、<br>家族に囲まれて歩んだ84年。</div>
+    <div class="rank"><span>困難</span><span>試行錯誤</span><span>波乱万丈</span><span class="on">バランス</span><span>幸福</span></div>
+  </div>
+
+  <div class="pearl" id="info">
+    <div class="tabs">
+      <button class="on" data-p="p1">📋 まとめ</button>
+      <button data-p="p2">🧬 才能</button>
+      <button data-p="p3">💴 お金のグラフ</button>
+      <button data-p="p4">📜 できごと</button>
+    </div>
+
+    <div class="page on" id="p1"><div class="g2">
+      <div>
+        <div class="kv"><span class="k">🎓 最終学歴</span><span>国立大学 教育学部<small>（奨学金あり）</small></span></div>
+        <div class="kv"><span class="k">💼 おもな仕事</span><span>🧑‍🏫 小学校教員 → 校長</span></div>
+        <div class="kv"><span class="k">🔄 転職</span><span>0回</span></div>
+        <div class="kv"><span class="k">💴 生涯の収入</span><span>2億4,300万円</span></div>
+        <div class="kv"><span class="k">👛 最後の所持金</span><span>1,860万円</span></div>
+        <div class="kv"><span class="k">🟥 最低の所持金</span><span class="neg">−86万円<small>（28歳・奨学金と車のローン）</small></span></div>
+      </div>
+      <div>
+        <div class="kv"><span class="k">💍 家族</span><span>夫・子ども2人・孫3人</span></div>
+        <div class="kv"><span class="k">📍 住んだ所</span><span>神奈川 → 東京 → 神奈川</span></div>
+        <div class="kv"><span class="k">✨ 趣味</span><span>🎮 ゲーム・🖍️ お絵かき ほか3つ</span></div>
+        <div class="kv"><span class="k">🏥 病気</span><span>高血圧・乳がん（克服）</span></div>
+        <div class="kv"><span class="k">📜 資格</span><span>小学校教員免許・英検2級</span></div>
+        <div class="kv"><span class="k">😊 満足感</span><span>平均 68<small>（いちばん高かったのは 35歳）</small></span></div>
+      </div>
+    </div></div>
+
+    <div class="page" id="p2">
+      <div class="tal"><span>📚 学力の才能</span><span class="bar c-blue"><i style="--w:58%"></i></span><span class="v">58</span><span class="r">上位 <b>30%</b></span></div>
+      <div class="tal"><span>🤝 コミュ力の才能</span><span class="bar c-mint"><i style="--w:74%"></i></span><span class="v">74</span><span class="r">上位 <b>5%</b></span></div>
+      <div class="tal"><span>🎨 芸術センス</span><span class="bar c-pink"><i style="--w:66%"></i></span><span class="v">66</span><span class="r">上位 <b>15%</b></span></div>
+      <div class="tal"><span>🏃 運動能力</span><span class="bar c-gold"><i style="--w:61%"></i></span><span class="v">61</span><span class="r">上位 <b>23%</b></span></div>
+      <div class="tal"><span>❤️ 体の丈夫さ</span><span class="bar c-red"><i style="--w:42%"></i></span><span class="v">42</span><span class="r">上位 <b>70%</b></span></div>
+      <div class="tal"><span>🏠 生まれた家</span><span class="bar c-purple"><i style="--w:48%"></i></span><span class="v">48</span><span class="r">ふつうの家庭</span></div>
+      <div class="cm">🧬 いちばんの才能は<b>コミュ力</b>（上位5%）。先生という仕事にぴったりでした。<br>好きだった「絵をかく」も、芸術センスが高く、よく伸びていました。体はあまり丈夫ではなく、がんや高血圧はそのせいもあったかもしれません。</div>
+    </div>
+
+    <div class="page" id="p3"><svg id="chart" width="808" height="420"></svg></div>
+
+    <div class="page" id="p4">
+      <div class="hl"><span class="y">2011年3月</span><span class="a">0歳</span><span class="e">🌊</span><span>東日本大震災。テレビで津波の映像を見た（まだ赤ちゃんだった）</span></div>
+      <div class="hl"><span class="y">2020年4月</span><span class="a">10歳</span><span class="e">😷</span><span>新型コロナで休校。オンライン授業が始まった</span></div>
+      <div class="hl"><span class="y">2028年3月</span><span class="a">18歳</span><span class="e">🌸</span><span>国立大学 教育学部に合格（合格率 46%）</span></div>
+      <div class="hl"><span class="y">2032年4月</span><span class="a">22歳</span><span class="e">🧑‍🏫</span><span>小学校の先生になった</span></div>
+      <div class="hl"><span class="y">2038年6月</span><span class="a">28歳</span><span class="e">🟥</span><span>所持金がマイナスに。奨学金の減額返還を申請した</span></div>
+      <div class="hl"><span class="y">2063年4月</span><span class="a">53歳</span><span class="e">🎗️</span><span>乳がんが見つかったが、手術で克服した（検診で早期発見）</span></div>
+      <div class="hl"><span class="y">2065年4月</span><span class="a">55歳</span><span class="e">🏫</span><span>校長になった</span></div>
+    </div>
+  </div>
+
+  <div id="bot"><span class="saved">✓ 「これまでの人生」に保存しました</span><button class="gl g-navy">📜 もっと見る</button><button class="gl g-cyan">🏠 タイトルへ</button></div>
+</div>
+<script>
+const st=document.getElementById('stage');function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();
+const show=id=>{document.querySelectorAll('.tabs button,.page').forEach(x=>x.classList.remove('on'));document.querySelector(`.tabs [data-p=${id}]`).classList.add('on');document.getElementById(id).classList.add('on')};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.p));
+if(location.hash)show(location.hash.slice(1));
+// ---- お金のグラフ（年収の棒＋所持金の折れ線。マイナスは赤） ----
+const W=808,H=420,L=62,R=16,T=20,B=40,ymin=-500,ymax=2500;
+const X=a=>L+(W-L-R)*a/85, Y=v=>T+(H-T-B)*(ymax-v)/(ymax-ymin);
+const inc=a=>a<22?0:a<60?380+(a-22)*12:a<65?260:0;
+// 所持金のサンプル（節目の値を直線でつなぐ）
+const K=[[16,3],[18,10],[22,5],[24,40],[26,-20],[28,-86],[30,30],[35,260],[40,520],[45,780],[49,900],[52,560],[56,640],[59,820],[60,2050],[65,2160],[70,2080],[75,1990],[80,1920],[84,1860]];
+const cash=[];for(let a=0;a<=84;a++){if(a<16){cash.push(0);continue}const i=K.findIndex(k=>k[0]>=a);const [a1,v1]=K[i],[a0,v0]=K[Math.max(0,i-1)];cash.push(a1===a0?v1:Math.round(v0+(v1-v0)*(a-a0)/(a1-a0)))}
+let s=`<rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="#fff" rx="10"/>`;
+for(let v=ymin;v<=ymax;v+=500){s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===0?'#23305a':'#efe6d6'}" stroke-width="${v===0?2:1}"/><text x="${L-8}" y="${Y(v)+5}" font-size="12" fill="#5d6b8f" text-anchor="end">${v}</text>`}
+for(let a=0;a<=80;a+=10)s+=`<text x="${X(a)}" y="${H-B+20}" font-size="12" fill="#5d6b8f" text-anchor="middle">${a}歳</text>`;
+for(let a=0;a<=84;a++){const v=inc(a);if(v)s+=`<rect x="${X(a)-3}" y="${Y(v)}" width="6" height="${Y(0)-Y(v)}" fill="#ffcf3f" opacity=".8"/>`}
+let d='';cash.forEach((v,a)=>{if(a<16)return;d+=(d?'L':'M')+X(a)+','+Y(v)});
+s+=`<path d="${d}" fill="none" stroke="#0a8fd1" stroke-width="3"/>`;
+cash.forEach((v,a)=>{if(a>=16&&v<0)s+=`<circle cx="${X(a)}" cy="${Y(v)}" r="4" fill="#e44d62"/>`});
+s+=`<circle cx="${X(28)}" cy="${Y(-86)}" r="7" fill="none" stroke="#e44d62" stroke-width="2"/><text x="${X(28)+10}" y="${Y(-86)+22}" font-size="13" fill="#e44d62">28歳 −86万円</text>`;
+s+=`<text x="${X(60)-8}" y="${Y(cash[60])-12}" font-size="13" fill="#0a8fd1" text-anchor="end">退職金</text><text x="${X(50)}" y="${Y(cash[50])+22}" font-size="13" fill="#0a8fd1" text-anchor="middle">子どもの大学</text>`;
+s+=`<rect x="${L+12}" y="${T+10}" width="14" height="14" fill="#ffcf3f"/><text x="${L+32}" y="${T+22}" font-size="13" fill="#23305a">年収（万円）</text><line x1="${L+130}" x2="${L+156}" y1="${T+17}" y2="${T+17}" stroke="#0a8fd1" stroke-width="3"/><text x="${L+162}" y="${T+22}" font-size="13" fill="#23305a">所持金（万円）</text>`;
+document.getElementById('chart').innerHTML=s;
+</script>
+</body></html>

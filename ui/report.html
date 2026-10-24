@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>まなびライフ 通知表</title>
+<link rel="stylesheet" href="base.css">
+<style>
+#behind{position:absolute;inset:0;background:url(../docs/ui/mock-main.png) center/cover;filter:blur(1px)}
+/* 通知表（紙） */
+#paper{position:relative;width:1150px;height:660px;display:grid;grid-template-columns:600px 1fr;column-gap:22px;padding:22px 26px;color:var(--ink);
+  background:#fffdf6;border:4px solid #fff;border-radius:20px;box-shadow:inset 0 0 0 3px #ffe2a8,0 16px 40px rgba(5,10,40,.6);animation:pop .25s ease-out}
+.left{display:flex;flex-direction:column}
+.hd{display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:3px double #e6cfa5}
+.hd .t{font-size:30px;font-weight:900;letter-spacing:.3em}
+.hd .g{font-size:18px;color:var(--ink2)}
+.hd .n{margin-left:auto;font-size:18px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{height:50px;border-bottom:2px solid #f1e6d2;font-size:19px}
+th{font-size:14px;color:var(--ink2);height:30px;text-align:center}
+td.s{width:150px;padding-left:10px}
+td.e{width:110px;text-align:center}
+td.m{font-size:14px;color:var(--ink2);padding-left:8px}
+.ev{display:inline-flex;width:44px;height:44px;border-radius:50%;align-items:center;justify-content:center;font-size:28px;font-weight:900}
+.ev.s2{color:#fff;background:radial-gradient(circle at 35% 30%,#ff9cc4,#ff5a96);box-shadow:0 3px 0 #c93b74}
+.ev.s1{color:#0a8fd1;background:#e5f4fd;box-shadow:inset 0 0 0 3px #9fd3f2}
+.ev.s0{color:#a7aec4;background:#f2ede4}
+.up{color:#2fbf86;font-size:13px;margin-left:4px}.dn{color:#e44d62;font-size:13px;margin-left:4px}
+.foot{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box2{background:#fbf3e3;border-radius:14px;padding:10px 14px;font-size:15px;line-height:1.55}
+.box2 .k{font-size:13px;color:var(--ink2);display:block;margin-bottom:2px}
+.stamp{position:absolute;left:400px;top:22px;width:92px;height:92px;border-radius:50%;border:4px solid #e44d62;color:#e44d62;display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:900;transform:rotate(-14deg);opacity:.85;line-height:1.1;text-align:center}
+/* 右：重点方針 */
+.right{display:flex;flex-direction:column;padding-left:22px;border-left:3px dashed #ecdcc2}
+.right .q{font-size:22px;line-height:1.5;margin:4px 0 12px}
+.right .q small{display:block;font-size:14px;color:var(--ink2)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fgrid button{height:70px;border-radius:16px;font-size:18px;display:grid;grid-template-columns:40px 1fr;align-items:center;text-align:left;padding:0 12px;column-gap:6px}
+.fgrid button .i{font-size:28px;text-align:center}
+.fgrid button small{display:block;font-size:12px;color:var(--ink2);font-weight:700}
+.fgrid button.sel{box-shadow:0 0 0 4px var(--cyan),0 5px 0 #b9c6e2;background:linear-gradient(180deg,#e9fbff,#d4f3fb)}
+#ok{margin-top:14px;height:54px;font-size:20px}
+.right .src{margin-top:12px}
+</style></head>
+<body>
+<div id="stage">
+  <div id="behind"></div>
+  <div class="ov">
+    <div id="paper">
+      <div class="left">
+        <div class="hd"><span class="t">通知表</span><span class="g">2021年3月　小学4年生</span><span class="n">さくら</span></div>
+        <div class="stamp">よく<br>できました</div>
+        <table>
+          <tr><th style="text-align:left;padding-left:10px">教科</th><th>評価</th><th style="text-align:left;padding-left:8px">先生から</th></tr>
+          <tr><td class="s">📖 国語</td><td class="e"><span class="ev s1">〇</span></td><td class="m">音読がとても上手です</td></tr>
+          <tr><td class="s">🔢 算数</td><td class="e"><span class="ev s2">◎</span><span class="up">▲</span></td><td class="m">計算が速く正確です</td></tr>
+          <tr><td class="s">🔬 理科</td><td class="e"><span class="ev s1">〇</span></td><td class="m">実験に意欲的です</td></tr>
+          <tr><td class="s">🗾 社会</td><td class="e"><span class="ev s0">△</span><span class="dn">▼</span></td><td class="m">地図の読み取りをがんばろう</td></tr>
+          <tr><td class="s">🔤 英語</td><td class="e"><span class="ev s1">〇</span></td><td class="m">発表に進んで取り組めました</td></tr>
+          <tr><td class="s">🏃 体育</td><td class="e"><span class="ev s2">◎</span></td><td class="m">リレーで活躍しました</td></tr>
+        </table>
+        <div class="foot">
+          <div class="box2"><span class="k">📅 出席</span>欠席 2日（かぜ）<br>遅刻 0回</div>
+          <div class="box2"><span class="k">✏️ 先生のことば</span>友だち思いで、学級委員としてクラスをまとめてくれました。</div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="q">来年度は、何を大事にする？<small>選んだ方針で、1年間のステータスの伸び方が変わります</small></div>
+        <div class="fgrid">
+          <button class="sel"><span class="i">📚</span><span>勉強<small>全教科が伸びる・ストレス↑</small></span></button>
+          <button><span class="i">🎯</span><span>得意を伸ばす<small>算数・体育がもっと伸びる</small></span></button>
+          <button><span class="i">🩹</span><span>苦手をなくす<small>社会が伸びる</small></span></button>
+          <button><span class="i">⚽</span><span>部活・習い事<small>スキル・人間関係↑</small></span></button>
+          <button><span class="i">🧑‍🤝‍🧑</span><span>友達と遊ぶ<small>人間関係・満足感↑</small></span></button>
+          <button><span class="i">🎮</span><span>趣味<small>満足感↑・ストレス↓</small></span></button>
+          <button><span class="i">🏋️</span><span>健康<small>健康↑・運動の習慣</small></span></button>
+          <button><span class="i">😌</span><span>休養<small>ストレス↓↓</small></span></button>
+        </div>
+        <button class="gl g-green" id="ok">この方針で 5年生へ ▶</button>
+        <div class="src"><span>📊</span><span>小学校の通知表は、多くの学校で「よくできる・できる・もう少し」の3段階です。<small>（文部科学省 学習評価の在り方）</small></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const st=document.getElementById('stage');function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();
+document.querySelectorAll('.fgrid button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.fgrid button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});
+</script>
+</body></html>

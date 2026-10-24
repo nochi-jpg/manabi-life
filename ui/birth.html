@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>まなびライフ 誕生</title>
+<link rel="stylesheet" href="base.css">
+<style>
+#date{position:absolute;left:0;right:0;top:34px;text-align:center;font-size:22px;color:#9fb4dc;letter-spacing:.3em}
+/* ルーレット */
+#roul{position:absolute;left:340px;top:84px;width:600px;height:150px;border-radius:28px;overflow:hidden;
+  background:linear-gradient(180deg,#0d1530,#1b2a5e 50%,#0d1530);border:4px solid #fff;box-shadow:0 0 0 4px var(--cyan),0 0 30px rgba(30,200,234,.5)}
+#roul::before,#roul::after{content:'';position:absolute;left:0;right:0;height:46px;z-index:2;pointer-events:none}
+#roul::before{top:0;background:linear-gradient(#0d1530,transparent)}#roul::after{bottom:0;background:linear-gradient(transparent,#0d1530)}
+#reel{position:absolute;left:0;right:0;top:0;text-align:center}
+#reel div{height:150px;line-height:150px;font-size:64px;font-weight:900;letter-spacing:.08em;text-shadow:0 4px 0 rgba(0,0,0,.4)}
+#born{position:absolute;left:0;right:0;top:250px;text-align:center;font-size:30px;opacity:0}
+#born b{color:var(--gold);font-size:38px}
+#born.on{animation:popin .5s ease-out forwards}
+/* 情報カード */
+#card{left:150px;top:300px;width:980px;height:344px;padding:18px 24px;display:grid;grid-template-columns:240px 1fr 1fr;column-gap:22px;opacity:0;transform:translateY(16px);transition:.5s}
+#card.on{opacity:1;transform:none}
+#card .pic{width:240px;height:128px;border-radius:14px;background:url(../assets/faces/F_0.png) center/cover;box-shadow:inset 0 0 0 2px #e6cfa5}
+#card .nm{margin-top:12px;font-size:14px;color:var(--ink2)}
+#card input{margin-top:4px;width:240px;height:46px;border-radius:12px;border:3px solid #e6cfa5;background:#fff;font-family:var(--f);font-weight:800;font-size:22px;color:var(--ink);padding:0 12px}
+#card .sex{margin-top:10px;height:36px;border-radius:999px;background:#ffe3ef;color:#d64a86;display:flex;align-items:center;justify-content:center;font-size:17px}
+.kv{display:grid;grid-template-columns:100px 1fr;align-items:center;min-height:38px;border-bottom:2px dashed #ecdcc2;font-size:17px}
+.kv .k{color:var(--ink2);font-size:14px}
+.kv small{font-size:13px;color:var(--ink2);margin-left:4px}
+.tier{display:inline-block;padding:0 10px;border-radius:999px;background:var(--cyan2);color:#fff;font-size:14px;margin-left:6px}
+.mini{display:grid;grid-template-columns:100px 1fr 46px;align-items:center;column-gap:8px;min-height:38px;border-bottom:2px dashed #ecdcc2;font-size:15px}
+.mini .k{color:var(--ink2);font-size:14px}
+#card .src{grid-column:1/4;margin-top:12px;padding-top:10px;border-top:2px dashed #ecdcc2}
+#go{position:absolute;left:50%;top:656px;transform:translateX(-50%);width:340px;height:56px;font-size:22px;opacity:0;transition:.4s}
+#go.on{opacity:1}
+</style></head>
+<body>
+<div id="stage">
+  <div id="date">2010年 4月</div>
+  <div id="roul"><div id="reel"></div></div>
+  <div id="born">🎉 <b id="pf">神奈川県</b> に誕生した！</div>
+
+  <div class="pearl" id="card">
+    <div>
+      <div class="pic"></div>
+      <div class="nm">なまえ（あとから変えられません）</div>
+      <input value="さくら" maxlength="6">
+      <div class="sex">👧 女の子</div>
+    </div>
+    <div>
+      <h3>👨‍👩‍👧 家族</h3>
+      <div class="kv"><span class="k">👨 父（32）</span><span>💼 営業職（会社員）</span></div>
+      <div class="kv"><span class="k">👩 母（30）</span><span>📋 事務（パート）</span></div>
+      <div class="kv"><span class="k">👦 兄（3）</span><span>🧸 保育園</span></div>
+      <div class="kv"><span class="k">👵 祖母（64）</span><span>🏠 となりの市に住む</span></div>
+    </div>
+    <div>
+      <h3>📍 神奈川県のデータ</h3>
+      <div class="kv"><span class="k">地域</span><span>関東<span class="tier">大都市圏</span></span></div>
+      <div class="kv"><span class="k">人口</span><span>約923万人<small>（全国2位）</small></span></div>
+      <div class="mini"><span class="k">大学進学率</span><span class="bar c-blue"><i style="--w:64%"></i></span><span>64%</span></div>
+      <div class="mini"><span class="k">（全国）</span><span class="bar c-mint"><i style="--w:58%"></i></span><span>58%</span></div>
+      <div class="kv"><span class="k">学校・会社</span><span>多い（選べる道が広い）</span></div>
+    </div>
+    <div class="src"><span>📊</span><span>日本で生まれる赤ちゃんは年に約70万人。生まれる場所・家族・才能は、だれにも選べません。<small>（厚生労働省 人口動態統計）</small></span></div>
+  </div>
+
+  <button class="gl g-green" id="go">人生をはじめる ▶</button>
+</div>
+<script>
+const st=document.getElementById('stage');function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();
+const P=['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+const goal='神奈川県';const reel=document.getElementById('reel');
+const seq=[];for(let i=0;i<40;i++)seq.push(P[Math.floor(Math.random()*47)]);seq.push(goal);
+reel.innerHTML=seq.map(p=>`<div>${p}</div>`).join('');
+const done=()=>{reel.style.transform=`translateY(${-(seq.length-1)*150}px)`;['born','card','go'].forEach(id=>document.getElementById(id).classList.add('on'))};
+if(location.hash==='#done'){done()}else{
+  reel.style.transition='transform 3.2s cubic-bezier(.15,.85,.25,1)';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{reel.style.transform=`translateY(${-(seq.length-1)*150}px)`}));
+  setTimeout(done,3400);
+}
+</script>
+</body></html>

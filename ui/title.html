@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>まなびライフ タイトル</title>
+<link rel="stylesheet" href="base.css">
+<style>
+#logo{position:absolute;left:190px;top:-20px;width:900px;height:490px;background:url(../assets/ui/title.jpg) center/contain no-repeat}
+#menu{position:absolute;left:50%;top:448px;transform:translateX(-50%);display:flex;flex-direction:column;gap:14px;width:340px}
+#menu button{height:52px;font-size:20px;color:var(--blue);background:#fff;border:2px solid #c9d7ea;border-radius:999px;box-shadow:0 3px 0 #dfe7f3;
+  display:flex;align-items:center;justify-content:center;gap:10px}
+#menu button:hover{border-color:var(--blue);filter:none}
+#menu button.main{color:#fff;background:var(--blue);border-color:var(--blue);box-shadow:0 3px 0 #1f4f82}
+#menu small{font-size:13px;color:inherit;opacity:.75}
+#note{position:absolute;left:0;right:0;bottom:30px;text-align:center;font-size:13px;color:#8a97b5}
+#cred{position:absolute;right:24px;bottom:16px;font-size:12px;color:#a7b2c9}
+</style></head>
+<body>
+<div id="stage" class="white">
+  <div id="logo"></div>
+  <div id="menu">
+    <button class="main" id="start">はじめから</button>
+    <button id="hist">これまでの人生 <small>（3人）</small></button>
+    <button>オプション</button>
+  </div>
+  <div id="note">人生は一度きり。とちゅうから やり直すことは できません（自動でセーブされます）</div>
+  <div id="cred">© のち（まなび堂）</div>
+</div>
+<script>
+const st=document.getElementById('stage');function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();
+// セーブがあるときは「つづきから」（URLの最後に #continue で確認）
+if(location.hash==='#continue'){const b=document.getElementById('start');b.innerHTML='つづきから <small>さくら・34歳</small>'}
+</script>
+</body></html>
