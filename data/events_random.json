@@ -1119,8 +1119,9 @@
       "weight": { "base": 1, "mul": [["spouseAge>=65", 2]] },
       "text": "{spouse}が病気で入院した。",
       "choices": [
-        { "label": "🏥 仕事を調整して付き添う", "effects": { "stats": { "stress": 6 }, "person": { "relation": "spouse", "delta": 10 }, "jobHoursMul": 0.85 } },
-        { "label": "💼 仕事を続け、できる範囲で支える", "effects": { "stats": { "stress": 4 } } }
+        { "label": "🏥 仕事を調整して付き添う", "when": { "selfWorking": true }, "effects": { "stats": { "stress": 6 }, "person": { "relation": "spouse", "delta": 10 }, "jobHoursMul": 0.85 } },
+        { "label": "💼 仕事を続け、できる範囲で支える", "when": { "selfWorking": true }, "effects": { "stats": { "stress": 4 } } },
+        { "label": "🏠 家で付き添い、できるかぎり支える", "when": { "selfWorking": false }, "effects": { "stats": { "stress": 5 }, "person": { "relation": "spouse", "delta": 10 } } }
       ] }
     ,{ "id": "ev_r_adult_lesson", "kind": "choice", "emoji": "🎒", "cat": "lesson",
       "when": { "age": [22, 85], "cooldownYears": 4 },

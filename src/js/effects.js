@@ -40,7 +40,7 @@ const Effects = (() => {
         case 'skill': for (const [s, d] of Object.entries(v)) stat('skill.' + s, num(d, ctx)); break;
         case 'skillClub': { const c = G.clubs[0] && Menu.club(G.clubs[0].id); const sk = c && Object.keys(c.yearly || {}).find((x) => x.startsWith('skill.')); if (sk) stat(sk, v); break; }
         case 'cash': G.cash += num(v, ctx); break;
-        case 'cash_household': G.household.cash = (G.household.cash ?? 100) + num(v, ctx); if (num(v, ctx) < -50) G.talents.familyWealth = Math.max(0, G.talents.familyWealth - 1); break;
+        case 'cash_household': G.household.cash = (G.household.cash ?? 100) + num(v, ctx); if (num(v, ctx) < -50) { G.talents.familyWealth = Math.max(0, G.talents.familyWealth - 1); G.vars.lessonForce = true; } break;
         case 'cash_child': if (G.age >= 16) G.cash += num(v, ctx); else G.vars.childSavings = (G.vars.childSavings || 0) + num(v, ctx); break;
         case 'cashYearly': G.vars.recurring = G.vars.recurring || []; G.vars.recurring.push({ v: num(v, ctx), left: ef.yearsOf || (ctx.who ? 15 : 4), from: ctx.ev && ctx.ev.id, who: ctx.who ? ctx.who.id : null }); break;
         case 'yearsOf': break;
@@ -61,7 +61,8 @@ const Effects = (() => {
         case 'focus': { const f = resolve(v, ctx); if (f) Engine.setFocus(f, true); break; }
         case 'school': School.apply(v, ctx); break;
         case 'nextStage': School.setStage(v); break;
-        case 'extendStage': if (G.school) G.school.years += v; break;
+        case 'extendStage': if (G.school) { G.school.years += v; School.cancelNaitei(logs, '留年'); } break;
+        case 'queueNow': G.queue = G.queue || []; G.queue.unshift({ id: v, ctx: {} }); break;
         case 'job': Work.apply(v, ctx); break;
         case 'club': Clubs.apply(v, ctx); break;
         case 'hobby': if (v.add) { const id = resolve(v.add, ctx); if (id && !G.hobbies.includes(id)) G.hobbies.push(id); } break;
@@ -86,7 +87,7 @@ const Effects = (() => {
         case 'move': Life.move(resolve(v.to, ctx), ctx, v); break;
         case 'householdCost': G.household.extraCost = (G.household.extraCost || 0) + v; break;
         case 'householdStress': stat('stress', v); break;
-        case 'wealthDelta': G.talents.familyWealth = clamp(G.talents.familyWealth + v, 0, 100); G.household.income = wealthIncome(G.talents.familyWealth); break;
+        case 'wealthDelta': G.talents.familyWealth = clamp(G.talents.familyWealth + v, 0, 100); G.household.income = wealthIncome(G.talents.familyWealth); G.vars.lessonForce = true; break;
         case 'allowance': G.vars.childSupport = true; break;
         case 'splitAssets': break; // → divorce
         case 'custody': break;
@@ -185,7 +186,10 @@ const School = {
     if (p) Menu.remember(p);
     G.school = { id, tmpl: tmplId, pick: id, name, emoji: t.emoji || (p && p.emoji) || '🏫', years, yearIn: 1, quality: t.quality || 1, cost: (p && p.cost) ?? t.cost ?? 0, h: p ? p.h : null };
     G.stage = stage;
+    if (stage === 'jhs') { G.clubs = G.clubs.filter((c) => c.id !== 'ls_juken_juku'); }
     (t.grant || []).forEach((f) => Effects.setFlag(f, true));
+    // ほかの県の学校：その県に引っ越して、ひとり暮らし
+    if (p && p.pref && p.pref !== G.pref) { Life.move(p.pref, ctx, {}); Effects.setFlag('living_alone', true); Effects.setFlag('lives_with_parents', false); for (const x of people('father|mother|sibling')) x.together = false; }
     if (D().schools.preschool.some((x) => x.id === tmplId)) { for (const [k, d] of Object.entries(t.effects || {})) { if (k === 'subj') for (const [a, b] of Object.entries(d)) G.vars['pre_' + a] = b; else if (k in G.stats) Effects.stat(k, d); } G.household.extraCost = (G.household.extraCost || 0) + (t.cost || 0); }
     if (p && p.dept) { G.vars.major = p.dept; const d = Menu.dept(p.dept); if (d) (d.autoSet || []).forEach((f) => Effects.setFlag(f, true)); }
     else if (['vocational', 'grad_master', 'grad_doctor', 'grad_prof'].includes(stage)) G.vars.major = tmplId;
@@ -199,11 +203,19 @@ const School = {
   leave(how) {
     if (!G.school) return;
     if (how === 'graduate') this.graduateFlags();
-    if (how === 'dropout') { const m = { hs: 'edu_hs_dropout', hs_corr: 'edu_hs_dropout', hs_night: 'edu_hs_dropout', univ: 'edu_univ_dropout', univ_med: 'edu_univ_dropout' }[G.stage]; if (m) Effects.setFlag(m, true); }
+    if (how === 'dropout') { this.cancelNaitei(null, '退学'); const m = { hs: 'edu_hs_dropout', hs_corr: 'edu_hs_dropout', hs_night: 'edu_hs_dropout', univ: 'edu_univ_dropout', univ_med: 'edu_univ_dropout' }[G.stage]; if (m) Effects.setFlag(m, true); }
     G.lastSchool = G.school.name;
     G.school = null; G.stage = 'none';
     G.clubs = G.clubs.filter((c) => (Menu.club(c.id) || {}).age); // 部活は学校を出たら終わり（習い事は残す）
     if (G.job && G.job.form === 'student_part') { G.job = null; G.employment = 'none'; }
+  },
+  // 留年・退学したら、決まっていた内定は取り消し
+  cancelNaitei(logs, why) {
+    if (!G.flags.naitei && !G.flags.naitei_school) return;
+    const t = Text.targetLabel();
+    delete G.flags.naitei; G.vars.target = 'none'; G.vars.targetPref = null;
+    const msg = `📄 ${why}が決まったので、${t ? t + 'の' : ''}内定が取り消しになった。`;
+    if (logs) logs.push(msg); else Fam.notice('📄', msg.slice(2), 'school');
   },
   graduateFlags() {
     const st = G.stage, t = G.school ? Menu.school(G.school.tmpl) : null;
@@ -256,6 +268,11 @@ const Work = {
     Effects.setFlag('naitei', false); Effects.setFlag('job_hunting', false);
     if (j.careerEndAge) G.vars.careerEnd = rangeInt(j.careerEndAge);
     G.vars.workAway = false;
+    if (['civil', 'teacher'].includes(G.vars.plan) || G.vars.plan === 'startup') G.vars.plan = 'work';
+    // ほかの県の会社：その県に引っ越す
+    const tp = G.vars.targetPref; G.vars.targetPref = null;
+    if (G.vars.commutePref) { G.job.pref = G.vars.commutePref; G.vars.commutePref = null; Fam.jobCheck(); }
+    if (tp && tp !== G.pref) Life.move(tp, ctx || {}, { withJob: true });
   },
   setForm(f) { if (!G.job) return; G.job.form = f; G.employment = f; if (!['seishain', 'civil_servant'].includes(f)) G.rank = 0; },
   quit(how) {

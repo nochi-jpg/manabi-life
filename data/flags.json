@@ -213,6 +213,7 @@
       "glasses": "メガネ"
     },
     "social": {
+      "allowance_cut": "親の仕送りが止まった",
       "near_parents": "親の近くに住んでいる（子育て・介護を手伝いあえる）",
       "separated": "配偶者と別居中",
       "no_more_children": "これ以上は子どもを持たないと決めた",

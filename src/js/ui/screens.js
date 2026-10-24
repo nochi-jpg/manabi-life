@@ -30,8 +30,9 @@ const Ending = (() => {
   }
   function compute(g) {
     const W = D().ending.weights;
-    const ha = Math.round(avg(g.hist.happiness));
-    const cr = Math.round(criterion(g, g.happinessType));
+    // 点数はやや甘めに（ふつうの人生で60点台になるくらい）
+    const ha = Math.round(clamp(12 + avg(g.hist.happiness) * 0.92, 0, 100));
+    const cr = Math.round(clamp(18 + criterion(g, g.happinessType) * 0.85, 0, 100));
     const score = Math.round(ha * W.happinessAvg + cr * W.criterion);
     const rank = D().ending.ranks.find((r) => score >= r.min) || D().ending.ranks[D().ending.ranks.length - 1];
     return { ha, cr, score, rank };
@@ -92,7 +93,7 @@ Screens.result = {
     el.innerHTML = `
       <div class="rttl"><div class="a">🕊️ ${esc(G.given)} の 人生</div><div class="b">2010年4月 ${esc(prefOf(G.birthPref).name)}に生まれる 〜 ${calYear()}年${MONTH[G.q]}月　${G.age}歳で人生を終える（${esc(G.deathCause || '病気')}）</div></div>
       <div class="panel" id="rme">
-        <div class="pic" style="background-image:url(${faceFile(G.gender, G.age)})"></div>
+        <div class="pic" style="background-image:url(${faceImgOf(G)})"></div>
         <div class="end">${esc(e.rank.label)}</div>
         <div class="score num">${e.score}<small>点</small></div>
         <div class="stars">${'⭐'.repeat(stars)}<span style="opacity:.25">${'⭐'.repeat(5 - stars)}</span></div>
@@ -115,7 +116,7 @@ Screens.result = {
           <div class="kv"><span class="k">✨ 趣味</span><span class="wrap">${esc(hob.join('・') || 'なし')}</span></div>
           <div class="kv"><span class="k">🏥 病気</span><span>${esc(ill.join('・') || 'とくになし')}</span></div>
           <div class="kv"><span class="k">📜 資格</span><span class="wrap">${esc(LIC.map(licText).join('・') || 'なし')}</span></div>
-          <div class="kv"><span class="k">🧮 点数の内わけ</span><span>満足感${e.ha}×0.6＋基準${e.cr}×0.4 <small>${esc(D().modes.resultBadge[G.mode])}</small></span></div>
+          <div class="kv"><span class="k">🌷 モード</span><span>${esc(D().modes.resultBadge[G.mode])}</span></div>
         </div></div></div>
         <div class="page" id="r2">${talentsHtml()}</div>
         <div class="page" id="r3">${chartSvg()}</div>
@@ -140,14 +141,14 @@ function eduLabel() {
   if (f.edu_hs_grad) return '高校'; if (f.edu_hs_kentei) return '高卒認定'; if (f.edu_jhs_grad) return '中学校';
   return '小学校';
 }
-function licText(f) { const q = D().events_random.qualifications.find((x) => x.flag === f); if (q) return q.label.replace(/（.*）/, ''); return ({ lic_car: '普通免許', lic_teacher_elem: '小学校教員免許', lic_teacher_sec: '中高教員免許', lic_nurse: '看護師', lic_doctor: '医師', lic_dentist: '歯科医師', lic_pharmacist: '薬剤師', lic_lawyer: '弁護士', eiken_3: '英検3級', eiken_2: '英検2級', eiken_p1: '英検準1級', eiken_1: '英検1級', toeic_600: 'TOEIC600', toeic_800: 'TOEIC800', toeic_900: 'TOEIC900' })[f] || f; }
+function licText(f) { const m = ({ lic_car: '普通自動車免許', lic_bike: 'バイク免許', lic_teacher_elem: '小学校教員免許', lic_teacher_sec: '中学・高校教員免許', lic_nurse: '看護師', lic_doctor: '医師', lic_dentist: '歯科医師', lic_pharmacist: '薬剤師', lic_lawyer: '弁護士', lic_pt: '理学療法士', lic_cook: '調理師', lic_beauty: '美容師', lic_pilot: 'パイロット', eiken_3: '英検3級', eiken_2: '英検2級', eiken_p1: '英検準1級', eiken_1: '英検1級', toeic_600: 'TOEIC 600点以上', toeic_800: 'TOEIC 800点以上（高得点）', toeic_900: 'TOEIC 900点以上（高得点）' })[f]; if (m) return m; const q = D().events_random.qualifications.find((x) => x.flag === f); return q ? q.label.replace(/（.*）/, '') : f; }
 function epitaph(jobs, fam) {
-  const j = jobs.filter((x) => x !== 'アルバイト・パート' && x !== '引退')[0];
-  const a = G.age;
-  if (j && fam !== 'ひとり') return `${j}として働き、\n${fam}とともに歩んだ${a}年。`;
-  if (j) return `${j}として働き、\n自分の道を歩んだ${a}年。`;
-  if (fam !== 'ひとり') return `${fam}とともに歩んだ${a}年。`;
-  return `${pref().name}で、自分らしく生きた${a}年。`;
+  const j = jobs.filter((x) => x !== 'アルバイト・パート' && x !== '引退').slice(-1)[0] || jobs.slice(-1)[0];
+  const sp = G.people.find((p) => p.role === 'spouse' && p.alive && p.together);
+  const kids = people('child').length;
+  const ill = /病気/.test(G.deathCause || '');
+  const who = sp ? `${roleLabel(sp)}に看取られた。` : kids ? '子どもたちに看取られた。' : Fam.household().length ? '家族に看取られた。' : ill ? '病院の医師と看護師に看取られた。' : '一人で亡くなった。';
+  return `${j ? j + 'として働き、' : `${pref().name}で暮らし、`}\n${who}\n享年${G.age}歳。`;
 }
 // 才能（上位◯%）
 function topPct(v) { const z = (v - 50) / 15; const cdf = 0.5 * (1 + erf(z / Math.SQRT2)); return Math.max(1, Math.round((1 - cdf) * 100)); }

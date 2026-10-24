@@ -73,7 +73,7 @@ const Engine = (() => {
     }
     Q.push(...afters);
     // 習い事を続ける？（要望3：春に。学年が上がる・入学・就職のとき）
-    if (G.q === 0 && G.clubs.some((c) => isLesson(c.id))) Q.push({ id: '__lessons', ctx: {} });
+    if ((G.q === 0 || G.vars.lessonForce) && G.clubs.some((c) => isLesson(c.id))) Q.push({ id: '__lessons', ctx: {} });
     // 3. リスク（病気・事故・失業など）
     let riskChoice = false;
     for (const src of ['events_random', 'events_flow', 'events_world', 'events_family']) {
@@ -282,7 +282,7 @@ const Engine = (() => {
       if (c.menu) {
         const items = Menu.build(c.menu.source, c.menu.filter, ctx);
         if (!items.length) return;
-        opts.push({ i, menu: true, items, label: c.label ? Text.fill(c.label, ctx) : null, showRate: !!c.menu.showRate });
+        opts.push({ i, menu: true, items, label: c.label ? Text.fill(c.label, ctx) : null, showRate: !!c.menu.showRate, src: c.menu.source, filter: c.menu.filter });
       } else {
         let rate = null;
         if (c.showRate && c.roll) rate = Math.round(clamp(rollP(c.roll, ctx), 0.03, 0.97) * 100);
@@ -314,7 +314,7 @@ const Engine = (() => {
     G.pending = null;
     G.choiceCount++;
     const out = { posts: [] };
-    if (o.menu && item) { ctx.pick = item; ctx.pickName = item.name; Menu.remember(item); }
+    if (o.menu && item) { ctx.pick = item; ctx.pickName = item.name; Menu.remember(item); G.vars.targetPref = item.pref && item.pref !== G.pref && !item.commute ? item.pref : null; if (item.commute && item.pref !== G.pref) G.vars.commutePref = item.pref; }
     const label = (o.menu && item ? `${item.emoji} ${item.name}` : o.label || '').replace(/（[^）]*）/g, '');
     const cp = post(out, e, v.text.replace(/（.*$/, '').slice(0, 60), ctx, 'choice', label);
     const s0 = snap();
@@ -362,6 +362,27 @@ const Engine = (() => {
     save();
     return out;
   }
+  // ほかの県で探す：その県の候補を作る（commute＝実家から通う）
+  const PREF_SRC = ['jobs.jobs', 'jobs.midCareer', 'schools.postByPlan'];
+  function prefMenu(src, filter, prefId, commute) {
+    const keep = G.pref; const home = G.pref;
+    G.pref = prefId;
+    let items = [];
+    try { items = Menu.build(src, filter, {}); } finally { G.pref = keep; }
+    const school = src.startsWith('schools');
+    const w = G.talents.familyWealth; const allow = w < 35 ? 4 : w < 65 ? 7 : 10;
+    return items.map((it) => {
+      const o = { ...it, pref: prefId, commute: !!commute, id: school ? `${it.id}@${prefId}${commute ? 'c' : ''}` : it.id };
+      if (prefId !== home) {
+        const pn = Fam.prefName(prefId).replace(/[都府県]$/, '');
+        if (school && !String(o.name).startsWith(pn)) o.name = o.label = `${pn}の` + String(o.name).replace(/^[^の]+の/, '');
+        o.sub = String(it.sub || '').replace(/・ひとり暮らし/, '') + (commute ? '・実家から通う' : school ? `・ひとり暮らし 生活費 月約6万／仕送りめやす 月${allow}万` : '・引っ越して働く');
+        if (!school && commute) o.sub = String(it.sub || '') + '・実家から通勤';
+      }
+      return o;
+    });
+  }
+  function prefCounts(src, filter) { return D().prefectures.prefectures.map((p) => { const keep = G.pref; G.pref = p.id; let n = 0; try { n = Menu.build(src, filter, {}).length; } catch (e) { n = 0; } G.pref = keep; return { p, n, hops: Fam.hops(G.pref, p.id) }; }); }
   // 専門学校などを選んだあと
   function chooseMenuNext(item) {
     G.pending = null;
@@ -387,25 +408,32 @@ const Engine = (() => {
     const stageNow = G.job && G.job.id && G.jobYears === 0 ? 'work' : G.stage;
     const changed = stageNow !== G.vars.lessonStage && LC.askAt.includes(stageNow);
     const outOfAge = ls.some((c) => { const d = Menu.club(c.id); return G.age > d.age[1]; });
+    const y = G.school ? G.school.yearIn : 0;
+    const mile = (G.stage === 'elem' && [1, 3, 5].includes(y)) || (['jhs', 'hs'].includes(G.stage) && [1, 3].includes(y));
+    const force = !!G.vars.lessonForce; G.vars.lessonForce = false;
     G.vars.lessonStage = stageNow;
-    if (!changed && !outOfAge && !chance(LC.askEveryYearChance)) return { posts: [] };
+    if (!changed && !outOfAge && !mile && !force) return { posts: [] };
+    const cap = G.age < 16 ? lessonCap() : null;
     const qc = LC.quitChance;
     const items = ls.map((c) => {
       const d = Menu.club(c.id); if (!d) return null;
       let pq = qc.byLesson[c.id] ?? (changed ? qc.atStage[stageNow] ?? qc.default : qc.default * 0.5);
       if (G.age > d.age[1]) pq = Math.max(pq, 0.85);
       if (G.age >= 22 && c.id.startsWith('ls_')) pq = Math.max(pq, 0.8); // 大人になってからも続ける人は少数派
-      return { ...lessonItem(c), quit: chance(pq) };
+      const out = G.age > d.age[1] || (c.id === 'ls_juken_juku' && G.stage !== 'elem');
+      return { ...lessonItem(c), quit: out, lock: out ? '年齢・学年で終わり' : null };
     }).filter(Boolean);
+    // 家計が苦しくなったら、高いものから続けられなくなる
+    if (cap != null) { let tot = items.filter((x) => !x.quit).reduce((a, x) => a + x.cost, 0); for (const x of items.slice().sort((a, b) => b.cost - a.cost)) { if (tot <= cap) break; if (!x.quit) { x.quit = true; x.lock = '家計が苦しく、続けられない'; tot -= x.cost; } } }
     const when = { jhs: '中学生になる', hs: '高校生になる', univ: '新しい学校に入る', work: '社会人になる' }[changed ? stageNow : ''] || '新しい学年になる';
-    const view = { ev: '__lessons', type: 'lessons', emoji: '🎒', date: `${calYear()}年 ${MONTH[G.q]}月`, ageLabel: ageLabel(), text: `${when}。習い事はどうする？`, note: changed ? 'いそがしくなります。続けるものを選ぼう（増やすこともできます）' : '続けるもの・増やすものを選ぼう', items, cap: G.age < 16 ? lessonCap() : null, rng: RNG.s };
+    const view = { ev: '__lessons', type: 'lessons', emoji: '🎒', date: `${calYear()}年 ${MONTH[G.q]}月`, ageLabel: ageLabel(), text: force ? '家の収入が変わった。習い事を見直そう。' : `${when}。習い事はどうする？`, note: changed ? 'いそがしくなります。続けるものを選ぼう（増やすこともできます）' : '続けるもの・増やすものを選ぼう', items, cap: G.age < 16 ? lessonCap() : null, rng: RNG.s };
     G.pending = { view, ctxRaw: {}, extra: {} };
     save();
     return { choice: view };
   }
   // 習い事の1行ぶん（ステータスの変化のめやすつき）
-  const EFF_L = { health: '健康', social: '人間関係', happiness: '満足感', stress: 'ストレス', 'skill.sport': 'スポーツ', 'skill.music': '音楽', 'skill.art': '美術', 'skill.it': 'IT', 'skill.language': '語学', 'skill.cooking': '料理', 'subj.jpn': '国語', 'subj.math': '算数', 'subj.eng': '英語', 'subj.pe': '体育', 'subj.art': '図工', 'subj.music': '音楽', 'subj.sci': '理科', subjAll: '全教科' };
-  function lessonEff(d) { return Object.entries(d.yearly || {}).slice(0, 3).map(([k, v]) => `${EFF_L[k] || k}${v > 0 ? '↑' : '↓'}`).join(' '); }
+  const EFF_L = { health: '健康', social: '人間関係', happiness: '満足感', stress: 'ストレス', 'skill.sport': '運動', 'skill.music': '演奏', 'skill.art': '絵', 'skill.it': 'IT', 'skill.language': '語学', 'skill.cooking': '料理', 'subj.jpn': '国語', 'subj.math': '算数', 'subj.eng': '英語', 'subj.pe': '体育', 'subj.art': '図工', 'subj.music': '音楽', 'subj.sci': '理科', subjAll: '全教科' };
+  function lessonEff(d) { const L = []; for (const [k, v] of Object.entries(d.yearly || {})) { const t = `${EFF_L[k] || k}${v > 0 ? '↑' : '↓'}`; if (!L.includes(t)) L.push(t); } return L.slice(0, 3).join(' '); }
   function lessonItem(c) { const d = Menu.club(c.id); return { id: c.id, emoji: d.emoji, label: d.label, years: G.year - (c.since || G.year) + 1, cost: d.cost, eff: lessonEff(d) }; }
   // 家計で決まる、習い事にかけられる1年の金額（万円）
   function lessonCap() { const w = G.talents.familyWealth; return w < 15 ? 8 : w < 35 ? 16 : w < 65 ? 32 : w < 85 ? 64 : 120; }
@@ -796,6 +824,7 @@ const Engine = (() => {
     } else if (['univ', 'univ_med', 'junior_college', 'vocational', 'grad_master', 'grad_doctor', 'grad_prof'].includes(st)) {
       if (G.focus === 'focus_study') { G.subj.eng = clamp(G.subj.eng + 1, 1, 99); }
       G.stats.academic = acad();
+      if (G.school && !['grad_doctor'].includes(st)) univReport();
     }
     G.focusHalf = false;
   }
@@ -820,7 +849,7 @@ const Engine = (() => {
       grades[lb] = v;
       const lvl = num(v) >= (e3 ? 3 : 5) ? 'hi' : num(v) >= (e3 ? 2 : 3) ? 'mid' : 'lo';
       const pool = (RC[k] || {})[lvl] || (RC.any || {})[lvl] || [''];
-      let tr = 0;
+      let tr = null;
       if (prev && prev.kind === (e3 ? 3 : 5) && prev.grades[lb] != null) tr = Math.sign(num(v) - num(prev.grades[lb]));
       rows.push({ l: lb, k, e: SUBJ_E[k] || '📘', v, cm: pick(pool), tr });
     }
@@ -850,6 +879,30 @@ const Engine = (() => {
     G.reports.push({ year: yr, stage: st, y, gradeLabel, grades, rows, comment, kind: e3 ? 3 : 5, att, club, st: stv, prevSt: prev && prev.st ? prev.st : null, focus: G.focus, evs, school: G.school.name });
   }
 
+  // 大学・短大・専門：毎年3月の成績表（単位8つ・S〜D・GPA）
+  const COURSES = {
+    bunkei: ['経済学入門', '民法総論', '社会学概論', '統計学の基礎', '日本史概説', '国際関係論', 'マーケティング論', '心理学入門', '文章表現演習', 'ゼミナール'],
+    rikei: ['微分積分', '線形代数', '物理学実験', '化学基礎', 'プログラミング演習', '情報理論', '材料力学', '電気回路', '生物学概論', '卒業研究準備'],
+    med: ['解剖学', '生理学', '生化学', '薬理学', '病理学', '公衆衛生学', '臨床実習', '医療倫理'],
+    edu: ['教育原理', '教育心理学', '国語科教育法', '算数科教育法', '特別支援教育', '生徒指導論', '教育実習事前指導', '道徳教育論'],
+    voc: ['基礎技術演習', '実技Ⅰ', '実技Ⅱ', '接客・マナー', '関係法規', '現場実習', '資格対策講座', '作品・研究発表'],
+    common: ['英語コミュニケーション', '情報リテラシー', 'キャリアデザイン', '体育実技'],
+  };
+  function univReport() {
+    const st = G.stage, d = Menu.dept(G.vars.major);
+    const key = st === 'vocational' ? 'voc' : st === 'univ_med' || ['nurse', 'med', 'dent', 'pharm'].includes(G.vars.major) ? 'med' : G.vars.major === 'edu' ? 'edu' : d && d.track === 'rikei' ? 'rikei' : 'bunkei';
+    const pool = shuffle(COURSES[key]).slice(0, 6).concat(shuffle(COURSES.common).slice(0, 2));
+    const f = G.focus;
+    const base = 71 + (G.stats.academic - 50) * 0.5 + (f === 'focus_study' ? 8 : f === 'focus_parttime' ? -6 : f === 'focus_friends' || f === 'focus_love' ? -3 : 0) - (G.stats.stress > 70 ? 6 : 0);
+    const GR = (sc) => (sc >= 90 ? ['S', 4] : sc >= 80 ? ['A', 3] : sc >= 70 ? ['B', 2] : sc >= 60 ? ['C', 1] : ['D', 0]);
+    const rows = pool.map((nm) => { const sc = Math.round(clamp(base + normal(0, 9), 20, 100)); const [g, gp] = GR(sc); return { l: nm, sc, v: g, gp }; });
+    const gpa = Math.round((rows.reduce((a, x) => a + x.gp, 0) / rows.length) * 100) / 100;
+    const credits = rows.filter((x) => x.gp > 0).length * 2;
+    const yr = calYear();
+    G.reports.push({ year: yr, stage: st, y: G.school.yearIn, gradeLabel: `${(D().flags.stages[st] || '大学').replace(/（.*）/, '')}${G.school.yearIn}年生`, grades: {}, rows, kind: 'u', gpa, credits, comment: gpa >= 3 ? 'とても優秀な成績です。' : gpa >= 2 ? '順調に単位をとれています。' : gpa >= 1 ? '落とした単位があります。来年はがんばろう。' : '単位がかなり足りません。', school: G.school.name, focus: G.focus, st: { academic: Math.round(G.stats.academic), stress: Math.round(G.stats.stress), social: Math.round(G.stats.social), health: Math.round(G.stats.health), happiness: Math.round(G.stats.happiness) } });
+    if (gpa < 1.0 && schoolYearsLeft() >= 1) schedule('ev_m_univ_low_gpa', 0);
+    G.vars.lastGpa = gpa;
+  }
   function setFocus(f, now) {
     if (!Menu.FOCUS[f]) return;
     if (f !== G.focus) { G.focus = f; G.focusHalf = !now && G.q !== 3; }
@@ -892,5 +945,5 @@ const Engine = (() => {
     }
     return false;
   }
-  return { lessonEffText: (d) => lessonEff(d), begin, next, choose, chooseMenuNext, chooseLessons, addLesson, lessonCandidates, lessonCap, isLesson, snap, diff, schedule, setFocus, onLike, initSubjects, die, rollP, ev, buildQueue, advance, checkDeath, ageLabel, acad };
+  return { prefMenu, prefCounts, PREF_SRC, univReport, lessonEffText: (d) => lessonEff(d), begin, next, choose, chooseMenuNext, chooseLessons, addLesson, lessonCandidates, lessonCap, isLesson, snap, diff, schedule, setFocus, onLike, initSubjects, die, rollP, ev, buildQueue, advance, checkDeath, ageLabel, acad };
 })();

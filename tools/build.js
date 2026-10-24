@@ -74,7 +74,8 @@ const usedText = (() => {
   return [...new Set(t)].join('');
 })();
 const font = (file) => {
-  if (!has('pyftsubset')) return fs.readFileSync(file);
+  // 名前（人名漢字）のために、フォントは間引かずにそのまま入れる
+  if (true || !has('pyftsubset')) return fs.readFileSync(file);
   const txt = path.join(CACHE, 'chars.txt'); fs.writeFileSync(txt, usedText);
   const key = require('crypto').createHash('md5').update(usedText).digest('hex').slice(0, 8);
   const out = path.join(CACHE, path.basename(file) + '.' + key + '.woff');

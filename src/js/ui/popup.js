@@ -38,9 +38,42 @@ const Popup = (() => {
       else entries.push({ k, label: o.label, rate: o.rate });
     }
     let page = 0, subOpen = null, sort = 'def';
+    // ほかの都道府県で探す（就職・進学）
+    const prefOpt = view.opts.find((o) => o.menu && Engine.PREF_SRC.includes(o.src));
+    const baseItems = prefOpt ? prefOpt.items.slice() : null;
+    let pmode = null, psort = 'rec', ppage = 0, pcounts = null, curPref = G.pref;
+    const homePref = () => { const p = people('father|mother').find((x) => x.alive); return p ? p.pref : G.birthPref; };
+    function setItems(items) { for (let i = entries.length - 1; i >= 0; i--) if (entries[i].o === prefOpt) entries.splice(i, 1); const at = entries.length; items.forEach((it) => entries.push({ k: view.opts.indexOf(prefOpt), item: it, o: prefOpt })); void at; prefOpt.items = items; page = 0; }
+    function prefList() {
+      if (!pcounts) pcounts = Engine.prefCounts(prefOpt.src, prefOpt.filter);
+      const hp = homePref();
+      const L = pcounts.map((x) => ({ ...x, hops: Fam.hops(hp, x.p.id) })).filter((x) => x.n > 0);
+      L.sort(psort === 'near' ? (a, b) => a.hops - b.hops || b.n - a.n : (a, b) => b.n - a.n || a.hops - b.hops);
+      const pages = Math.max(1, Math.ceil(L.length / PER)); ppage = clamp(ppage, 0, pages - 1);
+      const vis = L.slice(ppage * PER, ppage * PER + PER);
+      const unit = prefOpt.src.startsWith('schools') ? '校' : '件';
+      const dist = (h) => (h === 0 ? '実家のある県' : h === 1 ? 'となりの県（実家から通える）' : h <= 3 ? '実家から少し遠い' : '実家から遠い');
+      const box = show(`<div class="cs">🗾 都道府県をえらぶ</div>
+        <div class="top"><div class="who">🗾</div><div><div class="ttl">${esc(view.date)} ・ ${esc(view.ageLabel)}</div><div class="txt">どこの${unit === '校' ? '学校' : '会社'}を受ける？</div></div>
+        <div class="flt"><button data-ps="rec" class="${psort === 'rec' ? 'on' : ''}">おすすめ順</button><button data-ps="near" class="${psort === 'near' ? 'on' : ''}">🏠 実家に近い順</button></div></div>
+        <div class="opts">${vis.map((x, n) => `<button data-pf="${n}" class="norate">${btnHtml('📍', x.p.name, `${unit === '校' ? '進学先' : '就職先'} ${x.n}${unit}・${dist(x.hops)}`, null)}</button>`).join('')}</div>
+        ${pagerHtml(ppage, pages)}<div class="nx"><button id="pfBack">◀ もどる</button></div>`);
+      $$('[data-ps]', box).forEach((b) => (b.onclick = () => { psort = b.dataset.ps; ppage = 0; prefList(); }));
+      bindPager(box, 'p', () => ppage, (v) => { ppage = v; prefList(); });
+      $('#pfBack', box).onclick = () => { pmode = null; render(); };
+      $$('[data-pf]', box).forEach((b) => (b.onclick = () => { const x = vis[+b.dataset.pf]; if (x.hops === 1 && x.p.id !== G.pref) commuteAsk(x.p); else usePref(x.p.id, false); }));
+    }
+    function commuteAsk(p) {
+      const box = show(`<div class="cs">🏠 ${esc(p.name)}</div><div class="q2">${esc(p.name)}は実家からも通えるきょりです。どうする？<small>ひとり暮らしは家賃と生活費がかかります（月6〜10万円くらい）</small></div>
+        <div class="opts"><button id="cmY" class="norate">${btnHtml('🚃', '実家から通う', '通学・通勤に時間はかかるが、お金はかからない', null)}</button><button id="cmN" class="norate">${btnHtml('🔑', 'ひとり暮らしをする', '家賃・生活費がかかる。自由な時間がふえる', null)}</button></div>
+        <div class="nx"><button id="cmB">◀ 県をえらびなおす</button></div>`);
+      $('#cmY', box).onclick = () => usePref(p.id, true); $('#cmN', box).onclick = () => usePref(p.id, false); $('#cmB', box).onclick = () => prefList();
+    }
+    function usePref(id, commute) { curPref = id; setItems(id === G.pref ? baseItems : Engine.prefMenu(prefOpt.src, prefOpt.filter, id, commute)); pmode = null; render(); }
     const report = view.popup === 'reportCard' && G.reports.length ? G.reports[G.reports.length - 1] : null;
     const payOf = (x) => { const m = String((x.item && x.item.sub) || '').match(/年収 約?(\d+)/); return m ? +m[1] : 0; };
     function render() {
+      if (pmode === 'prefs') return prefList();
       let list = subOpen ? subOpen.o.items.map((it) => ({ k: subOpen.k, item: it, o: subOpen.o })) : entries.slice();
       const canSort = list.length > PER && list.some((x) => x.item && x.item.rate != null);
       const canPay = canSort && list.some((x) => payOf(x) > 0);
@@ -54,6 +87,7 @@ const Popup = (() => {
         const [e, l] = splitEmoji(x.label);
         return `<button data-n="${n}" class="${x.rate == null ? 'norate' : ''}">${btnHtml(e, l + (x.sub ? ' ▶' : ''), '', x.rate)}</button>`;
       }).join('')}${subOpen ? '<button class="back2" id="pBack">◀ もどる</button>' : ''}</div>`;
+      const prefBar = prefOpt && !subOpen ? `<div class="pbar"><span>📍 いま：<b>${esc(Fam.prefName(curPref))}</b>の候補</span>${curPref !== G.pref ? '<button id="pfHome">🏠 地元にもどす</button>' : ''}<button id="pfOther">🗾 ほかの都道府県で探す</button>${['ev_m_hs_target', 'ev_m_post_target', 'ev_m_bunri', 'ev_m_hs_plan'].includes(view.ev) && G.reports.length ? '<button id="pfRep">📋 通知表を見る</button>' : ''}</div>` : (['ev_m_hs_target', 'ev_m_post_target', 'ev_m_bunri', 'ev_m_hs_plan'].includes(view.ev) && G.reports.length ? '<div class="pbar"><span></span><button id="pfRep">📋 過去の通知表を見る</button></div>' : '');
       const sorter = canSort ? `<div class="flt"><button data-sort="def" class="${sort === 'def' ? 'on' : ''}">おすすめ順</button><button data-sort="rate" class="${sort === 'rate' ? 'on' : ''}">🎯 受かりやすい順</button>${canPay ? `<button data-sort="pay" class="${sort === 'pay' ? 'on' : ''}">💴 年収が高い順</button>` : ''}</div>` : '';
       let box;
       if (report) {
@@ -64,8 +98,11 @@ const Popup = (() => {
           <div class="cs">${COUNSEL[view.counselor] || '💭 どうする？'}</div>
           <div class="top"><div class="who">${view.emoji || '💭'}</div>
             <div><div class="ttl">${esc(view.date)} ・ ${esc(view.ageLabel)}</div><div class="txt">${esc(view.text)}</div></div>${sorter}</div>
-          ${btns}${pagerHtml(page, pages)}${factHtml(view.fact)}`);
+          ${prefBar}${btns}${pagerHtml(page, pages)}${factHtml(view.fact)}`);
       }
+      const po = $('#pfOther', box); if (po) po.onclick = () => { pmode = 'prefs'; ppage = 0; render(); };
+      const ph = $('#pfHome', box); if (ph) ph.onclick = () => usePref(G.pref, false);
+      const pr = $('#pfRep', box); if (pr) pr.onclick = () => reports(() => render());
       $$('[data-n]', box).forEach((b) => (b.onclick = () => pickEntry(vis[+b.dataset.n])));
       $$('[data-sort]', box).forEach((b) => (b.onclick = () => { sort = b.dataset.sort; page = 0; render(); }));
       bindPager(box, 'p', () => page, (v) => { page = v; render(); });
@@ -105,12 +142,20 @@ const Popup = (() => {
     return Object.entries(r.grades).map(([l, v]) => ({ l, e: '📘', v, cm: '', tr: 0 }));
   }
   function paperHtml(r) {
+    if (r.kind === 'u') {
+      const gc = (g) => ({ S: 's2', A: 's2', B: 's1', C: 's1', D: 's0' })[g] || 's1';
+      return `<div class="phd"><span class="t">成績表</span><span class="g">${r.year}年3月　${esc(r.gradeLabel)}</span><span class="n">${esc(G.surname)} ${esc(G.given)}</span></div>
+        <div class="tr th u"><span>科目</span><span>評価</span><span>点</span><span>GP</span></div>
+        ${r.rows.map((x) => `<div class="tr u"><span>📘 ${esc(x.l)}</span><span class="ev ${gc(x.v)}">${x.v}</span><span class="num">${x.sc}</span><span class="num">${x.gp}</span></div>`).join('')}
+        <div class="legend"><span><b class="s2">S</b> 90〜 秀</span><span><b class="s2">A</b> 80〜 優</span><span><b class="s1">B</b> 70〜 良</span><span><b class="s1">C</b> 60〜 可</span><span><b class="s0">D</b> 不可</span></div>
+        <div class="foot"><div class="kv"><span class="k">📊 GPA</span><span><b class="gpa">${r.gpa.toFixed(2)}</b> ／ 4.00 ・ 取得単位 ${r.credits}／16</span></div><div class="kv"><span class="k">✏️ ひとこと</span><span>${esc(r.comment)}</span></div></div>`;
+    }
     const cls = (v) => (r.kind === 3 ? (v === '◎' ? 's2' : v === '〇' ? 's1' : 's0') : v >= 5 ? 's2' : v >= 3 ? 's1' : 's0');
     const legend = r.kind === 3 ? '<span><b class="s2">◎</b> よくできる</span><span><b class="s1">〇</b> できる</span><span><b class="s0">△</b> もう少し</span>' : '<span><b class="s2">5</b> たいへんよい</span><span><b class="s1">4・3</b> よい・ふつう</span><span><b class="s0">2・1</b> がんばろう</span>';
     return `<div class="phd"><span class="t">通知表</span><span class="g">${r.year}年3月　${esc(r.gradeLabel.replace(/^(\D+)(\d)年$/, '$1$2年生'))}</span><span class="n">${esc(G.surname)} ${esc(G.given)}</span></div>
       <div class="tr th"><span>教科</span><span>${r.kind === 3 ? '評価' : '評定'}</span><span></span><span>先生から</span></div>
-      ${rowsOf(r).map((x) => `<div class="tr"><span>${x.e} ${esc(x.l)}</span><span class="ev ${cls(x.v)}">${x.v}</span><span class="${x.tr > 0 ? 'up' : x.tr < 0 ? 'dn' : ''}">${x.tr > 0 ? '▲' : x.tr < 0 ? '▼' : ''}</span><span>${esc(x.cm || '')}</span></div>`).join('')}
-      <div class="legend">${legend}<span><b class="up">▲</b>▼ 去年とくらべて</span></div>
+      ${rowsOf(r).map((x) => `<div class="tr"><span>${x.e} ${esc(x.l)}</span><span class="ev ${cls(x.v)}">${x.v}</span><span class="${x.tr > 0 ? 'up' : x.tr < 0 ? 'dn' : 'eq'}">${x.tr == null ? '' : x.tr > 0 ? '↑' : x.tr < 0 ? '↓' : '→'}</span><span>${esc(x.cm || '')}</span></div>`).join('')}
+      <div class="legend">${legend}<span><b class="up">↑</b>↓→ 去年とくらべて</span></div>
       <div class="foot">${r.att ? `<div class="kv"><span class="k">📅 出席</span><span>${esc(r.att)}</span></div>` : ''}${r.club ? `<div class="kv"><span class="k">⚽ 部活・習い事</span><span>${esc(r.club)}</span></div>` : ''}<div class="kv"><span class="k">✏️ 先生から</span><span>${esc(r.comment)}</span></div></div>`;
   }
   function reviewHtml(r, prev) {
@@ -144,7 +189,7 @@ const Popup = (() => {
       const box = show(`<div class="cs">🎒 ${esc(view.date)} ・ ${esc(view.ageLabel)}</div>
         <div class="q">${esc(view.text)}<small>${esc(view.note)}</small></div>
         <div class="ls">${view.items.map((x) => `<div class="l"><span class="e">${x.emoji}</span><span class="n">${esc(x.label)}<small>${x.years}年目 ・ 年${x.cost}万円 ・ ${esc(x.eff)}</small></span>
-          <button data-k="${x.id}" data-v="1" class="${keep[x.id] ? 'on' : ''}">続ける</button><button data-k="${x.id}" data-v="0" class="q2 ${keep[x.id] ? '' : 'on'}">やめる</button></div>`).join('')}</div>
+          ${x.lock ? `<span class="lock">${esc(x.lock)}</span><button class="q2 on" disabled>やめる</button>` : `<button data-k="${x.id}" data-v="1" class="${keep[x.id] ? 'on' : ''}">続ける</button><button data-k="${x.id}" data-v="0" class="q2 ${keep[x.id] ? '' : 'on'}">やめる</button>`}</div>`).join('')}</div>
         <div class="sum"><span>💡</span><span>続けると：<b>年${cost}万円</b>（${G.age < 16 ? '家計から' : '所持金から'}）${view.cap ? `　家計で出せるめやす：年${view.cap}万円まで` : ''}</span></div>
         <div class="lbtns"><button id="lAdd" ${n >= 4 ? 'disabled' : ''}>＋ 習い事を増やす（${n}/4）</button><button class="ok main" id="lOk">これで決める ▶</button></div>`, 'lbox');
       $$('[data-k]', box).forEach((b) => (b.onclick = () => { keep[b.dataset.k] = b.dataset.v === '1'; render(); }));
@@ -232,12 +277,13 @@ const Popup = (() => {
           <div class="sub">🎚️ 生活レベル${G.flags.welfare ? '（生活保護中は「節約」）' : ''}</div>
           <div class="lvb">${Object.entries(Econ.LEVELS).map(([k, L]) => `<button data-lv="${k}" class="${lv === k ? 'on' : ''}" ${G.flags.welfare ? 'disabled' : ''}>${L.e} ${L.l}<small>${L.d}</small></button>`).join('')}</div>
           <div class="sub">🔧 見直す</div>
-          <div class="row2"><button id="exHob">✨ 趣味を変える</button><button id="exIns">🛡️ 保険を変える</button></div>
+          <div class="row3"><button id="exHob">✨ 趣味を変える</button><button id="exIns">🛡️ 保険を変える</button><button id="exInv">📈 投資額を変える</button></div>
           <div class="src"><span>📊</span><span>2人以上の世帯の1か月の消費支出は平均で約30万円、ひとり暮らしは約17万円。<small>（総務省 家計調査 2024）</small></span></div></div></div>`, 'cbox xbox');
       $('#exX', box).onclick = () => { close(); done && done(); };
       $$('[data-lv]', box).forEach((b) => (b.onclick = () => { G.vars.lifeLevel = b.dataset.lv; G.vars.autoSave = false; save(); render(); }));
       $('#exHob', box).onclick = () => hobbies(render);
       $('#exIns', box).onclick = () => insurance(render);
+      $('#exInv', box).onclick = () => invest(render);
     };
     render();
   }
@@ -250,6 +296,31 @@ const Popup = (() => {
     $$('[data-q]', box).forEach((b) => (b.onclick = () => { G.hobbies = G.hobbies.filter((x) => x !== b.dataset.q); save(); hobbies(back); }));
     $('#hbX', box).onclick = back;
     $('#hbAdd', box).onclick = () => picker({ title: '✨ 新しい趣味', note: '何を始める？', items: Menu.build('clubs.hobbies') }, (it) => { if (it && !G.hobbies.includes(it.id)) G.hobbies.push(it.id); save(); hobbies(back); });
+  }
+  // 投資（NISAの積み立て）を変える
+  function invest(back) {
+    const cur = G.flags.nisa ? G.vars.nisaMonthly || 0 : 0;
+    const O = [0, 1, 3, 5, 10];
+    const box = show(`<div class="cs">📈 投資額を変える</div><div class="q2">毎月いくら積み立てる？（いま：月${cur}万円・資産 ${man(G.assets)}万円）<small>NISAは、もうけに税金がかからない国の制度。長く続けるほど増えやすいが、値下がりすることもある</small></div>
+      <div class="opts">${O.map((m) => `<button data-m="${m}" class="norate ${cur === m ? 'on' : ''}">${btnHtml(m ? '📈' : '🙅', m ? `月${m}万円` : '積み立てない', m ? `1年で${m * 12}万円を投資にまわす` : '投資はお休み', null)}</button>`).join('')}
+      <button id="ivSell" class="norate" ${G.assets > 1 ? '' : 'disabled'}>${btnHtml('💴', '投資をぜんぶ売って現金にする', `いまの値段で ${man(G.assets)}万円`, null)}</button></div>
+      <div class="nx"><button class="main" id="ivX">◀ もどる</button></div>`);
+    $$('[data-m]', box).forEach((b) => (b.onclick = () => { const m = +b.dataset.m; G.vars.nisaMonthly = m; Effects.setFlag('nisa', m > 0 || G.assets > 1); save(); invest(back); }));
+    $('#ivSell', box).onclick = () => { G.cash += G.assets; G.assets = 0; G.vars.nisaMonthly = 0; Effects.setFlag('nisa', false); save(); invest(back); };
+    $('#ivX', box).onclick = back;
+  }
+  // 持っている財産の一覧
+  function assets(done) {
+    const L = (G.loans || []).filter((l) => l.left > 0);
+    const row = (e, l, v, note = '') => `<div class="li"><span>${e}</span><span>${esc(l)}<small>${esc(note)}</small></span><span class="a num">${man(v)}万</span></div>`;
+    const rows = [row('💴', '現金', Math.max(0, G.cash)), G.assets > 0.5 ? row('📈', '投資（NISAなど）', G.assets, G.vars.nisaMonthly ? `毎月${G.vars.nisaMonthly}万円を積み立て中` : '') : '', G.flags.owns_house ? row('🏠', '家', G.vars.houseValue || 0, '今売ったときのめやす') : '', G.flags.owns_rental ? row('🏢', '貸している部屋', G.vars.rentalValue || 0, `家賃収入 月${G.vars.rentIncomeMonthly || 0}万円`) : ''].join('');
+    const debts = (G.cash < 0 ? row('💳', 'カードローン', -G.cash, '年15%の利息') : '') + L.map((l) => { const [e, lb] = Econ.LOAN_L[l.type] || ['💳', 'ローン']; return row(e, lb, l.left, l.yearly ? `月${round1(l.yearly / 12)}万円ずつ返済` : ''); }).join('');
+    const box = show(`<button class="x" id="asX">✕</button><div class="cs">🏦 持っている財産</div>
+      <div class="exp"><div class="el"><div class="sub">➕ 財産</div>${rows}<div class="sub">➖ 借金</div>${debts || '<div class="li"><span></span><span>なし</span><span></span></div>'}
+        <div class="li tot"><span>🧮</span><span>合計（財産−借金）</span><span class="a num">${man(Econ.netWorth())}万</span></div></div>
+      <div><div class="q2">お金を「現金」だけでなく、投資や家として持つこともできる<small>投資は増えることも減ることもある。現金が足りなくなったら、投資を売ってあてる</small></div><div class="row2"><button id="asInv">📈 投資額を変える</button><button class="main" id="asOk">とじる</button></div></div></div>`, 'cbox xbox');
+    $('#asX', box).onclick = $('#asOk', box).onclick = () => { close(); done && done(); };
+    $('#asInv', box).onclick = () => invest(() => assets(done));
   }
   function insurance(back) {
     const cur = G.flags.cancer_insurance ? 'both' : G.flags.life_insurance ? 'med' : 'none';
@@ -284,5 +355,5 @@ const Popup = (() => {
     $('#cN', box).onclick = () => { close(); cb(false); };
     $('#cY', box).onclick = () => { close(); cb(true); };
   }
-  return { choice, result, reports, paperHtml, menu, picker, person, expenses, death, info, list, confirm, close, isOpen: () => open, show };
+  return { assets, invest, choice, result, reports, paperHtml, menu, picker, person, expenses, death, info, list, confirm, close, isOpen: () => open, show };
 })();

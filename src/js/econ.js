@@ -236,7 +236,7 @@ const Econ = (() => {
     if (student) {
       const w = G.talents.familyWealth;
       inc += (w < 15 ? 0.3 : w < 35 ? 0.5 : w < 65 ? 0.8 : 1.5) * 3; // おこづかい（月）
-      if (G.flags.living_alone && ['univ', 'univ_med', 'junior_college', 'vocational', 'grad_master', 'grad_doctor', 'grad_prof'].includes(G.stage)) inc += (w < 35 ? 4 : w < 65 ? 7 : 10) * 3;
+      if (G.flags.living_alone && !G.flags.allowance_cut && ['univ', 'univ_med', 'junior_college', 'vocational', 'grad_master', 'grad_doctor', 'grad_prof'].includes(G.stage)) inc += (w < 35 ? 4 : w < 65 ? 7 : 10) * 3;
       if (G.flags.scholarship_loan && G.school) { inc += 15; addLoan('scholar', 15, 0, 'scholar'); G.vars.scholarBorrowed = (G.vars.scholarBorrowed || 0) + 15; }
     }
     const ex = expenses();

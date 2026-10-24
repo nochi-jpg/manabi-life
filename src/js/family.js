@@ -20,6 +20,8 @@ const Fam = (() => {
   };
   const ADJ = {};
   for (const [a, bs] of Object.entries(ADJ0)) for (const b of bs) { (ADJ[a] = ADJ[a] || []).push(b); (ADJ[b] = ADJ[b] || []).push(a); }
+  // 県どうしの近さ（となりの県をたどった回数）
+  function hops(a, b) { if (a === b) return 0; const seen = new Set([a]); let q = [a]; for (let d = 1; d < 12; d++) { const nx = []; for (const x of q) for (const y of ADJ[x] || []) { if (y === b) return d; if (!seen.has(y)) { seen.add(y); nx.push(y); } } q = nx; } return 12; }
   const near = (a, b) => !!a && !!b && (a === b || (ADJ[a] || []).includes(b));
   const prefName = (id) => (prefOf(id) || {}).name || '';
 
@@ -321,5 +323,5 @@ const Fam = (() => {
   }
   function kidStage(p) { const a = p.age; if (p.stage === 'work_start' || p.stage === 'work') return '社会人'; return a < 3 ? '赤ちゃん' : a < 6 ? '保育園・幼稚園' : a < 12 ? '小学生' : a < 15 ? '中学生' : a < 18 ? '高校生' : a < 22 ? '大学生など' : '社会人'; }
 
-  return { near, prefName, fill, migrate, assignJob, jobIncome, callName, household, spouseHome, householdIncome, householdAssets, livingLabel, roleShort, sync, moved, jobCheck, quitPerson, moveToWho, whoMoveIn, yearOf, childAdultYear, notice, divorce, separate, reunite, supportYear, supportYearly, bailout, familyCanHelp, statusLabel, kidStage, isWorking, pensionOf };
+  return { hops, near, prefName, fill, migrate, assignJob, jobIncome, callName, household, spouseHome, householdIncome, householdAssets, livingLabel, roleShort, sync, moved, jobCheck, quitPerson, moveToWho, whoMoveIn, yearOf, childAdultYear, notice, divorce, separate, reunite, supportYear, supportYearly, bailout, familyCanHelp, statusLabel, kidStage, isWorking, pensionOf };
 })();

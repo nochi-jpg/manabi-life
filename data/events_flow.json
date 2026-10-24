@@ -205,7 +205,7 @@
       "text": "初めてのボーナス。{firstBonusUse}", "effects": { "stats": { "happiness": 4 } } },
     { "id": "ev_f_bonus", "kind": "flow", "emoji": "💰", "cat": "work",
       "when": { "season": ["Q2", "Q4"], "employment": ["seishain", "civil_servant"] }, "weight": { "base": 1 },
-      "text": "ボーナスが出た。{bonus}万円。", "effects": { "silentIfSmall": true } },
+      "text": "{bonusText}", "effects": { "silentIfSmall": true } },
     { "id": "ev_f_ai_at_work", "kind": "flow", "emoji": "🤖", "cat": "work",
       "when": { "employment": ["seishain", "keiyaku", "haken", "civil_servant"], "jobCat": ["office", "finance", "it", "writing"], "once": true }, "weight": { "base": 2 },
       "text": "職場に新しいAIツールが入った。仕事のやり方が大きく変わりそうだ。", "effects": { "skill": { "it": 2 } } },

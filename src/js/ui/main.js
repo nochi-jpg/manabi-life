@@ -54,7 +54,7 @@ const Main = (() => {
     $('#lifebar', el).style.setProperty('--w', Math.min(100, (G.age / 90) * 100) + '%');
     const bg = bgOf();
     $('#pic', el).style.backgroundImage = `url(${asset(bg.file)})`;
-    const fi = $('#faceImg', el), ff = faceFile(G.gender, G.age); if (fi.getAttribute('src') !== ff) fi.src = ff;
+    const fi = $('#faceImg', el), ff = faceImgOf(G); if (fi.getAttribute('src') !== ff) fi.src = ff;
     $('#bgTag', el).textContent = '📍 ' + bg.label;
     $('#role', el).innerHTML = roleHtml();
     drawStats();
@@ -149,7 +149,7 @@ const Main = (() => {
     $('#pS', el).innerHTML = `<h3>📍 状況</h3>` + rows.map(([k, arr, html], i) => `<div class="kv" data-i="${i}"><span class="k">${k}</span>${html || chips(arr, 2)}</div>`).join('');
     $$('#pS .kv', el).forEach((row) => { const m = $('[data-more]', row); const r = rows[+row.dataset.i]; if (m) m.onclick = () => Popup.list(r[0], r[1]); });
   }
-  function licLabel(f) { const q = D().events_random.qualifications.find((x) => x.flag === f); if (q) return q.label.replace(/（.*）/, ''); return ({ lic_car: '普通免許', lic_bike: 'バイク免許', lic_teacher_elem: '小学校教員免許', lic_teacher_sec: '中高教員免許', lic_nurse: '看護師', lic_doctor: '医師', lic_dentist: '歯科医師', lic_pharmacist: '薬剤師', lic_lawyer: '弁護士', lic_pt: '理学療法士', lic_cook: '調理師', lic_beauty: '美容師', lic_pilot: 'パイロット', eiken_3: '英検3級', eiken_2: '英検2級', eiken_p1: '英検準1級', eiken_1: '英検1級', toeic_600: 'TOEIC600', toeic_800: 'TOEIC800', toeic_900: 'TOEIC900' })[f] || f; }
+  function licLabel(f) { const m = ({ lic_car: '普通自動車免許', lic_bike: 'バイク免許', lic_teacher_elem: '小学校教員免許', lic_teacher_sec: '中学・高校教員免許', lic_nurse: '看護師', lic_doctor: '医師', lic_dentist: '歯科医師', lic_pharmacist: '薬剤師', lic_lawyer: '弁護士', lic_pt: '理学療法士', lic_cook: '調理師', lic_beauty: '美容師', lic_pilot: 'パイロット', eiken_3: '英検3級', eiken_2: '英検2級', eiken_p1: '英検準1級', eiken_1: '英検1級', toeic_600: 'TOEIC 600点以上', toeic_800: 'TOEIC 800点以上（高得点）', toeic_900: 'TOEIC 900点以上（高得点）' })[f]; if (m) return m; const q = D().events_random.qualifications.find((x) => x.flag === f); return q ? q.label.replace(/（.*）/, '') : f; }
   function pageMoney() {
     const on = G.age >= 16;
     const d = G.lastDelta;
@@ -158,7 +158,7 @@ const Main = (() => {
     G.lastDelta = null;
     const debt = Econ.totalDebt();
     const tile = (cls, lb, v, extra = '') => `<div class="tile ${cls}"><small>${lb}</small><b class="num">${v}${extra}</b></div>`;
-    const tiles = on ? tile(G.cash < 0 ? 'neg' : '', '💴 現金', `${man(Math.max(0, G.cash))}<u>万</u>`, delta) + tile('', '📈 資産', `${man(Econ.assetsValue())}<u>万</u>`) + tile('debt', '💳 借金', `${man(debt)}<u>万</u>`) + tile('net', '🧮 合計', `${man(Econ.netWorth())}<u>万</u>`)
+    const tiles = on ? tile(G.cash < 0 ? 'neg' : '', '💴 現金', `${man(Math.max(0, G.cash))}<u>万</u>`, delta) + tile('as', '📈 資産 ▶', `${man(Econ.assetsValue())}<u>万</u>`) + tile('debt', '💳 借金', `${man(debt)}<u>万</u>`) + tile('net', '🧮 合計', `${man(Econ.netWorth())}<u>万</u>`)
       : `<div class="tile wide"><small>🏠 家のくらし</small><b>${esc(bandOf(G.talents.familyWealth).label)}</b></div><div class="tile wide"><small>👛 自分のお金</small><b>16歳から</b></div>`;
     const hi = Fam.householdIncome(), ha = Fam.householdAssets(); const selfPart = (v) => (v > 0 ? [`自分 ${man(v)}`] : []);
     const incRow = hi.others.length ? `${man(hi.total)}万円（${selfPart(hi.self).concat(hi.others.slice(0, 2).map((x) => roleLabel(x.p) + ' ' + man(x.v))).join('・')}）` : Econ.annualIncome() ? `${man(Econ.annualIncome())}万円（自分）` : '—';
@@ -172,6 +172,7 @@ const Main = (() => {
       <div class="kv ${on ? 'link' : ''}" id="exRow"><span class="k">🧾 月の支出</span><span class="tx1 num">${on ? `${round1(ex.total / 12)}万円 ・ 生活レベル ${Econ.LEVELS[Econ.lifeLevel()].l}` : '— （16歳から）'}</span></div>
       <div class="kv"><span class="k">🏛️ 税金</span><span class="tx1 num">これまで ${man(tax)}万円</span></div>`;
     if (on) $('#exRow', el).onclick = () => { stop(); Popup.expenses(() => { refresh(); kick(); }); };
+    const at = $('#pM .tile.as', el); if (at) at.onclick = () => { stop(); Popup.assets(() => { refresh(); kick(); }); };
   }
   const FAM_ORDER = ['spouse', 'partner', 'child', 'father', 'mother', 'sibling', 'grandparent', 'grandchild'];
   function famList() { return G.people.filter((p) => FAM_ORDER.includes(p.role) && (p.alive || calYear() - (p.diedYear || 0) < 3)).sort((a, b) => FAM_ORDER.indexOf(a.role) - FAM_ORDER.indexOf(b.role) || (b.alive - a.alive) || b.age - a.age); }

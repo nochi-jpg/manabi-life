@@ -39,7 +39,11 @@ const Text = (() => {
       case 'place': return pk(P().place);
       case 'scamText': return pk(pool().scamText);
       case 'disasterType': return pk(pool().disasterType);
-      case 'babyMilestone': { const b = pool().babyMilestone; return b[clamp(Math.floor(G.age * 0.9) + rint(-1, 0), 0, b.length - 1)]; }
+      case 'babyMilestone': { const b = pool().babyMilestone; const used = (G.vars.milestones = G.vars.milestones || []); const base = clamp(Math.floor(G.age * 0.9), 0, b.length - 1); const cand = [base, base - 1, base + 1, base + 2].filter((i) => i >= 0 && i < b.length && !used.includes(i)); const i = cand.length ? cand[0] : -1; if (i < 0) return pk(pool().studentDaily || ['すくすく育っている。']); used.push(i); return b[i]; }
+      case 'hsExamMonth': return ({ tokyo: '2月下旬', kanagawa: '2月中旬', saitama: '2月下旬', chiba: '2月下旬', osaka: '3月中旬', kyoto: '3月上旬', hyogo: '3月中旬', aichi: '3月上旬', fukuoka: '3月上旬', hokkaido: '3月上旬' })[G.pref] || '3月上旬';
+      case 'jhsExamMonth': return ['tokyo', 'kanagawa'].includes(G.pref) ? '2月1日' : ['saitama', 'chiba'].includes(G.pref) ? '1月中旬' : '1月';
+      case 'bonusText': { const b = Math.round((G.lastDelta && G.lastDelta.bonus) || 0); return b > 0 ? `ボーナスが出た。${b}万円。` : 'ボーナスはなかった。'; }
+      case 'lastGpa': return (G.vars.lastGpa ?? 0).toFixed(2);
       case 'studentDaily': { const sd = P().studentDaily[G.stage]; return pk(sd || pool().studentDaily); }
       case 'adultDaily': case 'seniorDaily': return pk(pool()[k]);
       case 'tripDest': return pk(pool().tripDest[G.stage] || pool().tripDest.elem);
@@ -75,7 +79,7 @@ const Text = (() => {
       case 'grandchildName': return nm(person('grandchild'));
       case 'newPref': return ctx.newPref ? prefOf(ctx.newPref).name : (ctx.newPref = newPref(), prefOf(ctx.newPref).name);
       case 'newTitle': return (Econ.curStep() || {}).t || ''; case 'nextTitle': return (Econ.nextStep() || {}).t || '';
-      case 'examName': return ctx.examName || (Econ.nextStep() || {}).exam || ((G.vars.major === 'vo_pt') ? '理学療法士国家試験' : (G.vars.major === 'vo_beauty') ? '美容師国家試験' : '試験');
+      case 'examName': { const ex = (Econ.nextStep() || {}).exam; if (ctx.examName) return ctx.examName; if (typeof ex === 'string') return ex; if (ex === true) return '昇格試験'; } return ((G.vars.major === 'vo_pt') ? '理学療法士国家試験' : (G.vars.major === 'vo_beauty') ? '美容師国家試験' : '試験');
       case 'tuition': { const p = Menu.picked(G.vars.target); return p ? p.cost : 100; }
       case 'householdComment': return bandOf(G.talents.familyWealth).label === 'ふつう' ? '家計はふつう' : '家計は' + bandOf(G.talents.familyWealth).label;
       case 'commute': return G.vars.schoolAway ? '実家から通うのはむずかしい' : '実家から通える';

@@ -60,7 +60,7 @@ const Menu = (() => {
     return { id: `${t.id}#${i}${extra ? '#' + extra : ''}`, tmpl: t.id, h: hv };
   }
   // 選んだものを覚えておく（target の表示・入学に使う）
-  function remember(o) { G.picked = G.picked || {}; G.picked[o.id] = { id: o.id, tmpl: o.tmpl, h: o.h, name: o.name, emoji: o.emoji, dept: o.dept, years: o.years, cost: o.cost, where: o.where, city: o.city, rate: o.rate, stage: o.stage }; }
+  function remember(o) { G.picked = G.picked || {}; G.picked[o.id] = { id: o.id, tmpl: o.tmpl, h: o.h, name: o.name, emoji: o.emoji, dept: o.dept, years: o.years, cost: o.cost, where: o.where, city: o.city, rate: o.rate, stage: o.stage, pref: o.commute ? null : o.pref, commute: o.commute }; }
   const picked = (id) => (G.picked || {})[id] || null;
 
   // ---- 学費 ----
@@ -222,6 +222,7 @@ const Menu = (() => {
     let d = hs - (j.hensachi || 40);
     d += (G.talents.t_comm - 50) / 10 + (G.stats.social - 50) / 10; // 面接（±5）
     for (const [f, b] of Object.entries(j.bonusFlags || {})) if (G.flags[f]) d += b;
+    if (G.flags.toeic_900) d += 3; else if (G.flags.toeic_800) d += 2; else if (G.flags.toeic_600) d += 0.5;
     const sc = G.school && picked(G.vars.schoolPick || '');
     if (sc && sc.tmpl) { const t = school(sc.tmpl); if (t && t.jobRank) d += (t.jobRank - 3) * 2; }
     if (G.vars.major) { const dp = dept(G.vars.major); if (dp && (dp.opens || []).some((o) => (j.tags || []).includes(o) || j.cat === o)) d += 3; }
@@ -263,7 +264,8 @@ const Menu = (() => {
     // 好きなこと・学部に合うものを先に。そのあと合格率の高い順
     const like = Cond.likeMain();
     const fit = (o) => { const j = job(o.id); let s = 0; if ((j.tags || []).includes(like)) s += 2; if (G.vars.major) { const dp = dept(G.vars.major) || school(G.vars.major); if (dp && (dp.opens || []).some((x) => (j.tags || []).includes(x) || j.cat === x || j.id.includes(x))) s += 3; } return s; };
-    return out.sort((a, b) => fit(b) - fit(a) || b.rate - a.rate).slice(0, 25);
+    for (const o of out) { const f = fit(o); if (f >= 3) o.sub += '・👍 学んだことが生きる'; else if (f >= 2) o.sub += '・💚 好きなことに合う'; }
+    return out.sort((a, b) => fit(b) + b.rate / 40 - (fit(a) + a.rate / 40)).slice(0, 25);
   }
 
   // ---- 重点方針（docs/09 §3-4） ----

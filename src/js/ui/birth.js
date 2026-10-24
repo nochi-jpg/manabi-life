@@ -1,9 +1,27 @@
 'use strict';
 // ===== 誕生（ui/birth.html）：都道府県のルーレット → 家族と県のデータ =====
 const faceFile = (g, age) => { const a = D().visuals.portraits.ages.find((r) => age >= r.from && age <= r.to); return asset(`assets/faces/${g}_${a ? a.img : 0}.png`); };
+// 主人公の顔：学生のあいだはライフステージで決める（小学生=10・中高=15・大学など/浪人=20）
+const STU20 = ['univ', 'univ_med', 'junior_college', 'vocational', 'grad_master', 'grad_doctor', 'grad_prof', 'ronin'];
+function faceImgOf(g) {
+  const st = g.stage, a = g.age;
+  let n;
+  if (a < 3) n = 0;
+  else if (st === 'elem' || st === 'free_school') n = 10;
+  else if (['jhs', 'hs', 'hs_corr', 'hs_night'].includes(st)) n = 15;
+  else if (st === 'kosen') n = g.school && g.school.yearIn > 3 ? 20 : 15;
+  else if (STU20.includes(st)) n = 20;
+  else if (a < 7) n = 5;
+  else if (a < 13) n = 10;
+  else if (a < 18) n = 15;
+  else if (a < 35) n = a <= 22 ? 20 : 30;
+  else n = a < 50 ? 40 : a < 70 ? 60 : 80;
+  return asset(`assets/faces/${g.gender}_${n}.png`);
+}
+const playerFace = () => faceImgOf(G);
 function familyLine(p) {
   let what = '';
-  if (p.role === 'father' || p.role === 'mother') what = `${p.jobEmoji || '💼'} ${esc(p.jobLabel || '')}`;
+  if (p.role === 'father' || p.role === 'mother') what = esc(Fam.statusLabel(p));
   else if (p.role === 'sibling') what = p.age < 1 ? '👶 赤ちゃん' : p.age < 3 ? '🏠 家で過ごす' : p.age < 6 ? '🧸 保育園・幼稚園' : p.age < 12 ? '🎒 小学生' : p.age < 15 ? '🏫 中学生' : '📚 学生';
   else if (p.role === 'grandparent') what = p.together ? '🏠 いっしょに住んでいる' : `🏘️ ${esc(Fam.prefName(p.pref))}に住んでいる`;
   return `<div class="kv"><span class="k">${roleEmoji(p)} ${p.role === 'grandparent' ? (p.side === 'mother' ? '母方の' : '父方の') : ''}${roleLabel(p)}（${p.age}）</span><span>${what}</span></div>`;
