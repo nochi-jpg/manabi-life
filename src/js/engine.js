@@ -943,6 +943,8 @@ const Engine = (() => {
   function setFocus(f, now) {
     if (!Menu.FOCUS[f]) return;
     if (f !== G.focus) { G.focus = f; G.focusHalf = !now && G.q !== 3; }
+    // バイトの方針にした瞬間、バイトをしていなければ「どこで働く？」を次に出す
+    if (f === 'focus_parttime' && Menu.isStudent() && G.age >= 16 && !(G.job && G.job.part)) { G.queue = G.queue || []; if (!G.queue.some((x) => x.id === 'ev_m_parttime_pick')) G.queue.unshift({ id: 'ev_m_parttime_pick', ctx: {}, sched: true }); }
   }
   function onLike(k) {
     // 好きなことが最初の趣味になる（clubs.hobbyRules.firstFrom）

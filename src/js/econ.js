@@ -339,12 +339,14 @@ const Econ = (() => {
     if (gross > 0 || G.age >= 20) G.hist.paidYears = (G.hist.paidYears || 0) + 1;
   }
   // 家・投資の評価（資産）
-  function assetsValue() { return Math.round(G.assets + (G.flags.owns_house ? G.vars.houseValue || 0 : 0) + (G.flags.owns_rental ? G.vars.rentalValue || 0 : 0)); }
+  function assetsValue() { return Math.round(G.assets + (G.flags.owns_house ? G.vars.houseValue || 0 : 0) + (G.flags.owns_rental ? G.vars.rentalValue || 0 : 0) + (G.flags.owns_car ? G.vars.carValue ?? 60 : 0)); }
   function yearAssets() {
     // 家は年2%目減り、投資は平均+4%（暴落イベントは別）
     if (G.flags.owns_house && G.vars.houseValue) G.vars.houseValue *= 1 - D().housing.buy.valueDecay;
     if (G.assets > 0) G.assets *= 1 + (G.flags.stock_trader || G.flags.crypto ? normal(0.04, 0.15) : normal(0.04, 0.06));
     if (G.flags.owns_rental && G.vars.rentalValue) G.vars.rentalValue *= 1 + (D().housing.investment.priceTrend[tierKey()] || 0);
+    // 車は毎年値下がり（新車は年15%、中古は年12%。いくら古くても5万円くらいでは売れる）
+    if (G.flags.owns_car) { if (G.vars.carValue == null) G.vars.carValue = 60; G.vars.carValue = Math.max(5, G.vars.carValue * (G.vars.carNew ? 0.85 : 0.88)); }
   }
   return { consumerDebt, myPocket, parentsIncome, homeIncome, childCost1, pocketMoney, jobGross, sideGross, annualIncome, monthlyIncome, hasBonus, salaryPreview, salaryCurve, rankTrack, nextStep, curStep, nextStepRate, steps, overtime, aiRisk, pensionMonthly, pensionAnnual, incomeTaxes, livingCost, childCosts, childAllowanceYear, quarter, addLoan, totalDebt, loansLeft, netWorth, liquid, householdCash, assetsValue, yearAssets, working, tierKey, WORKING, expenses, netIncomeYear, welfareQ, LEVELS, lifeLevel, costKids, childStage, LOAN_L, scholarStart };
 })();

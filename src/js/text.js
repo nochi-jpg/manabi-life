@@ -111,6 +111,9 @@ const Text = (() => {
       case 'reunionSchool': { const pn = Fam.prefName(G.birthPref || G.pref).replace(/[都道府県]$/, ''); const k = G.flags.edu_hs_grad ? pick(['小学校', '中学校', '高校']) : pick(['小学校', '中学校']); return `${pn}の${k}`; } // 同窓会は出身県の学校
       case 'licenseAdviser': { const fam = people('spouse').some((p) => p.alive) || people('child').some((p) => p.alive); return fam ? '家族' : 'かかりつけのお医者さん'; }
       case 'kidsGrown': return people('child').some((c) => c.alive && c.age < 18) ? '子どもも少し大きくなった。' : '少し落ち着いてきた。';
+      case 'partJob': { const j = G.job && G.job.part && Menu.job(G.job.part); return j ? j.label : 'アルバイト'; }
+      case 'partMonthly': { const j = G.job && G.job.part && Menu.job(G.job.part); return j ? round1((j.wage * j.hoursWeek * 50 / 10000) / 12 * (G.focus === 'focus_parttime' ? 2 : 1)).toFixed(1) : '0'; }
+      case 'carValueNow': return man(G.vars.carValue ?? 30);
       case 'cashNow': return man(Math.max(0, G.cash));
       case 'pocket': return round1(Econ.myPocket()).toFixed(1);
       case 'sendMoney': return ch ? String(ch.sendMoney ?? 7) : '7';

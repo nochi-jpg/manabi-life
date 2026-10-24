@@ -79,7 +79,7 @@
       "popup": "reportCard",
       "text": "{year}年3月。{reportName}が配られた。来年度は何を大事にする？",
       "choices": [
-        { "menu": { "source": "focus", "filter": "stage" }, "effects": { "focus": "$pick" } }
+        { "menu": { "source": "focus", "filter": "stage" }, "effects": { "focus": "$pick", "partReview": true } }
       ]
     },
     {
@@ -237,6 +237,26 @@
       "when": { "age": [16, 16], "season": ["Q1"], "once": true },
       "text": "16歳。自分のお金を自分で管理するようになった。おこづかい：月{allowance}万円。",
       "effects": { "showCash": true, "log": "👛 所持金の表示が始まった" }
+    },
+    {
+      "id": "ev_m_parttime_pick", "kind": "choice", "emoji": "💴", "counselor": "self", "type": "scheduled",
+      "when": { "age": [16, 30] },
+      "text": "バイトをがんばることにした。どこで働く？",
+      "fact": { "text": "高校生のアルバイトは、校則で届け出や許可が必要な学校も多い。大学生は約8割がアルバイトをしている。", "src": "全国大学生活協同組合連合会 学生生活実態調査" },
+      "choices": [
+        { "menu": { "source": "jobs.partTimeJobs", "page": 5, "filter": "age" }, "effects": { "job": { "hire": "$pick", "form": "student_part" } } },
+        { "label": "🙅 やっぱりバイトはやめておく", "effects": {} }
+      ]
+    },
+    {
+      "id": "ev_m_parttime_review", "kind": "choice", "emoji": "💴", "counselor": "self", "type": "scheduled",
+      "when": { "age": [16, 30] },
+      "text": "{partJob}のバイト、来年度も続ける？（バイト代 月{partMonthly}万円くらい）",
+      "choices": [
+        { "label": "💪 続ける", "effects": {} },
+        { "label": "🔄 ほかのバイトに変える", "menu": { "source": "jobs.partTimeJobs", "page": 5, "filter": "age" }, "effects": { "quitPart": true, "job": { "hire": "$pick", "form": "student_part" } } },
+        { "label": "📚 やめて、勉強などに集中する", "effects": { "quitPart": true, "stats": { "stress": -3 }, "log": "📚 バイトをやめた" } }
+      ]
     },
     {
       "id": "ev_m_parttime_start", "kind": "choice", "emoji": "🏪", "counselor": "self",

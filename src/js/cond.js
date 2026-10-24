@@ -143,6 +143,7 @@ function testKey(k, v, ctx) {
     case 'yearsLeft': return !!G.school && schoolYearsLeft() === v;
     case 'yearInStage': return !!G.school && (Array.isArray(v) ? inRange(G.school.yearIn, v) : G.school.yearIn === v);
     case 'hasBoss': { const st = Econ.steps(); const top = st.length > 0 && (G.rank || 0) >= st.length - 1; return (!top && G.employment !== 'executive' && G.employment !== 'self_employed') === !!v; } // 上の役職（上司）がいる
+    case 'noGrandchild': return !people('grandchild').some((p) => p.alive) === !!v;
     case 'lessonsLess': return G.clubs.filter((c) => Engine.isLesson(c.id)).length < v; // 習い事の数が v 個より少ない（4つまで）
     case 'noLesson': return !G.clubs.some((c) => c.id === v);
     case 'jobYears': return !!G.job && (Array.isArray(v) ? v.includes(G.jobYears) : G.jobYears === v);

@@ -267,6 +267,8 @@
     "mod_juku": "juku"
   },
   "vars": {
+    "carValue": "車のいまの値段（万円・毎年値下がり）",
+    "carNew": "新車で買ったか",
     "careCost": "介護にかかるお金（年・万円）",
     "lifeLevel": "生活レベル（save/normal/comfy/lux）",
     "plan": [

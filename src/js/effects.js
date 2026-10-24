@@ -59,6 +59,9 @@ const Effects = (() => {
           if (n === 'like3' || n === 'like6') Engine.onLike(n);
         } break;
         case 'focus': { const f = resolve(v, ctx); if (f) Engine.setFocus(f, true); break; }
+        // 成績表・通知表のあと：バイトをしていたら「続ける？」を必ず出す
+        case 'partReview': if (G.job && G.job.part && Menu.isStudent() && !(G.queue || []).some((x) => x.id === 'ev_m_parttime_pick')) G.queue.unshift({ id: 'ev_m_parttime_review', ctx: {}, sched: true }); break;
+        case 'quitPart': if (G.job && G.job.part) { if (G.job.id) { delete G.job.part; } else { G.job = null; if (G.employment === 'student_part') G.employment = 'none'; } } break;
         case 'school': School.apply(v, ctx); break;
         case 'nextStage': School.setStage(v); break;
         case 'roninSelf': if (G.school && G.stage === 'ronin') { G.school.name = '自宅で勉強'; G.school.emoji = '🏠'; G.school.quality = 0.95; G.school.cost = 0; } break;
@@ -111,6 +114,7 @@ const Effects = (() => {
         case 'blacklistYears': G.vars.blackUntil = Math.max(G.vars.blackUntil || 0, G.year + num(v, ctx)); break;
         case 'lifeLevel': G.vars.lifeLevel = v; G.vars.autoSave = false; break;
         case 'openUi': G.vars.openUi = v; break;
+        case 'sellCar': if (G.flags.owns_car) { const val = Math.round(G.vars.carValue ?? 30); G.cash += val; setFlag('owns_car', false); G.vars.carValue = 0; logs.push(`🚗 車を${man(val)}万円で売った。`); } break;
         case 'sellRental': if (G.flags.owns_rental) { const l = (G.loans || []).find((x) => x.type === 'investment' && x.left > 0); const val = G.vars.rentalValue || 0; G.cash += val - (l ? l.left : 0); if (l) l.left = 0; setFlag('owns_rental', false); G.vars.rentalValue = 0; G.vars.rentIncomeMonthly = 0; logs.push(`🏢 貸している部屋を${man(val)}万円で売った${l ? '（投資のローンを返した）' : ''}。`); } break;
         // 手元の現金で、利息の高い借金から返す（生活費として3か月分はのこす）
         case 'payDebtsFromCash': { const keep = Econ.expenses().total / 4; let x = Math.max(0, G.cash - keep); const before = Econ.consumerDebt(); const L = (G.loans || []).filter((l) => l.left > 0 && !['mortgage', 'investment', 'scholar'].includes(l.type)).sort((a, b) => (b.rate || 0) - (a.rate || 0)); for (const l of L) { if (x <= 0) break; const pay = Math.min(l.left, x); l.left -= pay; x -= pay; G.cash -= pay; } const paid = before - Econ.consumerDebt(); if (paid >= 1) logs.push(`💴 そのお金で、借金を${man(paid)}万円返した。`); break; }

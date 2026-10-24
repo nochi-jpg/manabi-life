@@ -336,7 +336,7 @@ const Popup = (() => {
   function assets(done) {
     const L = (G.loans || []).filter((l) => l.left > 0);
     const row = (e, l, v, note = '') => `<div class="li"><span>${e}</span><span>${esc(l)}<small>${esc(note)}</small></span><span class="a num">${man(v)}万</span></div>`;
-    const rows = [row('💴', '現金', Math.max(0, G.cash)), G.assets > 0.5 ? row('📈', '投資（NISAなど）', G.assets, G.vars.nisaMonthly ? `毎月${G.vars.nisaMonthly}万円を積み立て中` : '') : '', G.flags.owns_house ? row('🏠', '家', G.vars.houseValue || 0, '今売ったときのめやす') : '', G.flags.owns_rental ? row('🏢', '貸している部屋', G.vars.rentalValue || 0, `家賃収入 月${G.vars.rentIncomeMonthly || 0}万円`) : ''].join('');
+    const rows = [row('💴', '現金', Math.max(0, G.cash)), G.assets > 0.5 ? row('📈', '投資（NISAなど）', G.assets, G.vars.nisaMonthly ? `毎月${G.vars.nisaMonthly}万円を積み立て中` : '') : '', G.flags.owns_house ? row('🏠', '家', G.vars.houseValue || 0, '今売ったときのめやす') : '', G.flags.owns_rental ? row('🏢', '貸している部屋', G.vars.rentalValue || 0, `家賃収入 月${G.vars.rentIncomeMonthly || 0}万円`) : '', G.flags.owns_car ? row('🚗', G.vars.carNew ? '車（新車で買った）' : '車（中古で買った）', G.vars.carValue ?? 60, '毎年すこしずつ値下がりする') : ''].join('');
     const debts = (G.cash < 0 ? row('💳', 'カードローン', -G.cash, '年15%の利息') : '') + L.map((l) => { const [e, lb] = Econ.LOAN_L[l.type] || ['💳', 'ローン']; return row(e, lb, l.left, l.yearly ? `月${round1(l.yearly / 12)}万円ずつ返済` : ''); }).join('');
     const box = show(`<button class="x" id="asX">✕</button><div class="cs">🏦 持っている財産</div>
       <div class="exp"><div class="el"><div class="sub">➕ 財産</div>${rows}<div class="sub">➖ 借金</div>${debts || '<div class="li"><span></span><span>なし</span><span></span></div>'}
