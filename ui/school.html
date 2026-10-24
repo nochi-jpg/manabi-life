@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>まなびライフ 学校の詳細</title>
+<link rel="stylesheet" href="base.css">
+<style>
+#behind{position:absolute;inset:0;background:url(../docs/ui/mock-main.png) center/cover;filter:blur(1px)}
+#box{position:relative;width:1180px;padding:var(--sp4);color:var(--ink);display:grid;grid-template-columns:420px 1fr;column-gap:var(--sp3);
+  background:#fcf9f3;border:4px solid #fff;border-radius:24px;box-shadow:inset 0 0 0 3px #ffe2a8,0 16px 40px rgba(5,10,40,.6);animation:pop .22s ease-out}
+.cs{position:absolute;left:var(--sp3);top:-20px;height:38px;padding:0 var(--sp2);border-radius:999px;display:flex;align-items:center;gap:6px;font-size:16px;color:#fff;
+  background:linear-gradient(180deg,#26346e,#16224a);border:3px solid #fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.img{height:236px;border-radius:16px;background:url(../assets/bg/univ.jpg) center/cover;position:relative;box-shadow:inset 0 0 0 3px #fff}
+.img .tag{position:absolute;left:10px;bottom:10px;height:32px;padding:0 12px;border-radius:999px;background:rgba(13,21,48,.82);color:#fff;font-size:15px;display:flex;align-items:center;gap:6px;border:2px solid rgba(255,255,255,.7)}
+.jt{margin-top:var(--sp2);display:grid;grid-template-columns:52px 1fr;align-items:center;column-gap:var(--sp1)}
+.jt .e{font-size:42px;text-align:center}
+.jt .n{font-size:24px;font-weight:900;line-height:1.2}
+.jt .n small{display:block;font-size:14px;color:var(--ink2);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:var(--sp1);margin-top:var(--sp2)}
+.chip{height:28px;padding:0 10px;border-radius:999px;background:#fff;box-shadow:0 2px 0 #d9cdb5;font-size:14px;display:inline-flex;align-items:center;gap:4px}
+.rate{margin-top:var(--sp2);height:64px;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--sp3);background:linear-gradient(180deg,#ffd760,#f0a81c);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+.rate span{font-size:16px}.rate b{font-size:36px}
+.sec{background:#fff;border-radius:16px;padding:12px var(--sp2);box-shadow:0 3px 0 #ecdcc2;margin-bottom:var(--sp2)}
+.sec h4{font-size:14px;color:var(--ink2);margin-bottom:var(--sp1)}
+.money{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp2)}
+.money div{background:#fbf3e3;border-radius:12px;padding:8px 12px}
+.money span{display:block;font-size:13px;color:var(--ink2)}
+.money b{font-size:22px}.money small{font-size:13px;color:var(--ink2)}
+.subj{display:grid;grid-template-columns:110px 1fr 70px 70px;align-items:center;column-gap:var(--sp2);height:32px;font-size:15px;font-variant-numeric:tabular-nums}
+.subj.th{height:24px;font-size:12px;color:var(--ink2)}
+.subj .me{text-align:right}.subj .need{text-align:right;color:var(--ink2)}
+.ok{color:#1f9d6a}.ng{color:#e44d62}
+.after{display:grid;grid-template-columns:110px 1fr;align-items:center;column-gap:var(--sp2);min-height:30px;font-size:15px}
+.after .k{font-size:13px;color:var(--ink2)}
+.eff{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--sp1)}
+.eff div{height:54px;border-radius:12px;background:#fbf3e3;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;color:var(--ink2)}
+.eff b{font-size:17px}.up{color:#1f9d6a}.dn{color:#e44d62}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp3);margin-top:var(--sp1)}
+.btns button{height:56px;font-size:19px}
+.src{margin-top:var(--sp2)}
+</style></head>
+<body>
+<div id="stage">
+  <div id="behind"></div>
+  <div class="ov">
+    <div id="box">
+      <div class="cs">🎯 進路選択 ・ 2027年7月 ・ 高校3年生</div>
+      <div>
+        <div class="img"><span class="tag">📍 東京都（実家から通学 70分）</span></div>
+        <div class="jt"><span class="e">🎓</span><span class="n"><small>私立大学｜4年制｜理系</small>東京の難関私立大学 理工学部</span></div>
+        <div class="chips"><span class="chip">📈 偏差値 63</span><span class="chip">🏫 キャンパスは都心</span><span class="chip">🔬 大学院に進む人 約4割</span></div>
+        <div class="rate"><span>あなたの合格率</span><b>46%</b></div>
+      </div>
+      <div>
+        <div class="sec"><h4>💴 学費（家計から）</h4>
+          <div class="money">
+            <div><span>入学のとき</span><b>155</b><small>万円</small></div>
+            <div><span>2年目から（毎年）</span><b>150</b><small>万円</small></div>
+            <div><span>4年間の合計</span><b>605</b><small>万円</small></div>
+          </div>
+        </div>
+        <div class="sec"><h4>✏️ 入試で見られる教科（あなた ／ 合格ライン）</h4>
+          <div class="subj th"><span>教科</span><span></span><span class="me">あなた</span><span class="need">めやす</span></div>
+          <div class="subj"><span>🔢 数学</span><span class="bar c-blue"><i style="--w:68%"></i></span><span class="me ok">68</span><span class="need">65</span></div>
+          <div class="subj"><span>🔬 理科</span><span class="bar c-blue"><i style="--w:57%"></i></span><span class="me ng">57</span><span class="need">63</span></div>
+          <div class="subj"><span>🔤 英語</span><span class="bar c-blue"><i style="--w:61%"></i></span><span class="me ok">61</span><span class="need">60</span></div>
+        </div>
+        <div class="sec"><h4>🧭 卒業したあと ／ 📊 4年間のステータスの変化</h4>
+          <div class="after"><span class="k">おもな就職先</span><span>⚙️ メーカー技術職・🧑‍💻 ITエンジニア・🔬 研究職</span></div>
+          <div class="eff" style="margin-top:var(--sp1)">
+            <div>📚 学力<b class="up">↑ 大</b></div><div>😣 ストレス<b class="dn">↑ 中</b></div><div>🤝 人間関係<b class="up">↑ 中</b></div><div>❤️ 健康<b>−</b></div><div>😊 満足感<b class="up">↑ 小</b></div>
+          </div>
+        </div>
+        <div class="btns"><button class="gl g-navy">◀ ほかの候補にもどる</button><button class="gl g-green">この学校を受ける ▶</button></div>
+        <div class="src"><span>📊</span><span>私立大学（理系）の1年目の費用は平均で約150万円。国立大学は約82万円です。<small>（文部科学省）</small></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>const st=document.getElementById('stage');function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}addEventListener('resize',fit);fit();</script>
+</body></html>

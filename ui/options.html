@@ -5,29 +5,29 @@
 <style>
 #stage{background:#fdfdfb}
 #stage::before{display:none}
-.panel{position:absolute;left:290px;top:120px;width:700px;height:430px;padding:26px 34px;color:var(--ink);background:#fff;border:2px solid #dfe7f3;border-radius:24px;box-shadow:0 10px 30px rgba(47,106,168,.12)}
-h1{font-size:26px;color:var(--blue);margin-bottom:18px;display:flex;align-items:center;gap:10px}
-.row{display:grid;grid-template-columns:170px 1fr 56px;align-items:center;height:70px;border-bottom:2px solid #eef3fa;font-size:18px}
+.panel{position:absolute;left:290px;top:50%;transform:translateY(-50%);width:700px;padding:var(--sp4) var(--sp5) var(--sp5);display:flex;flex-direction:column;color:var(--ink);background:#fff;border:2px solid #dfe7f3;border-radius:24px;box-shadow:0 10px 30px rgba(47,106,168,.12)}
+h1{font-size:26px;color:var(--blue);margin-bottom:var(--sp2);display:flex;align-items:center;gap:10px}
+.row{display:grid;grid-template-columns:180px 1fr 56px;column-gap:var(--sp2);align-items:center;height:76px;border-bottom:2px solid #eef3fa;font-size:18px}
 .row .k{color:var(--ink)}
 .row .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--blue)}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:5px;background:linear-gradient(90deg,var(--blue) var(--p),#e3ebf6 var(--p));outline:0}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--blue);box-shadow:0 2px 4px rgba(0,0,0,.15)}
 input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--blue)}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;grid-column:2/4}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp2);grid-column:2/4}
 .seg button,.sw button{height:44px;font-size:17px;color:var(--blue);background:#fff;border:2px solid #c9d7ea;border-radius:999px;box-shadow:none}
 .seg button.on,.sw button.on{color:#fff;background:var(--blue);border-color:var(--blue)}
-.sw{display:grid;grid-template-columns:1fr 1fr;gap:8px;grid-column:2/4}
-.btns{position:absolute;left:34px;right:34px;bottom:26px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp2);grid-column:2/4}
+.btns{margin-top:var(--sp4);display:grid;grid-template-columns:1fr 1fr;gap:var(--sp3)}
 .btns button{height:52px;font-size:18px;color:var(--blue);background:#fff;border:2px solid #c9d7ea;border-radius:999px;box-shadow:0 3px 0 #dfe7f3}
 .btns button.main{color:#fff;background:var(--blue);border-color:var(--blue);box-shadow:0 3px 0 #1f4f82}
 /* クレジット */
 #cr{display:none;background:rgba(253,253,251,.92);backdrop-filter:none}#cr.on{display:flex}
-#cr .box{width:760px;height:600px;padding:26px 36px;color:var(--ink);background:#fff;border:2px solid #dfe7f3;border-radius:24px;box-shadow:0 10px 30px rgba(47,106,168,.15);animation:pop .2s;position:relative}
-#cr h2{font-size:24px;color:var(--blue);margin-bottom:14px}
-.cr{display:grid;grid-template-columns:200px 1fr;align-items:baseline;padding:9px 0;border-bottom:2px solid #eef3fa;font-size:17px;line-height:1.5}
+#cr .box{width:760px;padding:var(--sp4) var(--sp5) var(--sp5);display:flex;flex-direction:column;color:var(--ink);background:#fff;border:2px solid #dfe7f3;border-radius:24px;box-shadow:0 10px 30px rgba(47,106,168,.15);animation:pop .2s;position:relative}
+#cr h2{font-size:24px;color:var(--blue);margin-bottom:var(--sp2)}
+.cr{display:grid;grid-template-columns:200px 1fr;column-gap:var(--sp2);align-items:baseline;padding:10px 0;border-bottom:2px solid #eef3fa;font-size:17px;line-height:1.5}
 .cr .k{font-size:14px;color:var(--ink2)}
 .cr small{display:block;font-size:13px;color:var(--ink2)}
-#crClose{position:absolute;left:36px;right:36px;bottom:24px;height:50px;font-size:18px;color:#fff;background:var(--blue);border:0;border-radius:999px;box-shadow:0 3px 0 #1f4f82}
+#crClose{margin-top:var(--sp4);height:52px;font-size:18px;color:#fff;background:var(--blue);border:0;border-radius:999px;box-shadow:0 3px 0 #1f4f82}
 </style></head>
 <body>
 <div id="stage">

@@ -1,7 +1,9 @@
 /* まなびライフ 共通スタイル（manabi-battle の つやボタン・パールパネルを流用） */
 @font-face{font-family:"MBRound";font-weight:700;src:url("fonts/MPLUSRounded1c-Bold.woff") format("woff")}
 @font-face{font-family:"MBRound";font-weight:800 900;src:url("fonts/MPLUSRounded1c-ExtraBold.woff") format("woff")}
+/* 間かくのルール：8の倍数。部品どうし 16px、かたまりどうし 24px、ボタンどうし 20px 以上、わくの内側 32px 以上、最後の中身とボタンの間 32px 以上 */
 :root{
+  --sp1:8px;--sp2:16px;--sp3:24px;--sp4:32px;--sp5:40px;
   --f:"MBRound","BIZ UDPGothic","Hiragino Maru Gothic ProN","Meiryo",sans-serif;
   --ink:#23305a;--ink2:#5d6b8f;--cyan:#1ec8ea;--cyan2:#0a8fd1;--navy:#16224a;
   --gold:#ffcf3f;--orange:#f08a1c;--pink:#ff6fa8;--mint:#43d6a2;--red:#e44d62;--blue:#2f6aa8;
