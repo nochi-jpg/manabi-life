@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>まなびライフ UIモック</title>
+<style>
+/* ===== 素材：manabi-battle と同じ CSS のつやボタン・パールパネル ===== */
+@font-face{font-family:"MBRound";font-weight:700;src:url("fonts/MPLUSRounded1c-Bold.woff") format("woff")}
+@font-face{font-family:"MBRound";font-weight:800 900;src:url("fonts/MPLUSRounded1c-ExtraBold.woff") format("woff")}
+:root{
+  --f:"MBRound","BIZ UDPGothic","Hiragino Maru Gothic ProN","Meiryo",sans-serif;
+  --ink:#23305a;--ink2:#5d6b8f;--cyan:#1ec8ea;--cyan2:#0a8fd1;--navy:#16224a;
+  --gold:#ffcf3f;--orange:#f08a1c;--pink:#ff6fa8;--mint:#43d6a2;--red:#ff5a6e;
+  --rowH:32px;               /* ステータス1行の高さ（全部そろえる） */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#05081a}
+body{font-family:var(--f);font-weight:700;letter-spacing:.02em;color:#fff;user-select:none;word-break:auto-phrase;line-break:strict}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center;overflow:hidden;
+  background:radial-gradient(ellipse at 30% 20%,#2b3f8a 0%,transparent 55%),radial-gradient(ellipse at 90% 90%,#3a1f6e 0%,transparent 50%),linear-gradient(160deg,#1b2a5e,#0b1230)}
+#stage::before{content:'';position:absolute;inset:0;opacity:.07;pointer-events:none;
+  background-image:radial-gradient(#fff 1px,transparent 1.5px);background-size:22px 22px}
+
+button{font-family:var(--f);font-weight:800;color:var(--ink);cursor:pointer;
+  background:linear-gradient(180deg,#fff 0%,#f3f7ff 55%,#e3ebfa 100%);border:3px solid #fff;border-radius:16px;
+  box-shadow:0 5px 0 #b9c6e2,0 8px 14px rgba(10,20,60,.25);transition:transform .08s,filter .12s,box-shadow .08s}
+button:hover{filter:brightness(1.04)}
+button:active{transform:translateY(3px) scale(.98)}
+/* つやボタン */
+.gl{position:relative;color:#fff;border:3px solid #0d1530;border-radius:999px;
+  background:linear-gradient(180deg,var(--b1) 0%,var(--b2) 50%,var(--b3) 51%,var(--b4) 100%);
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.45),inset 0 -4px 0 rgba(0,0,0,.16),0 4px 0 #0d1530,0 8px 12px rgba(5,10,40,.35);
+  text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.gl::before{content:'';position:absolute;left:14px;top:6px;width:10px;height:7px;border-radius:50%;background:rgba(255,255,255,.85)}
+.gl:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.45),inset 0 -4px 0 rgba(0,0,0,.16),0 1px 0 #0d1530}
+.g-green{--b1:#c6ec4c;--b2:#a9d62e;--b3:#8cc31f;--b4:#9bd52c}
+.g-cyan{--b1:#21e0d6;--b2:#0bb6cc;--b3:#0894c4;--b4:#24a6d8}
+.g-navy{--b1:#323766;--b2:#262a52;--b3:#1d2044;--b4:#272b58}
+.g-purple{--b1:#9b6cff;--b2:#8350f3;--b3:#6c38e6;--b4:#8a4ff7}
+/* パールのパネル */
+.pearl{position:absolute;color:var(--ink);border:4px solid #fff;border-radius:22px;background:#faf3eb;
+  box-shadow:inset 0 0 0 3px #ffe2a8,0 10px 22px rgba(5,10,40,.45)}
+.pearl h3{font-size:15px;color:var(--ink2);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.pearl h3::after{content:'';flex:1;height:2px;background:linear-gradient(90deg,#ffd27a,transparent)}
+
+/* ===== 左上：日付・名前・身分 ===== */
+#head{position:absolute;left:16px;top:14px;width:820px;height:50px;display:flex;align-items:center;gap:10px}
+.date{height:42px;padding:0 16px 0 8px;display:flex;align-items:center;gap:8px;border-radius:999px;
+  background:linear-gradient(180deg,#26346e,#16224a);border:3px solid #0d1530;box-shadow:inset 0 0 0 2px rgba(30,200,234,.55);font-size:20px}
+.date .ssn{width:30px;height:30px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:19px}
+.pname{height:42px;display:flex;align-items:center;gap:8px;padding:0 30px 0 12px;font-size:22px;color:var(--ink);
+  background:linear-gradient(90deg,#fff,#e9f5ff);clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%);box-shadow:inset 0 -4px 0 var(--cyan)}
+.pname small{font-size:16px;color:var(--ink2)}
+.sp{flex:1}
+#speed{display:flex;gap:8px}
+#speed button{width:62px;height:42px;font-size:17px;padding:0}
+#speed .pz{display:inline-block;width:14px;height:16px;border-left:5px solid #fff;border-right:5px solid #fff;vertical-align:middle}
+#speed .pl{display:inline-block;border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px;vertical-align:middle}
+#speed button.on{--b1:#21e0d6;--b2:#0bb6cc;--b3:#0894c4;--b4:#24a6d8}
+
+/* ===== 顔グラ ===== */
+#face{left:16px;top:74px;width:316px;height:226px;padding:8px}
+#face .pic{width:292px;height:156px;border-radius:12px;overflow:hidden;background:#e9dcc6 center/cover no-repeat;box-shadow:inset 0 0 0 2px #e6cfa5}
+#face .role{margin-top:8px;height:42px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:18px;
+  background:linear-gradient(180deg,#fff,#eef4ff);box-shadow:0 3px 0 #c9d4ec}
+#face .role b{color:var(--cyan2)}
+
+/* ===== ステータス：2列×5行。行の高さ・ゲージの幅を全部そろえる ===== */
+#stat{left:344px;top:74px;width:492px;height:226px;padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+.row{height:var(--rowH);display:grid;grid-template-columns:96px 1fr 44px;align-items:center;column-gap:8px;font-size:16px}
+.row .lb{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.row .v{text-align:right;font-size:18px;color:var(--ink)}
+.bar{height:16px;background:#1b2448;border:2px solid #fff;border-radius:4px;transform:skewX(-16deg);overflow:hidden;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.bar i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--c1),var(--c2));transition:width .6s}
+.c-blue{--c1:#3d8bff;--c2:#7fc0ff}.c-red{--c1:#ff5a6e;--c2:#ffb04d}.c-mint{--c1:#3fe0a4;--c2:#7cf7c9}.c-pink{--c1:#ff6fa8;--c2:#ffb3d3}
+.c-gold{--c1:#ffcf3f;--c2:#fff09a}.c-gray{--c1:#7f8bb0;--c2:#b6c0de}
+.row .num{grid-column:2/4;justify-self:end;font-size:19px}
+.row .num small{font-size:14px;color:var(--ink2);margin-left:2px}
+.dash{grid-column:2/4;justify-self:end;color:#b4bdd6;font-size:18px}
+
+/* ===== 重点方針・季節 ===== */
+#mid{position:absolute;left:16px;top:312px;width:820px;height:46px;display:flex;align-items:center;gap:12px}
+#focus{height:46px;width:316px;font-size:19px;display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:999px;box-shadow:0 4px 0 #b9c6e2,0 8px 14px rgba(10,20,60,.25)}
+#focus .k{color:var(--ink2);font-size:15px}
+#focus .arw{margin-left:auto;color:var(--cyan2)}
+.seasons{display:flex;gap:6px;padding:4px 10px;height:46px;align-items:center;border-radius:999px;background:rgba(8,14,40,.55);border:2px solid rgba(255,255,255,.2)}
+.seasons span{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;opacity:.35;transition:.2s}
+.seasons span.on{opacity:1;background:#fff;box-shadow:0 0 0 3px var(--cyan),0 0 12px var(--cyan)}
+.life{flex:1;height:46px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:999px;background:rgba(8,14,40,.55);border:2px solid rgba(255,255,255,.2);font-size:16px}
+.life .bar{flex:1;height:14px}
+
+/* ===== タイムライン（新しいものが上から出てくる） ===== */
+#tl{position:absolute;left:16px;top:370px;width:820px;height:334px;
+  background:linear-gradient(100deg,rgba(14,24,56,.92),rgba(20,34,78,.82));box-shadow:inset 6px 0 0 var(--cyan);
+  clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,0 100%);padding:12px 18px 12px 26px}
+#tl .hd{font-size:16px;color:#9fb4dc;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+#tl .hd::after{content:'';flex:1;height:2px;background:linear-gradient(90deg,rgba(30,200,234,.6),transparent)}
+#feed{height:276px;overflow-y:auto;scrollbar-width:none;padding-right:4px;mask-image:linear-gradient(180deg,#000 85%,transparent)}
+#feed::-webkit-scrollbar{display:none}
+.post{display:grid;grid-template-columns:116px 40px 1fr;align-items:center;column-gap:8px;min-height:48px;padding:6px 10px;margin-bottom:6px;
+  border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:18px;line-height:1.4;animation:drop .35s cubic-bezier(.34,1.5,.5,1)}
+.post .d{font-size:14px;color:#9fb4dc;white-space:nowrap}
+.post .d b{color:#fff;font-size:15px}
+.post .e{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:24px}
+.post.choice{background:linear-gradient(90deg,rgba(255,207,63,.22),rgba(255,207,63,.04));border-color:rgba(255,207,63,.5)}
+.post.big{background:linear-gradient(90deg,rgba(255,111,168,.25),rgba(255,111,168,.04));border-color:rgba(255,111,168,.5)}
+.post .t small{color:#ffcf3f;font-size:14px;margin-left:6px}
+@keyframes drop{from{transform:translateY(-24px);opacity:0}to{transform:none;opacity:1}}
+
+/* ===== 右：背景 ===== */
+#bg{position:absolute;left:852px;top:14px;width:412px;height:232px;border:4px solid #fff;border-radius:20px;overflow:hidden;
+  box-shadow:inset 0 0 0 3px #ffe2a8,0 10px 22px rgba(5,10,40,.45);background:#9ec3e6 center/cover no-repeat}
+#bg .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:90px;
+  background:linear-gradient(180deg,#bfe3ff,#f7e7c6);filter:saturate(.9)}
+#bg .tag{position:absolute;left:10px;bottom:10px;height:36px;padding:0 16px 0 10px;border-radius:999px;font-size:17px;display:flex;align-items:center;gap:6px;
+  background:rgba(13,21,48,.82);border:2px solid rgba(255,255,255,.7)}
+
+/* ===== 右：くわしいステータス（タブでページを切りかえ。スクロールなし） ===== */
+#det{left:852px;top:258px;width:412px;height:384px;padding:10px 14px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.tabs button{height:40px;font-size:16px;padding:0;border-radius:12px;box-shadow:0 3px 0 #c9d4ec}
+.tabs button.on{--b1:#21e0d6;--b2:#0bb6cc;--b3:#0894c4;--b4:#24a6d8;color:#fff;border:3px solid #0d1530;border-radius:999px;
+  background:linear-gradient(180deg,var(--b1),var(--b2) 50%,var(--b3) 51%,var(--b4));box-shadow:0 3px 0 #0d1530;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.page{display:none}.page.on{display:block;animation:fade .2s}
+@keyframes fade{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+.kv{display:grid;grid-template-columns:92px 1fr;align-items:center;min-height:36px;border-bottom:2px dashed #ecdcc2;font-size:17px}
+.kv .k{color:var(--ink2);font-size:15px;display:flex;align-items:center;gap:4px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;padding:3px 0}
+.chip{display:inline-flex;align-items:center;gap:3px;height:26px;padding:0 10px;border-radius:999px;background:#fff;box-shadow:0 2px 0 #d9cdb5;font-size:14px}
+.chip.no{color:#a7aec4;background:#f2ede4;box-shadow:none}
+.fam{display:grid;grid-template-columns:44px 64px 1fr;align-items:center;min-height:46px;border-bottom:2px dashed #ecdcc2;font-size:16px}
+.fam .av{width:36px;height:36px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 0 #d9cdb5}
+.fam .r{color:var(--ink2);font-size:15px}
+.rc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.rc div{height:62px;border-radius:14px;background:#fff;box-shadow:0 3px 0 #d9cdb5;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;color:var(--ink2)}
+.rc b{font-size:28px;line-height:1.1}
+.rc b.s2{color:#ff6fa8}.rc b.s1{color:#0a8fd1}.rc b.s0{color:#a7aec4}
+.pgnote{margin-top:8px;font-size:13px;color:var(--ink2);text-align:center}
+
+/* ===== 右下：ボタン（同じ大きさ） ===== */
+#foot{position:absolute;left:852px;top:654px;width:412px;height:52px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#foot button{height:52px;font-size:19px;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* ===== ポップアップ（選択肢イベント） ===== */
+.ov{position:absolute;inset:0;background:rgba(8,14,40,.6);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:20}
+.ov.on{display:flex}
+.box{position:relative;width:900px;padding:22px 30px 24px;color:var(--ink);border:4px solid #fff;border-radius:24px;background:#fcf9f3;
+  box-shadow:inset 0 0 0 3px #ffe2a8,0 16px 40px rgba(5,10,40,.6);animation:pop .22s ease-out}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
+.box .cs{position:absolute;left:24px;top:-20px;height:38px;padding:0 16px;border-radius:999px;display:flex;align-items:center;gap:6px;font-size:16px;color:#fff;
+  background:linear-gradient(180deg,#26346e,#16224a);border:3px solid #fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.box .top{display:grid;grid-template-columns:96px 1fr;column-gap:16px;align-items:center;margin:8px 0 14px}
+.box .who{width:96px;height:96px;border-radius:22px;background:#fff;box-shadow:0 4px 0 #e2d4ba;display:flex;align-items:center;justify-content:center;font-size:58px}
+.box .ttl{font-size:15px;color:var(--orange)}
+.box .txt{font-size:22px;line-height:1.55}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts button{height:68px;display:grid;grid-template-columns:36px 1fr 72px;align-items:center;column-gap:8px;padding:0 12px;font-size:18px;text-align:left;border-radius:16px}
+.opts .oe{font-size:26px;text-align:center}
+.opts .on2{display:flex;flex-direction:column;line-height:1.25}.opts .on2 small{font-size:14px;color:var(--ink2)}
+.rate{height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.3)}
+.rate.hi{background:linear-gradient(180deg,#5fe0a8,#2fbf86)}.rate.mid{background:linear-gradient(180deg,#ffd760,#f0a81c)}.rate.lo{background:linear-gradient(180deg,#ff8a8a,#e44d62)}
+.opts button.more{--b1:#323766;--b2:#262a52;--b3:#1d2044;--b4:#272b58;grid-template-columns:1fr;text-align:center;font-size:19px}
+.pager{margin-top:12px;display:flex;justify-content:center;gap:6px}
+.pager i{width:10px;height:10px;border-radius:50%;background:#e2d4ba}.pager i.on{background:var(--cyan)}
+
+/* ===== 一時停止中のしるし ===== */
+#paused{position:absolute;left:16px;top:370px;width:820px;height:334px;display:none;align-items:center;justify-content:center;pointer-events:none;
+  font-size:40px;color:rgba(255,255,255,.85);text-shadow:0 4px 0 rgba(0,0,0,.4);letter-spacing:.2em}
+#paused.on{display:flex}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <div id="head">
+    <div class="date"><span class="ssn" id="ssnIc">🌸</span><span id="date">2032年 4月</span></div>
+    <div class="pname">🙂 さくら <small id="age">10歳</small></div>
+    <div class="sp"></div>
+    <div id="speed">
+      <button class="gl g-navy" data-s="0"><span class="pz"></span></button>
+      <button class="gl g-navy on" data-s="1"><span class="pl"></span></button>
+      <button class="gl g-navy" data-s="2">×2</button>
+      <button class="gl g-navy" data-s="4">×4</button>
+    </div>
+  </div>
+
+  <div class="pearl" id="face">
+    <div class="pic" id="pic"></div>
+    <div class="role">🏫 <b>公立小学校</b> 4年生</div>
+  </div>
+
+  <div class="pearl" id="stat">
+    <div>
+      <h3>🧑 本人ステータス</h3>
+      <div class="row"><span class="lb">📚 学力</span><span class="bar c-blue"><i style="--w:62%"></i></span><span class="v">62</span></div>
+      <div class="row"><span class="lb">😣 ストレス</span><span class="bar c-red"><i style="--w:28%"></i></span><span class="v">28</span></div>
+      <div class="row"><span class="lb">🤝 人間関係</span><span class="bar c-mint"><i style="--w:71%"></i></span><span class="v">71</span></div>
+      <div class="row"><span class="lb">❤️ 健康</span><span class="bar c-pink"><i style="--w:88%"></i></span><span class="v">88</span></div>
+      <div class="row"><span class="lb">😊 満足感</span><span class="bar c-gold"><i style="--w:66%"></i></span><span class="v">66</span></div>
+    </div>
+    <div>
+      <h3>💼 職業ステータス</h3>
+      <div class="row"><span class="lb">💴 月収</span><span class="dash">— 学生 —</span></div>
+      <div class="row"><span class="lb">💪 肉体負荷</span><span class="bar c-gray"><i style="--w:0%"></i></span><span class="v">—</span></div>
+      <div class="row"><span class="lb">🧠 精神負荷</span><span class="bar c-gray"><i style="--w:0%"></i></span><span class="v">—</span></div>
+      <div class="row"><span class="lb">⭐ 仕事満足</span><span class="bar c-gray"><i style="--w:0%"></i></span><span class="v">—</span></div>
+      <div class="row"><span class="lb">👛 所持金</span><span class="dash">16歳から</span></div>
+    </div>
+  </div>
+
+  <div id="mid">
+    <button id="focus"><span class="k">重点方針</span>📚 勉強<span class="arw">▼</span></button>
+    <div class="seasons" id="ssn"><span class="on">🌸</span><span>🌻</span><span>🍁</span><span>⛄</span></div>
+    <div class="life">🕰️ 人生<span class="bar c-mint"><i id="lifebar" style="--w:12%"></i></span><span id="lifeN">10 / 約85年</span></div>
+  </div>
+
+  <div id="tl">
+    <div class="hd">📜 タイムライン</div>
+    <div id="feed"></div>
+  </div>
+  <div id="paused">⏸ 一時停止中</div>
+
+  <div id="bg"><div class="ph">🏫</div><div class="tag">📍 教室</div></div>
+
+  <div class="pearl" id="det">
+    <div class="tabs">
+      <button class="on" data-p="p1">状況</button>
+      <button data-p="p2">家族</button>
+      <button data-p="p3">通知表</button>
+      <button data-p="p4">お金</button>
+    </div>
+    <div class="page on" id="p1">
+      <div class="kv"><span class="k">📍 住まい</span><span>神奈川県（実家）</span></div>
+      <div class="kv"><span class="k">🎒 習い事</span><span class="chips"><span class="chip">🎹 ピアノ</span><span class="chip">🎮 テレビゲーム</span></span></div>
+      <div class="kv"><span class="k">💕 恋愛</span><span class="chips"><span class="chip no">なし</span></span></div>
+      <div class="kv"><span class="k">📜 資格</span><span class="chips"><span class="chip no">なし</span></span></div>
+      <div class="kv"><span class="k">🏥 病気</span><span class="chips"><span class="chip no">なし</span></span></div>
+      <div class="kv"><span class="k">🏷️ その他</span><span class="chips"><span class="chip">📱 スマホ（ルールあり）</span></span></div>
+    </div>
+    <div class="page" id="p2">
+      <div class="fam"><span class="av">👨</span><span class="r">父 41</span><span>👔 会社経営</span></div>
+      <div class="fam"><span class="av">👩</span><span class="r">母 38</span><span>🏠 専業主婦</span></div>
+      <div class="fam"><span class="av">👦</span><span class="r">弟 5</span><span>🧸 幼稚園（年長）</span></div>
+      <div class="fam"><span class="av">👵</span><span class="r">祖母 72</span><span>🏠 同居・扶養</span></div>
+      <div class="pgnote">家族の人数がふえたら ◀ ▶ でページを切りかえ</div>
+    </div>
+    <div class="page" id="p3">
+      <div class="kv"><span class="k">📋 3年生</span><span>（3月に配られた通知表）</span></div>
+      <div class="rc">
+        <div>国語<b class="s1">〇</b></div><div>算数<b class="s2">◎</b></div><div>理科<b class="s1">〇</b></div>
+        <div>社会<b class="s0">△</b></div><div>英語<b class="s1">〇</b></div><div>体育<b class="s2">◎</b></div>
+      </div>
+      <div class="pgnote">◀ 2年生 ／ 4年生 ▶</div>
+    </div>
+    <div class="page" id="p4">
+      <div class="kv"><span class="k">👛 所持金</span><span>— （16歳から）</span></div>
+      <div class="kv"><span class="k">🏠 家計</span><span>ゆとりあり</span></div>
+      <div class="kv"><span class="k">💳 借金</span><span class="chips"><span class="chip no">なし</span></span></div>
+      <div class="kv"><span class="k">🛡️ 保険</span><span>親の健康保険（扶養）</span></div>
+      <div class="kv"><span class="k">📈 投資</span><span class="chips"><span class="chip no">なし</span></span></div>
+    </div>
+  </div>
+
+  <div id="foot">
+    <button class="gl g-navy" id="logBtn">📖 バックログ</button>
+    <button class="gl g-navy">⚙️ オプション</button>
+  </div>
+
+  <!-- 選択肢イベント -->
+  <div class="ov" id="ov">
+    <div class="box">
+      <div class="cs">🧑‍🏫 先生と親からの提案</div>
+      <div class="top">
+        <div class="who">🎯</div>
+        <div><div class="ttl">2037年 10月 ・ 中学3年生</div><div class="txt">三者面談。成績と家計に合わせて、志望校の候補を出してもらった。どこを受ける？</div></div>
+      </div>
+      <div class="opts" id="opts"></div>
+      <div class="pager" id="pager"><i class="on"></i><i></i><i></i></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- 画面を 1280×720 のまま、ウィンドウに合わせて拡大縮小 ----
+const st=document.getElementById('stage');
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}
+addEventListener('resize',fit);fit();
+
+// ---- 顔グラ（年齢で切りかえ。画像がなければ絵文字） ----
+const FACE_AGES=[[0,2,0],[3,7,5],[8,12,10],[13,17,15],[18,24,20],[25,34,30],[35,49,40],[50,69,60],[70,200,80]];
+function setFace(g,age){const a=FACE_AGES.find(r=>age>=r[0]&&age<=r[1])[2];
+  document.getElementById('pic').style.backgroundImage=`url(../assets/faces/${g}_${a}.png)`}
+setFace('F',10);
+
+// ---- タブ ----
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button,.page').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');document.getElementById(b.dataset.p).classList.add('on')});
+
+// ---- 速さ ----
+let speed=1;
+document.querySelectorAll('#speed button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#speed button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  speed=+b.dataset.s;document.getElementById('paused').classList.toggle('on',speed===0)});
+
+// ---- タイムライン（デモ） ----
+const SS=['🌸','🌻','🍁','⛄'],MON=[4,7,10,1];
+const demo=[
+  ['🎨','図工の時間に、先生に「色づかいがすてきね」とほめられた。'],
+  ['🏃','運動会のリレーで、アンカーをまかされた。'],
+  ['🌻','夏休み。家族で海に行った。'],
+  ['🎹','ピアノの発表会。少しまちがえたけど、最後までひけた。'],
+  ['🍁','学級委員に推薦され、引き受けることにした。','choice'],
+  ['🧧','お年玉を2万円もらった。'],
+  ['📋','通知表が配られた。算数と体育が◎だった。','choice'],
+  ['👶','いとこに赤ちゃんが生まれた。'],
+  ['📱','スマホを持つことになった。ルールは「夜9時まで」。','choice'],
+  ['🏫','いよいよ5年生。クラスがえで仲のいい子と別のクラスに。'],
+  ['🎯','中3の秋。三者面談で志望校を決める時期が来た。','big'],
+];
+let y=2032,q=0,i=0,age=10;
+const feed=document.getElementById('feed');
+function post(e,t,kind){
+  const d=document.createElement('div');d.className='post'+(kind?' '+kind:'');
+  const m=MON[q];d.innerHTML=`<span class="d"><b>${q===3?y+1:y}年${m}月</b> ${age}歳</span><span class="e">${e}</span><span class="t">${t}${kind==='choice'?'<small>選んだ</small>':''}</span>`;
+  feed.prepend(d);
+}
+function tick(){
+  if(speed===0||document.getElementById('ov').classList.contains('on'))return;
+  const [e,t,k]=demo[i%demo.length];
+  if(k==='big'){openChoice();i++;return}
+  post(e,t,k);i++;
+  q=(q+1)%4;if(q===0){y++;age++;document.getElementById('age').textContent=age+'歳';document.getElementById('lifeN').textContent=age+' / 約85年';
+    document.getElementById('lifebar').style.setProperty('--w',(age/85*100)+'%')}
+  document.getElementById('date').textContent=`${q===3?y+1:y}年 ${MON[q]}月`;
+  document.getElementById('ssnIc').textContent=SS[q];
+  document.querySelectorAll('#ssn span').forEach((s,n)=>s.classList.toggle('on',n===q));
+}
+(function loop(){tick();setTimeout(loop,speed?1500/speed:300)})();
+
+// ---- 選択肢ポップアップ（5件＋別の候補） ----
+const pages=[
+  [['👑','県立トップ進学校|偏差値68',18],['📗','県立上位校|偏差値60',46],['📙','県立中堅校|偏差値52',79],['🎓','私立高校 進学コース|偏差値58',55],['⚙️','国立高専|偏差値61',38]],
+  [['📕','県立高校|偏差値44',93],['🔧','県立工業高校|偏差値45',90],['🧾','県立商業高校|偏差値45',90],['🏫','私立高校|偏差値42',95],['💻','通信制高校|書類と面接',97]],
+  [['🌙','定時制高校|4年制・昼は働く',97],['🌏','インター・IB校|偏差値62',31],['🏟️','私立スポーツ強豪校|偏差値46',72],['🌾','県立農業高校|偏差値40',96],['💼','高校に行かず働く|中卒で就職',100]],
+];
+let pg=0;
+function rc(r){return r>=70?'hi':r>=40?'mid':'lo'}
+function renderOpts(){
+  const o=document.getElementById('opts');o.innerHTML='';
+  pages[pg].forEach(([e,l,r])=>{const b=document.createElement('button');
+    const [nm,sub]=l.split('|');b.innerHTML=`<span class="oe">${e}</span><span class="on2">${nm}${sub?`<small>${sub}</small>`:''}</span><span class="rate ${rc(r)}">${r}%</span>`;
+    b.onclick=()=>{document.getElementById('ov').classList.remove('on');post(e,`${l.split('|')[0]} を受けることにした。`,'choice')};o.appendChild(b)});
+  const m=document.createElement('button');m.className='gl more';m.textContent='別の候補を見る ▶';
+  m.onclick=()=>{pg=(pg+1)%pages.length;renderOpts()};o.appendChild(m);
+  document.querySelectorAll('#pager i').forEach((p,n)=>p.classList.toggle('on',n===pg));
+}
+function openChoice(){pg=0;renderOpts();document.getElementById('ov').classList.add('on')}
+</script>
+</body>
+</html>
