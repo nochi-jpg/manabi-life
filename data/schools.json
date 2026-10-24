@@ -1,130 +1,1835 @@
 {
   "_comment": "学校テンプレート。実名は使わず『{pref}の〜』で表示。hensachi=[下限,上限]で、生成時に範囲内で1校ずつ値を振る。cost=1年の家計負担(万円):学費＋教材・制服・給食等(文科省『子供の学習費調査』の概数)。where: home=地元, near=隣県の大都市, city=旧帝大のある都市など, abroad=海外。countByTier=地元に生成する校数。quality=学力の伸び係数。",
   "nameRule": "{pref}{label}（偏差値{h}）。学部は『{pref}{label} {dept}学部（偏差値{h}）』。都市限定校は {city} を使う。",
-  "bigCities": ["tokyo", "osaka", "kyoto", "aichi", "fukuoka", "miyagi", "hokkaido", "hiroshima"],
+  "bigCities": [
+    "tokyo",
+    "osaka",
+    "kyoto",
+    "aichi",
+    "fukuoka",
+    "miyagi",
+    "hokkaido",
+    "hiroshima"
+  ],
   "preschool": [
-    { "id": "pre_home", "emoji": "🏠", "label": "家庭で過ごす", "cost": 0, "when": {}, "effects": { "social": -3 } },
-    { "id": "pre_nursery", "emoji": "🧸", "label": "保育園", "stage": "nursery", "cost": 0, "when": { "note": "共働き・ひとり親なら優先。3歳以上は保育料無償（給食費等は別）" }, "effects": { "social": 3 } },
-    { "id": "pre_kinder", "emoji": "🎒", "label": "幼稚園", "stage": "kindergarten", "cost": 15, "when": {}, "effects": { "social": 2 } },
-    { "id": "pre_kinder_private", "emoji": "🎀", "label": "私立のお受験幼稚園", "stage": "kindergarten", "cost": 60, "when": { "tier": ["A"], "wealthMin": 65 }, "effects": { "social": 1, "academicGrowth": 1.05 } },
-    { "id": "pre_intl", "emoji": "🌏", "label": "インターナショナルプリスクール", "stage": "kindergarten", "cost": 180, "when": { "tier": ["A"], "wealthMin": 80 }, "effects": { "subj": { "eng": 15 } } }
+    {
+      "id": "pre_home",
+      "emoji": "🏠",
+      "label": "家庭で過ごす",
+      "cost": 0,
+      "when": {},
+      "effects": {
+        "social": -3
+      }
+    },
+    {
+      "id": "pre_nursery",
+      "emoji": "🧸",
+      "label": "保育園",
+      "stage": "nursery",
+      "cost": 0,
+      "when": {
+        "note": "共働き・ひとり親なら優先。3歳以上は保育料無償（給食費等は別）"
+      },
+      "effects": {
+        "social": 3
+      }
+    },
+    {
+      "id": "pre_kinder",
+      "emoji": "🎒",
+      "label": "幼稚園",
+      "stage": "kindergarten",
+      "cost": 15,
+      "when": {},
+      "effects": {
+        "social": 2
+      }
+    },
+    {
+      "id": "pre_kinder_private",
+      "emoji": "🎀",
+      "label": "私立のお受験幼稚園",
+      "stage": "kindergarten",
+      "cost": 60,
+      "when": {
+        "tier": [
+          "A"
+        ],
+        "wealthMin": 65
+      },
+      "effects": {
+        "social": 1,
+        "academicGrowth": 1.05
+      }
+    },
+    {
+      "id": "pre_intl",
+      "emoji": "🌏",
+      "label": "インターナショナルプリスクール",
+      "stage": "kindergarten",
+      "cost": 180,
+      "when": {
+        "tier": [
+          "A"
+        ],
+        "wealthMin": 80
+      },
+      "effects": {
+        "subj": {
+          "eng": 15
+        }
+      }
+    }
   ],
   "elementary": [
-    { "id": "el_public", "emoji": "🏫", "label": "公立小学校", "stage": "elem", "cost": 35, "quality": 1.0, "exam": false },
-    { "id": "el_private", "emoji": "🎩", "label": "私立小学校", "stage": "elem", "cost": 167, "quality": 1.15, "exam": "ojuken", "when": { "tier": ["A", "B"], "wealthMin": 65 }, "grant": ["edu_elem_private"], "note": "5歳秋のお受験。エスカレーターで系列中学へ進める" },
-    { "id": "el_national", "emoji": "🏛️", "label": "国立大学附属小学校", "stage": "elem", "cost": 60, "quality": 1.15, "exam": "lottery", "when": { "tier": ["A", "B"] }, "note": "抽選＋簡単な試験。学費は安いが倍率が高い（合格率10〜20%）" },
-    { "id": "el_intl", "emoji": "🌏", "label": "インターナショナルスクール", "stage": "elem", "cost": 250, "quality": 1.1, "exam": "interview", "when": { "tier": ["A"], "wealthMin": 85 }, "growth": { "eng": 2.5, "jpn": 0.7 }, "note": "日本の義務教育として扱われない場合がある" },
-    { "id": "el_free", "emoji": "🌱", "label": "フリースクール", "stage": "free_school", "cost": 40, "quality": 0.8, "exam": false, "when": { "flags": { "any": ["futoko"] } }, "note": "不登校になったときの選択肢。在籍校の出席扱いになることもある" }
+    {
+      "id": "el_public",
+      "emoji": "🏫",
+      "label": "公立小学校",
+      "stage": "elem",
+      "cost": 35,
+      "quality": 1.0,
+      "exam": false
+    },
+    {
+      "id": "el_private",
+      "emoji": "🎩",
+      "label": "私立小学校",
+      "stage": "elem",
+      "cost": 167,
+      "quality": 1.15,
+      "exam": "ojuken",
+      "when": {
+        "tier": [
+          "A",
+          "B"
+        ],
+        "wealthMin": 65
+      },
+      "grant": [
+        "edu_elem_private"
+      ],
+      "note": "5歳秋のお受験。エスカレーターで系列中学へ進める"
+    },
+    {
+      "id": "el_national",
+      "emoji": "🏛️",
+      "label": "国立大学附属小学校",
+      "stage": "elem",
+      "cost": 60,
+      "quality": 1.15,
+      "exam": "lottery",
+      "when": {
+        "tier": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "抽選＋簡単な試験。学費は安いが倍率が高い（合格率10〜20%）"
+    },
+    {
+      "id": "el_intl",
+      "emoji": "🌏",
+      "label": "インターナショナルスクール",
+      "stage": "elem",
+      "cost": 250,
+      "quality": 1.1,
+      "exam": "interview",
+      "when": {
+        "tier": [
+          "A"
+        ],
+        "wealthMin": 85
+      },
+      "growth": {
+        "eng": 2.5,
+        "jpn": 0.7
+      },
+      "note": "日本の義務教育として扱われない場合がある"
+    }
   ],
   "juniorHigh": [
-    { "id": "jh_public", "emoji": "🏫", "label": "公立中学校", "stage": "jhs", "cost": 54, "quality": 1.0, "exam": false },
-    { "id": "jh_private_top", "emoji": "👑", "label": "私立 難関中学", "stage": "jhs", "cost": 144, "quality": 1.3, "hensachi": [62, 72], "subjects": { "jpn": 1, "math": 1.3, "sci": 0.8, "soc": 0.8 }, "when": { "tier": ["A"], "flags": { "all": ["juken_track"] } }, "grant": ["edu_jhs_private", "edu_jhs_exam"], "countByTier": { "A": 4, "B": 0, "C": 0 } },
-    { "id": "jh_private_mid", "emoji": "🎓", "label": "私立 中高一貫校", "stage": "jhs", "cost": 144, "quality": 1.15, "hensachi": [50, 61], "subjects": { "jpn": 1, "math": 1.2, "sci": 0.8, "soc": 0.8 }, "when": { "tier": ["A", "B"], "flags": { "all": ["juken_track"] } }, "grant": ["edu_jhs_private", "edu_jhs_exam"], "countByTier": { "A": 6, "B": 2, "C": 0 } },
-    { "id": "jh_private_easy", "emoji": "🏫", "label": "私立中学", "stage": "jhs", "cost": 140, "quality": 1.05, "hensachi": [38, 49], "subjects": { "jpn": 1, "math": 1 }, "when": { "tier": ["A", "B"], "flags": { "all": ["juken_track"] } }, "grant": ["edu_jhs_private", "edu_jhs_exam"], "countByTier": { "A": 5, "B": 2, "C": 0 } },
-    { "id": "jh_public_ikkan", "emoji": "📘", "label": "公立中高一貫校", "stage": "jhs", "cost": 60, "quality": 1.2, "hensachi": [55, 66], "subjects": { "jpn": 1.3, "math": 1, "sci": 0.7, "soc": 0.7 }, "exam": "tekisei", "note": "適性検査型。学費は公立。倍率5〜7倍", "grant": ["edu_jhs_exam"], "countByTier": { "A": 2, "B": 1, "C": 1 } },
-    { "id": "jh_national", "emoji": "🏛️", "label": "国立大学附属中学", "stage": "jhs", "cost": 60, "quality": 1.25, "hensachi": [55, 68], "subjects": { "jpn": 1, "math": 1, "sci": 1, "soc": 1 }, "grant": ["edu_jhs_private", "edu_jhs_exam"], "countByTier": { "A": 1, "B": 1, "C": 1 } },
-    { "id": "jh_escalator", "emoji": "🎩", "label": "系列の私立中学（内部進学）", "stage": "jhs", "cost": 144, "quality": 1.1, "exam": false, "when": { "flags": { "all": ["edu_elem_private"] } }, "grant": ["edu_jhs_private"] },
-    { "id": "jh_intl", "emoji": "🌏", "label": "インターナショナルスクール", "stage": "jhs", "cost": 280, "quality": 1.1, "when": { "tier": ["A"], "wealthMin": 85 }, "growth": { "eng": 2.5, "jpn": 0.7 } },
-    { "id": "jh_free", "emoji": "🌱", "label": "フリースクール", "stage": "free_school", "cost": 40, "quality": 0.8, "when": { "flags": { "any": ["futoko"] } } }
+    {
+      "id": "jh_public",
+      "emoji": "🏫",
+      "label": "公立中学校",
+      "stage": "jhs",
+      "cost": 54,
+      "quality": 1.0,
+      "exam": false
+    },
+    {
+      "id": "jh_private_top",
+      "emoji": "👑",
+      "label": "私立 難関中学",
+      "stage": "jhs",
+      "cost": 144,
+      "quality": 1.3,
+      "hensachi": [
+        62,
+        72
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1.3,
+        "sci": 0.8,
+        "soc": 0.8
+      },
+      "when": {
+        "tier": [
+          "A"
+        ],
+        "flags": {
+          "all": [
+            "juken_track"
+          ]
+        }
+      },
+      "grant": [
+        "edu_ikkan",
+        "edu_jhs_private",
+        "edu_jhs_exam"
+      ],
+      "countByTier": {
+        "A": 4,
+        "B": 0,
+        "C": 0
+      }
+    },
+    {
+      "id": "jh_private_mid",
+      "emoji": "🎓",
+      "label": "私立 中高一貫校",
+      "stage": "jhs",
+      "cost": 144,
+      "quality": 1.15,
+      "hensachi": [
+        50,
+        61
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1.2,
+        "sci": 0.8,
+        "soc": 0.8
+      },
+      "when": {
+        "tier": [
+          "A",
+          "B"
+        ],
+        "flags": {
+          "all": [
+            "juken_track"
+          ]
+        }
+      },
+      "grant": [
+        "edu_ikkan",
+        "edu_jhs_private",
+        "edu_jhs_exam"
+      ],
+      "countByTier": {
+        "A": 6,
+        "B": 2,
+        "C": 0
+      }
+    },
+    {
+      "id": "jh_private_easy",
+      "emoji": "🏫",
+      "label": "私立中学",
+      "stage": "jhs",
+      "cost": 140,
+      "quality": 1.05,
+      "hensachi": [
+        38,
+        49
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1
+      },
+      "when": {
+        "tier": [
+          "A",
+          "B"
+        ],
+        "flags": {
+          "all": [
+            "juken_track"
+          ]
+        }
+      },
+      "grant": [
+        "edu_ikkan",
+        "edu_jhs_private",
+        "edu_jhs_exam"
+      ],
+      "countByTier": {
+        "A": 5,
+        "B": 2,
+        "C": 0
+      }
+    },
+    {
+      "id": "jh_public_ikkan",
+      "emoji": "📘",
+      "label": "公立中高一貫校",
+      "stage": "jhs",
+      "cost": 60,
+      "quality": 1.2,
+      "hensachi": [
+        55,
+        66
+      ],
+      "subjects": {
+        "jpn": 1.3,
+        "math": 1,
+        "sci": 0.7,
+        "soc": 0.7
+      },
+      "exam": "tekisei",
+      "note": "適性検査型。学費は公立。倍率5〜7倍",
+      "grant": [
+        "edu_ikkan",
+        "edu_jhs_exam"
+      ],
+      "countByTier": {
+        "A": 2,
+        "B": 1,
+        "C": 1
+      }
+    },
+    {
+      "id": "jh_private_affil",
+      "emoji": "🏫",
+      "label": "私立大学の付属中学",
+      "stage": "jhs",
+      "cost": 150,
+      "quality": 1.1,
+      "hensachi": [
+        52,
+        66
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1.1,
+        "sci": 0.7,
+        "soc": 0.7
+      },
+      "when": {
+        "tier": [
+          "A",
+          "B"
+        ],
+        "flags": {
+          "all": [
+            "juken_track"
+          ]
+        }
+      },
+      "grant": [
+        "edu_ikkan",
+        "edu_affiliated",
+        "edu_jhs_private",
+        "edu_jhs_exam"
+      ],
+      "countByTier": {
+        "A": 3,
+        "B": 1,
+        "C": 0
+      },
+      "note": "系列の高校・大学に内部進学できる（大学は成績しだいで学部が決まる）"
+    },
+    {
+      "id": "jh_national",
+      "emoji": "🏛️",
+      "label": "国立大学附属中学",
+      "stage": "jhs",
+      "cost": 60,
+      "quality": 1.25,
+      "hensachi": [
+        55,
+        68
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1,
+        "sci": 1,
+        "soc": 1
+      },
+      "grant": [
+        "edu_jhs_private",
+        "edu_jhs_exam"
+      ],
+      "countByTier": {
+        "A": 1,
+        "B": 1,
+        "C": 1
+      }
+    },
+    {
+      "id": "jh_escalator",
+      "emoji": "🎩",
+      "label": "系列の私立中学（内部進学）",
+      "stage": "jhs",
+      "cost": 144,
+      "quality": 1.1,
+      "exam": false,
+      "when": {
+        "flags": {
+          "all": [
+            "edu_elem_private"
+          ]
+        }
+      },
+      "grant": [
+        "edu_ikkan",
+        "edu_jhs_private"
+      ]
+    },
+    {
+      "id": "jh_intl",
+      "emoji": "🌏",
+      "label": "インターナショナルスクール",
+      "stage": "jhs",
+      "cost": 280,
+      "quality": 1.1,
+      "when": {
+        "tier": [
+          "A"
+        ],
+        "wealthMin": 85
+      },
+      "growth": {
+        "eng": 2.5,
+        "jpn": 0.7
+      }
+    }
   ],
   "highSchool": [
-    { "id": "hs_pub_top", "emoji": "👑", "label": "県立トップ進学校", "stage": "hs", "cost": 51, "quality": 1.3, "hensachi": [64, 72], "subjects": { "jpn": 1, "math": 1, "sci": 1, "soc": 1, "eng": 1 }, "countByTier": { "A": 4, "B": 2, "C": 1 }, "recommendBonus": 4 },
-    { "id": "hs_pub_high", "emoji": "📗", "label": "県立上位校", "stage": "hs", "cost": 51, "quality": 1.15, "hensachi": [57, 63], "subjects": { "jpn": 1, "math": 1, "sci": 1, "soc": 1, "eng": 1 }, "countByTier": { "A": 6, "B": 3, "C": 2 }, "recommendBonus": 2 },
-    { "id": "hs_pub_mid", "emoji": "📙", "label": "県立中堅校", "stage": "hs", "cost": 51, "quality": 1.0, "hensachi": [48, 56], "subjects": { "jpn": 1, "math": 1, "sci": 1, "soc": 1, "eng": 1 }, "countByTier": { "A": 8, "B": 4, "C": 3 } },
-    { "id": "hs_pub_low", "emoji": "📕", "label": "県立高校", "stage": "hs", "cost": 51, "quality": 0.9, "hensachi": [36, 47], "subjects": { "jpn": 1, "math": 1, "eng": 1 }, "countByTier": { "A": 8, "B": 4, "C": 3 } },
-    { "id": "hs_priv_top", "emoji": "💎", "label": "私立難関高校", "stage": "hs", "cost": 105, "quality": 1.3, "hensachi": [65, 73], "subjects": { "jpn": 1, "math": 1.2, "eng": 1.2 }, "countByTier": { "A": 3, "B": 1, "C": 0 }, "note": "高校授業料の就学支援金で世帯年収により実質負担が下がる" },
-    { "id": "hs_priv_mid", "emoji": "🎓", "label": "私立高校（進学コース）", "stage": "hs", "cost": 105, "quality": 1.1, "hensachi": [50, 64], "subjects": { "jpn": 1, "math": 1, "eng": 1 }, "countByTier": { "A": 6, "B": 3, "C": 1 } },
-    { "id": "hs_priv_easy", "emoji": "🏫", "label": "私立高校", "stage": "hs", "cost": 100, "quality": 0.95, "hensachi": [35, 49], "subjects": { "jpn": 1, "math": 1, "eng": 1 }, "countByTier": { "A": 6, "B": 3, "C": 2 }, "note": "併願（すべり止め）になりやすい" },
-    { "id": "hs_priv_sports", "emoji": "🏟️", "label": "私立 スポーツ強豪校", "stage": "hs", "cost": 100, "quality": 0.9, "hensachi": [40, 52], "subjects": { "pe": 2, "jpn": 0.5, "math": 0.5 }, "countByTier": { "A": 2, "B": 2, "C": 1 }, "when": { "note": "部活で全国大会 or skill.sport>=70 でスポーツ推薦の声がかかる" }, "grant": ["sports_recommend"], "lives_dorm_chance": 0.4 },
-    { "id": "hs_kosen", "emoji": "⚙️", "label": "国立高専（5年制）", "stage": "kosen", "years": 5, "cost": 40, "quality": 1.15, "hensachi": [55, 66], "subjects": { "math": 1.5, "sci": 1.3, "eng": 0.8, "jpn": 0.6 }, "countByTier": { "A": 1, "B": 1, "C": 1 }, "grant": ["track_rikei"], "onGraduate": ["edu_kosen_grad"], "note": "卒業時の求人倍率がとても高い（20倍以上）。大学3年への編入も可能" },
-    { "id": "hs_tech", "emoji": "🔧", "label": "県立工業高校", "stage": "hs", "cost": 55, "quality": 0.95, "hensachi": [40, 50], "subjects": { "math": 1.3, "sci": 1.2, "jpn": 0.7 }, "countByTier": { "A": 2, "B": 2, "C": 2 }, "grant": ["track_rikei"], "onGraduateChance": { "lic_electric": 0.5 }, "jobBonus": { "manufacturing": 8, "construction": 8 } },
-    { "id": "hs_commerce", "emoji": "🧾", "label": "県立商業高校", "stage": "hs", "cost": 55, "quality": 0.95, "hensachi": [40, 50], "subjects": { "math": 1, "jpn": 1, "soc": 1 }, "countByTier": { "A": 2, "B": 2, "C": 2 }, "onGraduateChance": { "lic_boki2": 0.4 }, "jobBonus": { "office": 8, "finance": 5 } },
-    { "id": "hs_agri", "emoji": "🌾", "label": "県立農業高校", "stage": "hs", "cost": 55, "quality": 0.9, "hensachi": [36, 46], "subjects": { "sci": 1.2, "jpn": 1 }, "countByTier": { "A": 1, "B": 2, "C": 2 }, "jobBonus": { "agri": 10 } },
-    { "id": "hs_corr", "emoji": "💻", "label": "通信制高校", "stage": "hs_corr", "cost": 30, "quality": 0.75, "hensachi": [0, 0], "exam": "document", "always": true, "note": "書類と面接だけ。自分のペースで学べる。働きながら・不登校からの選択肢。通う日は週0〜5日を選べる" },
-    { "id": "hs_night", "emoji": "🌙", "label": "定時制高校（4年）", "stage": "hs_night", "years": 4, "cost": 20, "quality": 0.8, "hensachi": [0, 0], "exam": "easy", "always": true, "note": "昼は働き、夜に学ぶ" },
-    { "id": "hs_intl", "emoji": "🌏", "label": "インター・国際バカロレア校", "stage": "hs", "cost": 280, "quality": 1.2, "hensachi": [55, 68], "subjects": { "eng": 2 }, "when": { "tier": ["A"], "wealthMin": 80 }, "note": "海外大学進学に有利" }
+    {
+      "id": "hs_pub_top",
+      "emoji": "👑",
+      "label": "県立トップ進学校",
+      "stage": "hs",
+      "cost": 51,
+      "quality": 1.3,
+      "hensachi": [
+        64,
+        72
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1,
+        "sci": 1,
+        "soc": 1,
+        "eng": 1
+      },
+      "countByTier": {
+        "A": 4,
+        "B": 2,
+        "C": 1
+      },
+      "recommendBonus": 4
+    },
+    {
+      "id": "hs_pub_high",
+      "emoji": "📗",
+      "label": "県立上位校",
+      "stage": "hs",
+      "cost": 51,
+      "quality": 1.15,
+      "hensachi": [
+        57,
+        63
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1,
+        "sci": 1,
+        "soc": 1,
+        "eng": 1
+      },
+      "countByTier": {
+        "A": 6,
+        "B": 3,
+        "C": 2
+      },
+      "recommendBonus": 2
+    },
+    {
+      "id": "hs_pub_mid",
+      "emoji": "📙",
+      "label": "県立中堅校",
+      "stage": "hs",
+      "cost": 51,
+      "quality": 1.0,
+      "hensachi": [
+        48,
+        56
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1,
+        "sci": 1,
+        "soc": 1,
+        "eng": 1
+      },
+      "countByTier": {
+        "A": 8,
+        "B": 4,
+        "C": 3
+      }
+    },
+    {
+      "id": "hs_pub_low",
+      "emoji": "📕",
+      "label": "県立高校",
+      "stage": "hs",
+      "cost": 51,
+      "quality": 0.9,
+      "hensachi": [
+        36,
+        47
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1,
+        "eng": 1
+      },
+      "countByTier": {
+        "A": 8,
+        "B": 4,
+        "C": 3
+      }
+    },
+    {
+      "id": "hs_priv_top",
+      "emoji": "💎",
+      "label": "私立難関高校",
+      "stage": "hs",
+      "cost": 105,
+      "quality": 1.3,
+      "hensachi": [
+        65,
+        73
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1.2,
+        "eng": 1.2
+      },
+      "countByTier": {
+        "A": 3,
+        "B": 1,
+        "C": 0
+      },
+      "note": "高校授業料の就学支援金で世帯年収により実質負担が下がる"
+    },
+    {
+      "id": "hs_priv_mid",
+      "emoji": "🎓",
+      "label": "私立高校（進学コース）",
+      "stage": "hs",
+      "cost": 105,
+      "quality": 1.1,
+      "hensachi": [
+        50,
+        64
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1,
+        "eng": 1
+      },
+      "countByTier": {
+        "A": 6,
+        "B": 3,
+        "C": 1
+      }
+    },
+    {
+      "id": "hs_priv_affil",
+      "emoji": "🏛️",
+      "label": "私立大学の付属高校",
+      "stage": "hs",
+      "cost": 110,
+      "quality": 1.05,
+      "hensachi": [
+        55,
+        70
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1,
+        "eng": 1.2
+      },
+      "countByTier": {
+        "A": 4,
+        "B": 1,
+        "C": 0
+      },
+      "grant": [
+        "edu_affiliated"
+      ],
+      "note": "系列の大学に内部推薦で進める（約7〜9割）。大学受験をしないぶん部活や趣味に時間が使える"
+    },
+    {
+      "id": "hs_priv_easy",
+      "emoji": "🏫",
+      "label": "私立高校",
+      "stage": "hs",
+      "cost": 100,
+      "quality": 0.95,
+      "hensachi": [
+        35,
+        49
+      ],
+      "subjects": {
+        "jpn": 1,
+        "math": 1,
+        "eng": 1
+      },
+      "countByTier": {
+        "A": 6,
+        "B": 3,
+        "C": 2
+      },
+      "note": "併願（すべり止め）になりやすい"
+    },
+    {
+      "id": "hs_priv_sports",
+      "emoji": "🏟️",
+      "label": "私立 スポーツ強豪校",
+      "stage": "hs",
+      "cost": 100,
+      "quality": 0.9,
+      "hensachi": [
+        40,
+        52
+      ],
+      "subjects": {
+        "pe": 2,
+        "jpn": 0.5,
+        "math": 0.5
+      },
+      "countByTier": {
+        "A": 2,
+        "B": 2,
+        "C": 1
+      },
+      "when": {
+        "note": "部活で全国大会 or skill.sport>=70 でスポーツ推薦の声がかかる"
+      },
+      "grant": [
+        "sports_recommend"
+      ],
+      "lives_dorm_chance": 0.4
+    },
+    {
+      "id": "hs_kosen",
+      "emoji": "⚙️",
+      "label": "国立高専（5年制）",
+      "stage": "kosen",
+      "years": 5,
+      "cost": 40,
+      "quality": 1.15,
+      "hensachi": [
+        55,
+        66
+      ],
+      "subjects": {
+        "math": 1.5,
+        "sci": 1.3,
+        "eng": 0.8,
+        "jpn": 0.6
+      },
+      "countByTier": {
+        "A": 1,
+        "B": 1,
+        "C": 1
+      },
+      "grant": [
+        "track_rikei"
+      ],
+      "onGraduate": [
+        "edu_kosen_grad"
+      ],
+      "grant2": "高専は5年一貫（高校入試イベントはそのあとない）",
+      "note": "卒業時の求人倍率がとても高い（20倍以上）。大学3年への編入も可能"
+    },
+    {
+      "id": "hs_tech",
+      "emoji": "🔧",
+      "label": "県立工業高校",
+      "stage": "hs",
+      "cost": 55,
+      "quality": 0.95,
+      "hensachi": [
+        40,
+        50
+      ],
+      "subjects": {
+        "math": 1.3,
+        "sci": 1.2,
+        "jpn": 0.7
+      },
+      "countByTier": {
+        "A": 2,
+        "B": 2,
+        "C": 2
+      },
+      "grant": [
+        "track_rikei"
+      ],
+      "onGraduateChance": {
+        "lic_electric": 0.5
+      },
+      "jobBonus": {
+        "manufacturing": 8,
+        "construction": 8
+      }
+    },
+    {
+      "id": "hs_commerce",
+      "emoji": "🧾",
+      "label": "県立商業高校",
+      "stage": "hs",
+      "cost": 55,
+      "quality": 0.95,
+      "hensachi": [
+        40,
+        50
+      ],
+      "subjects": {
+        "math": 1,
+        "jpn": 1,
+        "soc": 1
+      },
+      "countByTier": {
+        "A": 2,
+        "B": 2,
+        "C": 2
+      },
+      "onGraduateChance": {
+        "lic_boki2": 0.4
+      },
+      "jobBonus": {
+        "office": 8,
+        "finance": 5
+      }
+    },
+    {
+      "id": "hs_agri",
+      "emoji": "🌾",
+      "label": "県立農業高校",
+      "stage": "hs",
+      "cost": 55,
+      "quality": 0.9,
+      "hensachi": [
+        36,
+        46
+      ],
+      "subjects": {
+        "sci": 1.2,
+        "jpn": 1
+      },
+      "countByTier": {
+        "A": 1,
+        "B": 2,
+        "C": 2
+      },
+      "jobBonus": {
+        "agri": 10
+      }
+    },
+    {
+      "id": "hs_corr",
+      "emoji": "💻",
+      "label": "通信制高校",
+      "stage": "hs_corr",
+      "cost": 30,
+      "quality": 0.75,
+      "hensachi": [
+        0,
+        0
+      ],
+      "exam": "document",
+      "always": true,
+      "note": "書類と面接だけ。自分のペースで学べる。働きながら・不登校からの選択肢。通う日は週0〜5日を選べる"
+    },
+    {
+      "id": "hs_night",
+      "emoji": "🌙",
+      "label": "定時制高校（4年）",
+      "stage": "hs_night",
+      "years": 4,
+      "cost": 20,
+      "quality": 0.8,
+      "hensachi": [
+        0,
+        0
+      ],
+      "exam": "easy",
+      "always": true,
+      "note": "昼は働き、夜に学ぶ"
+    },
+    {
+      "id": "hs_intl",
+      "emoji": "🌏",
+      "label": "インター・国際バカロレア校",
+      "stage": "hs",
+      "cost": 280,
+      "quality": 1.2,
+      "hensachi": [
+        55,
+        68
+      ],
+      "subjects": {
+        "eng": 2
+      },
+      "when": {
+        "tier": [
+          "A"
+        ],
+        "wealthMin": 80
+      },
+      "note": "海外大学進学に有利"
+    }
   ],
   "postSecondary": {
     "universityTiers": [
-      { "id": "u_top_national", "emoji": "👑", "label": "最難関国立大学", "where": "city", "hensachi": [65, 73], "costByType": "national", "quality": 1.3, "jobRank": 5 },
-      { "id": "u_top_private", "emoji": "💎", "label": "難関私立大学", "where": "city", "cities": ["tokyo", "kyoto", "osaka"], "hensachi": [60, 70], "costByType": "private", "quality": 1.2, "jobRank": 5 },
-      { "id": "u_national", "emoji": "🏛️", "label": "国立大学", "where": "home", "hensachi": [50, 62], "costByType": "national", "quality": 1.1, "jobRank": 4, "note": "全都道府県にある。地元就職に強い" },
-      { "id": "u_public", "emoji": "🏢", "label": "公立大学", "where": "home", "hensachi": [47, 58], "costByType": "national", "quality": 1.0, "jobRank": 3, "localDiscount": true },
-      { "id": "u_private_mid", "emoji": "🎓", "label": "中堅私立大学", "where": "home_or_city", "hensachi": [50, 59], "costByType": "private", "quality": 1.0, "jobRank": 3, "tierOnly": ["A", "B"] },
-      { "id": "u_private_easy", "emoji": "🏫", "label": "私立大学", "where": "home", "hensachi": [35, 49], "costByType": "private", "quality": 0.9, "jobRank": 2, "note": "総合型選抜・推薦で入る人が多い" },
-      { "id": "u_edu", "emoji": "🍎", "label": "国立教育大学", "where": "home", "hensachi": [50, 58], "costByType": "national", "quality": 1.0, "jobRank": 3, "fixedDept": "edu" },
-      { "id": "u_art", "emoji": "🎨", "label": "芸術大学", "where": "city", "hensachi": [45, 60], "skillCheck": { "art": 1, "music": 1 }, "costByType": "art", "quality": 1.0, "jobRank": 2, "fixedDept": "art", "note": "実技試験が中心。国立芸大は倍率が非常に高い" },
-      { "id": "u_sports", "emoji": "🏅", "label": "体育大学", "where": "city", "hensachi": [40, 55], "skillCheck": { "sport": 1 }, "costByType": "private", "quality": 0.95, "jobRank": 2, "fixedDept": "pe" },
-      { "id": "u_abroad", "emoji": "✈️", "label": "海外の大学", "where": "abroad", "hensachi": [55, 75], "subjects": { "eng": 2.5, "math": 1 }, "costByType": "abroad", "quality": 1.25, "jobRank": 5, "requires": { "subj.eng": 70, "wealthOrScholar": true }, "grantOnGrad": ["edu_abroad_degree", "edu_univ_grad"] }
+      {
+        "id": "u_top_national",
+        "emoji": "👑",
+        "label": "最難関国立大学",
+        "where": "city",
+        "hensachi": [
+          65,
+          73
+        ],
+        "costByType": "national",
+        "quality": 1.3,
+        "jobRank": 5
+      },
+      {
+        "id": "u_top_private",
+        "emoji": "💎",
+        "label": "難関私立大学",
+        "where": "city",
+        "cities": [
+          "tokyo",
+          "kyoto",
+          "osaka"
+        ],
+        "hensachi": [
+          60,
+          70
+        ],
+        "costByType": "private",
+        "quality": 1.2,
+        "jobRank": 5
+      },
+      {
+        "id": "u_national",
+        "emoji": "🏛️",
+        "label": "国立大学",
+        "where": "home",
+        "hensachi": [
+          50,
+          62
+        ],
+        "costByType": "national",
+        "quality": 1.1,
+        "jobRank": 4,
+        "note": "全都道府県にある。地元就職に強い"
+      },
+      {
+        "id": "u_public",
+        "emoji": "🏢",
+        "label": "公立大学",
+        "where": "home",
+        "hensachi": [
+          47,
+          58
+        ],
+        "costByType": "national",
+        "quality": 1.0,
+        "jobRank": 3,
+        "localDiscount": true
+      },
+      {
+        "id": "u_private_mid",
+        "emoji": "🎓",
+        "label": "中堅私立大学",
+        "where": "home_or_city",
+        "hensachi": [
+          50,
+          59
+        ],
+        "costByType": "private",
+        "quality": 1.0,
+        "jobRank": 3,
+        "tierOnly": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "id": "u_private_easy",
+        "emoji": "🏫",
+        "label": "私立大学",
+        "where": "home",
+        "hensachi": [
+          35,
+          49
+        ],
+        "costByType": "private",
+        "quality": 0.9,
+        "jobRank": 2,
+        "note": "総合型選抜・推薦で入る人が多い"
+      },
+      {
+        "id": "u_edu",
+        "emoji": "🍎",
+        "label": "国立教育大学",
+        "where": "home",
+        "hensachi": [
+          50,
+          58
+        ],
+        "costByType": "national",
+        "quality": 1.0,
+        "jobRank": 3,
+        "fixedDept": "edu"
+      },
+      {
+        "id": "u_art",
+        "emoji": "🎨",
+        "label": "芸術大学",
+        "where": "city",
+        "hensachi": [
+          45,
+          60
+        ],
+        "skillCheck": {
+          "art": 1,
+          "music": 1
+        },
+        "costByType": "art",
+        "quality": 1.0,
+        "jobRank": 2,
+        "fixedDept": "art",
+        "note": "実技試験が中心。国立芸大は倍率が非常に高い"
+      },
+      {
+        "id": "u_sports",
+        "emoji": "🏅",
+        "label": "体育大学",
+        "where": "city",
+        "hensachi": [
+          40,
+          55
+        ],
+        "skillCheck": {
+          "sport": 1
+        },
+        "costByType": "private",
+        "quality": 0.95,
+        "jobRank": 2,
+        "fixedDept": "pe"
+      },
+      {
+        "id": "u_abroad",
+        "emoji": "✈️",
+        "label": "海外の大学",
+        "where": "abroad",
+        "hensachi": [
+          55,
+          75
+        ],
+        "subjects": {
+          "eng": 2.5,
+          "math": 1
+        },
+        "costByType": "abroad",
+        "quality": 1.25,
+        "jobRank": 5,
+        "requires": {
+          "subj.eng": 70,
+          "wealthOrScholar": true
+        },
+        "grantOnGrad": [
+          "edu_abroad_degree",
+          "edu_univ_grad"
+        ]
+      }
     ],
     "departments": [
-      { "id": "law", "emoji": "⚖️", "label": "法", "track": "bunkei", "subjects": { "jpn": 1.2, "soc": 1.3, "eng": 1 }, "opens": ["lawyer_path", "civil"] },
-      { "id": "econ", "emoji": "📈", "label": "経済", "track": "bunkei", "subjects": { "math": 1.1, "soc": 1.1, "eng": 1 }, "opens": ["finance", "office"] },
-      { "id": "biz", "emoji": "💼", "label": "経営・商", "track": "bunkei", "subjects": { "math": 1, "soc": 1, "eng": 1 }, "opens": ["sales", "office", "startup"] },
-      { "id": "lit", "emoji": "📖", "label": "文", "track": "bunkei", "subjects": { "jpn": 1.4, "soc": 1, "eng": 1 }, "opens": ["writing", "teacher_course"] },
-      { "id": "foreign", "emoji": "🗣️", "label": "外国語", "track": "bunkei", "subjects": { "eng": 1.6, "jpn": 1 }, "opens": ["global"], "abroadChance": 0.5 },
-      { "id": "intl", "emoji": "🌐", "label": "国際関係", "track": "bunkei", "subjects": { "eng": 1.4, "soc": 1.2 }, "opens": ["global"], "abroadChance": 0.4 },
-      { "id": "edu", "emoji": "🍎", "label": "教育", "track": "both", "subjects": { "jpn": 1, "math": 1, "soc": 1, "sci": 1, "eng": 1 }, "autoSet": ["teacher_course"], "opens": ["teacher"] },
-      { "id": "soc", "emoji": "🏘️", "label": "社会・福祉", "track": "bunkei", "subjects": { "jpn": 1.1, "soc": 1.2 }, "opens": ["welfare", "civil"] },
-      { "id": "psy", "emoji": "🧠", "label": "心理", "track": "bunkei", "subjects": { "jpn": 1, "math": 0.8, "eng": 1 }, "opens": ["welfare"] },
-      { "id": "sci", "emoji": "🔭", "label": "理", "track": "rikei", "subjects": { "math": 1.3, "sci": 1.5, "eng": 1 }, "opens": ["science", "teacher_course"], "gradRate": 0.45 },
-      { "id": "eng", "emoji": "🛠️", "label": "工", "track": "rikei", "subjects": { "math": 1.5, "sci": 1.3, "eng": 1 }, "opens": ["engineering"], "gradRate": 0.4 },
-      { "id": "info", "emoji": "💻", "label": "情報", "track": "rikei", "subjects": { "math": 1.5, "sci": 1, "eng": 1 }, "opens": ["it"], "gradRate": 0.35 },
-      { "id": "agri", "emoji": "🌱", "label": "農", "track": "rikei", "subjects": { "sci": 1.4, "math": 1 }, "opens": ["agri", "science"], "gradRate": 0.35 },
-      { "id": "med", "emoji": "🩺", "label": "医", "track": "rikei", "years": 6, "stage": "univ_med", "hensachiBonus": 8, "subjects": { "math": 1.4, "sci": 1.5, "eng": 1.2, "jpn": 0.8 }, "costOverride": { "national": 54, "private": 500 }, "exam": "ev_m_kokushi_doctor", "opens": ["doctor"] },
-      { "id": "dent", "emoji": "🦷", "label": "歯", "track": "rikei", "years": 6, "stage": "univ_med", "hensachiBonus": 2, "subjects": { "math": 1.2, "sci": 1.4, "eng": 1 }, "costOverride": { "national": 54, "private": 450 }, "exam": "ev_m_kokushi_dentist", "opens": ["dentist"] },
-      { "id": "pharm", "emoji": "💊", "label": "薬", "track": "rikei", "years": 6, "stage": "univ_med", "hensachiBonus": 2, "subjects": { "math": 1.2, "sci": 1.5, "eng": 1 }, "costOverride": { "national": 54, "private": 210 }, "exam": "ev_m_kokushi_pharm", "opens": ["pharmacist"] },
-      { "id": "nurse", "emoji": "🧑‍⚕️", "label": "看護", "track": "rikei", "subjects": { "sci": 1.2, "jpn": 1, "eng": 1 }, "exam": "ev_m_kokushi_nurse", "opens": ["nurse"] },
-      { "id": "nutri", "emoji": "🥗", "label": "家政・栄養", "track": "both", "subjects": { "sci": 1.1, "jpn": 1 }, "opens": ["food", "welfare"] },
-      { "id": "art", "emoji": "🎨", "label": "美術・デザイン・音楽", "track": "bunkei", "subjects": { "art": 2, "jpn": 0.6 }, "skillCheck": { "art": 1, "music": 1 }, "opens": ["creative", "design"] },
-      { "id": "pe", "emoji": "🏅", "label": "体育・スポーツ科学", "track": "both", "subjects": { "pe": 2, "jpn": 0.6 }, "skillCheck": { "sport": 1 }, "opens": ["sport", "teacher_course"] }
+      {
+        "id": "law",
+        "emoji": "⚖️",
+        "label": "法",
+        "track": "bunkei",
+        "subjects": {
+          "jpn": 1.2,
+          "soc": 1.3,
+          "eng": 1
+        },
+        "opens": [
+          "lawyer_path",
+          "civil"
+        ]
+      },
+      {
+        "id": "econ",
+        "emoji": "📈",
+        "label": "経済",
+        "track": "bunkei",
+        "subjects": {
+          "math": 1.1,
+          "soc": 1.1,
+          "eng": 1
+        },
+        "opens": [
+          "finance",
+          "office"
+        ]
+      },
+      {
+        "id": "biz",
+        "emoji": "💼",
+        "label": "経営・商",
+        "track": "bunkei",
+        "subjects": {
+          "math": 1,
+          "soc": 1,
+          "eng": 1
+        },
+        "opens": [
+          "sales",
+          "office",
+          "startup"
+        ]
+      },
+      {
+        "id": "lit",
+        "emoji": "📖",
+        "label": "文",
+        "track": "bunkei",
+        "subjects": {
+          "jpn": 1.4,
+          "soc": 1,
+          "eng": 1
+        },
+        "opens": [
+          "writing",
+          "teacher_course"
+        ]
+      },
+      {
+        "id": "foreign",
+        "emoji": "🗣️",
+        "label": "外国語",
+        "track": "bunkei",
+        "subjects": {
+          "eng": 1.6,
+          "jpn": 1
+        },
+        "opens": [
+          "global"
+        ],
+        "abroadChance": 0.5
+      },
+      {
+        "id": "intl",
+        "emoji": "🌐",
+        "label": "国際関係",
+        "track": "bunkei",
+        "subjects": {
+          "eng": 1.4,
+          "soc": 1.2
+        },
+        "opens": [
+          "global"
+        ],
+        "abroadChance": 0.4
+      },
+      {
+        "id": "edu",
+        "emoji": "🍎",
+        "label": "教育",
+        "track": "both",
+        "subjects": {
+          "jpn": 1,
+          "math": 1,
+          "soc": 1,
+          "sci": 1,
+          "eng": 1
+        },
+        "autoSet": [
+          "teacher_course"
+        ],
+        "opens": [
+          "teacher"
+        ]
+      },
+      {
+        "id": "soc",
+        "emoji": "🏘️",
+        "label": "社会・福祉",
+        "track": "bunkei",
+        "subjects": {
+          "jpn": 1.1,
+          "soc": 1.2
+        },
+        "opens": [
+          "welfare",
+          "civil"
+        ]
+      },
+      {
+        "id": "psy",
+        "emoji": "🧠",
+        "label": "心理",
+        "track": "bunkei",
+        "subjects": {
+          "jpn": 1,
+          "math": 0.8,
+          "eng": 1
+        },
+        "opens": [
+          "welfare"
+        ]
+      },
+      {
+        "id": "sci",
+        "emoji": "🔭",
+        "label": "理",
+        "track": "rikei",
+        "subjects": {
+          "math": 1.3,
+          "sci": 1.5,
+          "eng": 1
+        },
+        "opens": [
+          "science",
+          "teacher_course"
+        ],
+        "gradRate": 0.45
+      },
+      {
+        "id": "eng",
+        "emoji": "🛠️",
+        "label": "工",
+        "track": "rikei",
+        "subjects": {
+          "math": 1.5,
+          "sci": 1.3,
+          "eng": 1
+        },
+        "opens": [
+          "engineering"
+        ],
+        "gradRate": 0.4
+      },
+      {
+        "id": "info",
+        "emoji": "💻",
+        "label": "情報",
+        "track": "rikei",
+        "subjects": {
+          "math": 1.5,
+          "sci": 1,
+          "eng": 1
+        },
+        "opens": [
+          "it"
+        ],
+        "gradRate": 0.35
+      },
+      {
+        "id": "agri",
+        "emoji": "🌱",
+        "label": "農",
+        "track": "rikei",
+        "subjects": {
+          "sci": 1.4,
+          "math": 1
+        },
+        "opens": [
+          "agri",
+          "science"
+        ],
+        "gradRate": 0.35
+      },
+      {
+        "id": "med",
+        "emoji": "🩺",
+        "label": "医",
+        "track": "rikei",
+        "years": 6,
+        "stage": "univ_med",
+        "hensachiBonus": 8,
+        "subjects": {
+          "math": 1.4,
+          "sci": 1.5,
+          "eng": 1.2,
+          "jpn": 0.8
+        },
+        "costOverride": {
+          "national": 54,
+          "private": 500
+        },
+        "exam": "ev_m_kokushi_doctor",
+        "opens": [
+          "doctor"
+        ]
+      },
+      {
+        "id": "dent",
+        "emoji": "🦷",
+        "label": "歯",
+        "track": "rikei",
+        "years": 6,
+        "stage": "univ_med",
+        "hensachiBonus": 2,
+        "subjects": {
+          "math": 1.2,
+          "sci": 1.4,
+          "eng": 1
+        },
+        "costOverride": {
+          "national": 54,
+          "private": 450
+        },
+        "exam": "ev_m_kokushi_dentist",
+        "opens": [
+          "dentist"
+        ]
+      },
+      {
+        "id": "pharm",
+        "emoji": "💊",
+        "label": "薬",
+        "track": "rikei",
+        "years": 6,
+        "stage": "univ_med",
+        "hensachiBonus": 2,
+        "subjects": {
+          "math": 1.2,
+          "sci": 1.5,
+          "eng": 1
+        },
+        "costOverride": {
+          "national": 54,
+          "private": 210
+        },
+        "exam": "ev_m_kokushi_pharm",
+        "opens": [
+          "pharmacist"
+        ]
+      },
+      {
+        "id": "nurse",
+        "emoji": "🧑‍⚕️",
+        "label": "看護",
+        "track": "rikei",
+        "subjects": {
+          "sci": 1.2,
+          "jpn": 1,
+          "eng": 1
+        },
+        "exam": "ev_m_kokushi_nurse",
+        "opens": [
+          "nurse"
+        ]
+      },
+      {
+        "id": "nutri",
+        "emoji": "🥗",
+        "label": "家政・栄養",
+        "track": "both",
+        "subjects": {
+          "sci": 1.1,
+          "jpn": 1
+        },
+        "opens": [
+          "food",
+          "welfare"
+        ]
+      },
+      {
+        "id": "art",
+        "emoji": "🎨",
+        "label": "美術・デザイン・音楽",
+        "track": "bunkei",
+        "subjects": {
+          "art": 2,
+          "jpn": 0.6
+        },
+        "skillCheck": {
+          "art": 1,
+          "music": 1
+        },
+        "opens": [
+          "creative",
+          "design"
+        ]
+      },
+      {
+        "id": "pe",
+        "emoji": "🏅",
+        "label": "体育・スポーツ科学",
+        "track": "both",
+        "subjects": {
+          "pe": 2,
+          "jpn": 0.6
+        },
+        "skillCheck": {
+          "sport": 1
+        },
+        "opens": [
+          "sport",
+          "teacher_course"
+        ]
+      }
     ],
     "cost": {
-      "national": { "entry": 28, "yearly": 54 },
-      "private": { "entry": 25, "yearly": 100, "rikeiPlus": 30 },
-      "art": { "entry": 25, "yearly": 140 },
-      "abroad": { "entry": 0, "yearly": 600, "note": "米国私大の概数。英国・豪州・アジアは安い。給付型奨学金で大きく下がる" },
-      "livingAway": { "yearly": 120, "note": "ひとり暮らしの仕送り＋生活費の概数。地元進学ならゼロ" }
+      "national": {
+        "entry": 28,
+        "yearly": 54
+      },
+      "private": {
+        "entry": 25,
+        "yearly": 100,
+        "rikeiPlus": 30
+      },
+      "art": {
+        "entry": 25,
+        "yearly": 140
+      },
+      "abroad": {
+        "entry": 0,
+        "yearly": 600,
+        "note": "米国私大の概数。英国・豪州・アジアは安い。給付型奨学金で大きく下がる"
+      },
+      "livingAway": {
+        "yearly": 120,
+        "note": "ひとり暮らしの仕送り＋生活費の概数。地元進学ならゼロ"
+      }
     },
     "juniorCollege": [
-      { "id": "jc_general", "emoji": "📚", "label": "短期大学（教養・ビジネス）", "years": 2, "hensachi": [35, 48], "cost": 100, "opens": ["office"] },
-      { "id": "jc_childcare", "emoji": "🧸", "label": "短期大学（保育）", "years": 2, "hensachi": [35, 48], "cost": 110, "onGraduate": ["lic_nursery"], "opens": ["nursery"] },
-      { "id": "jc_nutri", "emoji": "🥗", "label": "短期大学（栄養）", "years": 2, "hensachi": [35, 48], "cost": 110, "opens": ["food"] }
+      {
+        "id": "jc_general",
+        "emoji": "📚",
+        "label": "短期大学（教養・ビジネス）",
+        "years": 2,
+        "hensachi": [
+          35,
+          48
+        ],
+        "cost": 100,
+        "opens": [
+          "office"
+        ]
+      },
+      {
+        "id": "jc_childcare",
+        "emoji": "🧸",
+        "label": "短期大学（保育）",
+        "years": 2,
+        "hensachi": [
+          35,
+          48
+        ],
+        "cost": 110,
+        "onGraduate": [
+          "lic_nursery"
+        ],
+        "opens": [
+          "nursery"
+        ]
+      },
+      {
+        "id": "jc_nutri",
+        "emoji": "🥗",
+        "label": "短期大学（栄養）",
+        "years": 2,
+        "hensachi": [
+          35,
+          48
+        ],
+        "cost": 110,
+        "opens": [
+          "food"
+        ]
+      }
     ],
     "vocational": [
-      { "id": "vo_nurse", "emoji": "🧑‍⚕️", "label": "看護専門学校", "years": 3, "exam": "ev_m_kokushi_nurse", "hensachi": [42, 52], "cost": 90, "opens": ["nurse"] },
-      { "id": "vo_pt", "emoji": "🦽", "label": "理学療法の専門学校", "years": 3, "hensachi": [40, 50], "cost": 150, "examFlag": "lic_pt", "opens": ["pt"] },
-      { "id": "vo_care", "emoji": "🤲", "label": "介護福祉の専門学校", "years": 2, "hensachi": [30, 38], "cost": 110, "onGraduate": ["lic_care"], "opens": ["care"] },
-      { "id": "vo_nursery", "emoji": "🧸", "label": "保育の専門学校", "years": 2, "hensachi": [30, 40], "cost": 120, "onGraduate": ["lic_nursery"], "opens": ["nursery"] },
-      { "id": "vo_cook", "emoji": "🍳", "label": "調理師専門学校", "years": 1, "hensachi": [30, 38], "cost": 200, "onGraduate": ["lic_cook"], "opens": ["cook"] },
-      { "id": "vo_patissier", "emoji": "🍰", "label": "製菓専門学校", "years": 2, "hensachi": [30, 38], "cost": 150, "opens": ["cook"] },
-      { "id": "vo_beauty", "emoji": "💇", "label": "美容専門学校", "years": 2, "hensachi": [30, 38], "cost": 150, "examFlag": "lic_beauty", "opens": ["beauty"] },
-      { "id": "vo_it", "emoji": "💻", "label": "IT・プログラミング専門学校", "years": 2, "hensachi": [32, 42], "cost": 130, "onGraduateChance": { "lic_it": 0.5 }, "opens": ["it"] },
-      { "id": "vo_game", "emoji": "🎮", "label": "ゲーム・CG専門学校", "years": 2, "hensachi": [30, 40], "cost": 140, "opens": ["game", "design"] },
-      { "id": "vo_design", "emoji": "🎨", "label": "デザイン専門学校", "years": 2, "hensachi": [30, 40], "cost": 140, "opens": ["design"] },
-      { "id": "vo_anime", "emoji": "🖌️", "label": "アニメ・マンガ専門学校", "years": 2, "hensachi": [30, 38], "cost": 140, "opens": ["creative"] },
-      { "id": "vo_voice", "emoji": "🎙️", "label": "声優・俳優の専門学校", "years": 2, "hensachi": [30, 38], "cost": 140, "opens": ["entertain"] },
-      { "id": "vo_auto", "emoji": "🚗", "label": "自動車整備専門学校", "years": 2, "hensachi": [30, 38], "cost": 120, "opens": ["mechanic"] },
-      { "id": "vo_arch", "emoji": "🏗️", "label": "建築の専門学校", "years": 2, "hensachi": [32, 42], "cost": 130, "opens": ["construction"] },
-      { "id": "vo_civil", "emoji": "🏢", "label": "公務員の専門学校", "years": 2, "hensachi": [32, 42], "cost": 120, "civilExamBonus": 10, "opens": ["civil"] },
-      { "id": "vo_medoffice", "emoji": "🗂️", "label": "医療事務の専門学校", "years": 2, "hensachi": [30, 38], "cost": 110, "opens": ["office"] },
-      { "id": "vo_animal", "emoji": "🐶", "label": "動物の専門学校（トリマー等）", "years": 2, "hensachi": [30, 38], "cost": 130, "opens": ["animal"] },
-      { "id": "vo_aviation", "emoji": "✈️", "label": "航空の専門学校", "years": 2, "hensachi": [32, 42], "cost": 160, "opens": ["airline"] }
+      {
+        "id": "vo_nurse",
+        "emoji": "🧑‍⚕️",
+        "label": "看護専門学校",
+        "years": 3,
+        "exam": "ev_m_kokushi_nurse",
+        "hensachi": [
+          42,
+          52
+        ],
+        "cost": 90,
+        "opens": [
+          "nurse"
+        ]
+      },
+      {
+        "id": "vo_pt",
+        "emoji": "🦽",
+        "label": "理学療法の専門学校",
+        "years": 3,
+        "hensachi": [
+          40,
+          50
+        ],
+        "cost": 150,
+        "examFlag": "lic_pt",
+        "opens": [
+          "pt"
+        ]
+      },
+      {
+        "id": "vo_care",
+        "emoji": "🤲",
+        "label": "介護福祉の専門学校",
+        "years": 2,
+        "hensachi": [
+          30,
+          38
+        ],
+        "cost": 110,
+        "onGraduate": [
+          "lic_care"
+        ],
+        "opens": [
+          "care"
+        ]
+      },
+      {
+        "id": "vo_nursery",
+        "emoji": "🧸",
+        "label": "保育の専門学校",
+        "years": 2,
+        "hensachi": [
+          30,
+          40
+        ],
+        "cost": 120,
+        "onGraduate": [
+          "lic_nursery"
+        ],
+        "opens": [
+          "nursery"
+        ]
+      },
+      {
+        "id": "vo_cook",
+        "emoji": "🍳",
+        "label": "調理師専門学校",
+        "years": 1,
+        "hensachi": [
+          30,
+          38
+        ],
+        "cost": 200,
+        "onGraduate": [
+          "lic_cook"
+        ],
+        "opens": [
+          "cook"
+        ]
+      },
+      {
+        "id": "vo_patissier",
+        "emoji": "🍰",
+        "label": "製菓専門学校",
+        "years": 2,
+        "hensachi": [
+          30,
+          38
+        ],
+        "cost": 150,
+        "opens": [
+          "cook"
+        ]
+      },
+      {
+        "id": "vo_beauty",
+        "emoji": "💇",
+        "label": "美容専門学校",
+        "years": 2,
+        "hensachi": [
+          30,
+          38
+        ],
+        "cost": 150,
+        "examFlag": "lic_beauty",
+        "opens": [
+          "beauty"
+        ]
+      },
+      {
+        "id": "vo_it",
+        "emoji": "💻",
+        "label": "IT・プログラミング専門学校",
+        "years": 2,
+        "hensachi": [
+          32,
+          42
+        ],
+        "cost": 130,
+        "onGraduateChance": {
+          "lic_it": 0.5
+        },
+        "opens": [
+          "it"
+        ]
+      },
+      {
+        "id": "vo_game",
+        "emoji": "🎮",
+        "label": "ゲーム・CG専門学校",
+        "years": 2,
+        "hensachi": [
+          30,
+          40
+        ],
+        "cost": 140,
+        "opens": [
+          "game",
+          "design"
+        ]
+      },
+      {
+        "id": "vo_design",
+        "emoji": "🎨",
+        "label": "デザイン専門学校",
+        "years": 2,
+        "hensachi": [
+          30,
+          40
+        ],
+        "cost": 140,
+        "opens": [
+          "design"
+        ]
+      },
+      {
+        "id": "vo_anime",
+        "emoji": "🖌️",
+        "label": "アニメ・マンガ専門学校",
+        "years": 2,
+        "hensachi": [
+          30,
+          38
+        ],
+        "cost": 140,
+        "opens": [
+          "creative"
+        ]
+      },
+      {
+        "id": "vo_voice",
+        "emoji": "🎙️",
+        "label": "声優・俳優の専門学校",
+        "years": 2,
+        "hensachi": [
+          30,
+          38
+        ],
+        "cost": 140,
+        "opens": [
+          "entertain"
+        ]
+      },
+      {
+        "id": "vo_auto",
+        "emoji": "🚗",
+        "label": "自動車整備専門学校",
+        "years": 2,
+        "hensachi": [
+          30,
+          38
+        ],
+        "cost": 120,
+        "opens": [
+          "mechanic"
+        ]
+      },
+      {
+        "id": "vo_arch",
+        "emoji": "🏗️",
+        "label": "建築の専門学校",
+        "years": 2,
+        "hensachi": [
+          32,
+          42
+        ],
+        "cost": 130,
+        "opens": [
+          "construction"
+        ]
+      },
+      {
+        "id": "vo_civil",
+        "emoji": "🏢",
+        "label": "公務員の専門学校",
+        "years": 2,
+        "hensachi": [
+          32,
+          42
+        ],
+        "cost": 120,
+        "civilExamBonus": 10,
+        "opens": [
+          "civil"
+        ]
+      },
+      {
+        "id": "vo_medoffice",
+        "emoji": "🗂️",
+        "label": "医療事務の専門学校",
+        "years": 2,
+        "hensachi": [
+          30,
+          38
+        ],
+        "cost": 110,
+        "opens": [
+          "office"
+        ]
+      },
+      {
+        "id": "vo_animal",
+        "emoji": "🐶",
+        "label": "動物の専門学校（トリマー等）",
+        "years": 2,
+        "hensachi": [
+          30,
+          38
+        ],
+        "cost": 130,
+        "opens": [
+          "animal"
+        ]
+      },
+      {
+        "id": "vo_aviation",
+        "emoji": "✈️",
+        "label": "航空の専門学校",
+        "years": 2,
+        "hensachi": [
+          32,
+          42
+        ],
+        "cost": 160,
+        "opens": [
+          "airline"
+        ]
+      }
     ],
     "graduate": [
-      { "id": "gr_master_rikei", "emoji": "🔬", "label": "大学院 修士課程（理系）", "stage": "grad_master", "years": 2, "requires": ["edu_univ_grad", "track_rikei"], "cost": 54, "onGraduate": ["edu_master_grad"], "effects": "研究職・メーカー技術職の選択肢と初任給+2万/月" },
-      { "id": "gr_master_bunkei", "emoji": "📜", "label": "大学院 修士課程（文系）", "stage": "grad_master", "years": 2, "requires": ["edu_univ_grad"], "cost": 54, "onGraduate": ["edu_master_grad"], "effects": "研究職・専門職の選択肢。民間就職では大卒と同等に扱われやすい" },
-      { "id": "gr_doctor", "emoji": "🧪", "label": "大学院 博士課程", "stage": "grad_doctor", "years": 3, "requires": ["edu_master_grad"], "cost": 54, "onGraduate": ["edu_doctor_grad"], "effects": "大学教員・研究者の道。修了後に任期付き（ポスドク）が数年続くことが多い。DC研究奨励金（月20万）に採用されることもある" },
-      { "id": "gr_law", "emoji": "⚖️", "label": "法科大学院", "stage": "grad_prof", "years": 2, "requires": ["edu_univ_grad"], "cost": 100, "exam": "ev_m_shihou", "opens": ["lawyer"] },
-      { "id": "gr_mba", "emoji": "📊", "label": "ビジネススクール（MBA）", "stage": "grad_prof", "years": 2, "requires": ["edu_univ_grad"], "minAge": 25, "cost": 200, "effects": "社会人向け。管理職・転職の選択肢が広がる" },
-      { "id": "gr_teacher", "emoji": "🍎", "label": "教職大学院", "stage": "grad_prof", "years": 2, "requires": ["edu_univ_grad", "teacher_course"], "cost": 54, "effects": "教員採用試験の合格率+15%" },
-      { "id": "gr_abroad", "emoji": "✈️", "label": "海外の大学院", "stage": "grad_master", "years": 2, "requires": ["edu_univ_grad"], "check": { "subj.eng": 70 }, "cost": 500, "onGraduate": ["edu_master_grad", "lives_abroad"], "effects": "外資・国際機関・海外就職の選択肢" }
+      {
+        "id": "gr_master_rikei",
+        "emoji": "🔬",
+        "label": "大学院 修士課程（理系）",
+        "stage": "grad_master",
+        "years": 2,
+        "requires": [
+          "edu_univ_grad",
+          "track_rikei"
+        ],
+        "cost": 54,
+        "onGraduate": [
+          "edu_master_grad"
+        ],
+        "effects": "研究職・メーカー技術職の選択肢と初任給+2万/月"
+      },
+      {
+        "id": "gr_master_bunkei",
+        "emoji": "📜",
+        "label": "大学院 修士課程（文系）",
+        "stage": "grad_master",
+        "years": 2,
+        "requires": [
+          "edu_univ_grad"
+        ],
+        "cost": 54,
+        "onGraduate": [
+          "edu_master_grad"
+        ],
+        "effects": "研究職・専門職の選択肢。民間就職では大卒と同等に扱われやすい"
+      },
+      {
+        "id": "gr_doctor",
+        "emoji": "🧪",
+        "label": "大学院 博士課程",
+        "stage": "grad_doctor",
+        "years": 3,
+        "requires": [
+          "edu_master_grad"
+        ],
+        "cost": 54,
+        "onGraduate": [
+          "edu_doctor_grad"
+        ],
+        "effects": "大学教員・研究者の道。修了後に任期付き（ポスドク）が数年続くことが多い。DC研究奨励金（月20万）に採用されることもある"
+      },
+      {
+        "id": "gr_law",
+        "emoji": "⚖️",
+        "label": "法科大学院",
+        "stage": "grad_prof",
+        "years": 2,
+        "requires": [
+          "edu_univ_grad"
+        ],
+        "cost": 100,
+        "exam": "ev_m_shihou",
+        "opens": [
+          "lawyer"
+        ]
+      },
+      {
+        "id": "gr_mba",
+        "emoji": "📊",
+        "label": "ビジネススクール（MBA）",
+        "stage": "grad_prof",
+        "years": 2,
+        "requires": [
+          "edu_univ_grad"
+        ],
+        "minAge": 25,
+        "cost": 200,
+        "effects": "社会人向け。管理職・転職の選択肢が広がる"
+      },
+      {
+        "id": "gr_teacher",
+        "emoji": "🍎",
+        "label": "教職大学院",
+        "stage": "grad_prof",
+        "years": 2,
+        "requires": [
+          "edu_univ_grad",
+          "teacher_course"
+        ],
+        "cost": 54,
+        "effects": "教員採用試験の合格率+15%"
+      },
+      {
+        "id": "gr_abroad",
+        "emoji": "✈️",
+        "label": "海外の大学院",
+        "stage": "grad_master",
+        "years": 2,
+        "requires": [
+          "edu_univ_grad"
+        ],
+        "check": {
+          "subj.eng": 70
+        },
+        "cost": 500,
+        "onGraduate": [
+          "edu_master_grad",
+          "lives_abroad"
+        ],
+        "effects": "外資・国際機関・海外就職の選択肢"
+      }
     ],
     "abroad": [
-      { "id": "ab_hs_exchange", "emoji": "🎒", "label": "高校の交換留学（1年）", "age": [15, 17], "cost": 200, "requires": {}, "growth": { "eng": 15, "social": 5 }, "grant": ["edu_abroad_hs"], "note": "1年休学扱いか単位認定。帰国後は学年が1つ下がる学校もある" },
-      { "id": "ab_univ_exchange", "emoji": "🌍", "label": "大学の交換留学（半年〜1年）", "age": [19, 22], "cost": 150, "requires": { "stage": ["univ"] }, "growth": { "eng": 15, "social": 5 }, "grant": ["edu_abroad_univ"], "note": "授業料は在籍大学のまま。就活の時期とずれることがある" },
-      { "id": "ab_language", "emoji": "🗣️", "label": "語学留学（3か月）", "age": [16, 40], "cost": 80, "growth": { "eng": 7 } },
-      { "id": "ab_wh", "emoji": "🧳", "label": "ワーキングホリデー（1年）", "age": [18, 30], "cost": 50, "growth": { "eng": 10, "social": 3 }, "grant": ["edu_workingholiday"], "note": "現地で働きながら暮らす。帰国後の就職では空白期間に見られることも" }
+      {
+        "id": "ab_hs_exchange",
+        "emoji": "🎒",
+        "label": "高校の交換留学（1年）",
+        "age": [
+          15,
+          17
+        ],
+        "cost": 200,
+        "requires": {},
+        "growth": {
+          "eng": 15,
+          "social": 5
+        },
+        "grant": [
+          "edu_abroad_hs"
+        ],
+        "note": "1年休学扱いか単位認定。帰国後は学年が1つ下がる学校もある"
+      },
+      {
+        "id": "ab_univ_exchange",
+        "emoji": "🌍",
+        "label": "大学の交換留学（半年〜1年）",
+        "age": [
+          19,
+          22
+        ],
+        "cost": 150,
+        "requires": {
+          "stage": [
+            "univ"
+          ]
+        },
+        "growth": {
+          "eng": 15,
+          "social": 5
+        },
+        "grant": [
+          "edu_abroad_univ"
+        ],
+        "note": "授業料は在籍大学のまま。就活の時期とずれることがある"
+      },
+      {
+        "id": "ab_language",
+        "emoji": "🗣️",
+        "label": "語学留学（3か月）",
+        "age": [
+          16,
+          40
+        ],
+        "cost": 80,
+        "growth": {
+          "eng": 7
+        }
+      },
+      {
+        "id": "ab_wh",
+        "emoji": "🧳",
+        "label": "ワーキングホリデー（1年）",
+        "age": [
+          18,
+          30
+        ],
+        "cost": 50,
+        "growth": {
+          "eng": 10,
+          "social": 3
+        },
+        "grant": [
+          "edu_workingholiday"
+        ],
+        "note": "現地で働きながら暮らす。帰国後の就職では空白期間に見られることも"
+      }
     ]
+  },
+  "ikkanHigh": {
+    "jh_private_top": "hs_priv_top",
+    "jh_private_mid": "hs_priv_mid",
+    "jh_private_easy": "hs_priv_easy",
+    "jh_public_ikkan": "hs_pub_high",
+    "jh_escalator": "hs_priv_mid",
+    "jh_private_affil": "hs_priv_affil"
   }
 }

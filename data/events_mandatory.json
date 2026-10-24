@@ -125,7 +125,7 @@
     },
     {
       "id": "ev_m_hs_target", "kind": "choice", "emoji": "🎯", "counselor": "parents_teacher",
-      "when": { "age": [14, 14], "season": ["Q3"], "stage": ["jhs", "free_school"], "once": true },
+      "when": { "age": [14, 14], "season": ["Q3"], "stage": ["jhs", "free_school"], "none": ["edu_ikkan"], "once": true },
       "text": "中3の秋。三者面談で、先生と親から志望校の候補を出された。",
       "choices": [
         { "menu": { "source": "schools.highSchool", "page": 5, "showRate": true, "filter": "eligible" }, "effects": { "var": { "target": "$pick" } } },
@@ -133,8 +133,28 @@
       ]
     },
     {
+      "id": "ev_m_ikkan_choice", "kind": "choice", "emoji": "🏫", "counselor": "parents_teacher",
+      "when": { "age": [14, 14], "season": ["Q3"], "stage": ["jhs"], "all": ["edu_ikkan"], "once": true },
+      "text": "中高一貫校の中3。このまま系列の高校に上がるか、高校入試で別の高校を受けるか決める時期だ。",
+      "choices": [
+        { "label": "🏫 そのまま系列の高校に上がる（内部進学・試験なし）", "effects": { "var": { "target": "$ikkanHigh" }, "set": ["naitei_internal"] } },
+        { "label": "🎯 高校入試で別の高校を受ける（内部進学の権利はなくなる）", "menu": { "source": "schools.highSchool", "page": 5, "showRate": true, "filter": "eligible" }, "effects": { "var": { "target": "$pick" }, "clear": ["edu_ikkan", "edu_affiliated"] } }
+      ],
+      "note": "外部受験すると内部進学できなくなる学校が多い。不合格なら ev_m_hs_exam の失敗ルート（すべり止め・二次募集・通信制など）"
+    },
+    {
+      "id": "ev_m_affil_univ", "kind": "choice", "emoji": "🏛️", "counselor": "parents_teacher",
+      "when": { "age": [17, 17], "season": ["Q2"], "stage": ["hs"], "all": ["edu_affiliated"], "once": true },
+      "text": "付属高校の3年生。系列の大学に内部推薦で進むか、大学受験で別の大学をめざすか。（内部推薦の学部は、高校の成績順に決まる）",
+      "choices": [
+        { "label": "🏛️ 内部推薦で系列の大学へ（学部は成績しだい）", "menu": { "source": "schools.affiliatedDepts", "page": 5, "showRate": true, "filter": "byGrade" }, "roll": { "rate": "$menuRate" }, "success": { "var": { "target": "$pick", "plan": "univ" }, "set": ["naitei_school"], "log": "🏛️ 内部推薦で{target}に決まった" }, "fail": { "var": { "target": "$affilFallback", "plan": "univ" }, "set": ["naitei_school"], "log": "🍂 希望の学部は成績が足りず、{target}に決まった" } },
+        { "label": "🎯 大学受験で別の大学をめざす（内部推薦はことわる）", "effects": { "var": { "plan": "univ" }, "clear": ["edu_affiliated"] } }
+      ],
+      "note": "内部推薦の希望学部は成績（通知表）で判定。落ちても系列のどこかの学部には入れる（付属校の内部進学率は7〜9割）"
+    },
+    {
       "id": "ev_m_hs_exam", "kind": "choice", "emoji": "✏️", "counselor": "self",
-      "when": { "age": [14, 14], "season": ["Q4"], "stage": ["jhs", "free_school"], "once": true },
+      "when": { "age": [14, 14], "season": ["Q4"], "stage": ["jhs", "free_school"], "none": ["naitei_internal"], "once": true },
       "text": "高校入試の結果発表……",
       "auto": { "roll": { "rate": "$targetRate" } },
       "success": { "text": "🌸 {target}に合格！", "effects": { "stats": { "happiness": 8 } } },
@@ -167,7 +187,7 @@
       "text": "中学を出て、働くことにした。どこで働く？（中卒で応募できる仕事）",
       "choices": [
         { "menu": { "source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "job": { "hire": "$pick" } }, "fail": { "job": { "hire": "j_parttime_general" }, "log": "🍂 不採用。まずはアルバイトから" } },
-        { "label": "🏮 家の手伝いをする", "when": { "person": { "role": "father", "jobIn": ["j_farmer", "j_fisher", "j_family_business", "j_carpenter", "j_cook"] } }, "effects": { "job": { "hire": "j_family_business" } } }
+        { "label": "🏮 親の家業を継ぐ（就職率100%）", "when": { "person": { "role": "father|mother", "alive": true, "employment": ["self_employed"] } }, "effects": { "job": { "hire": "$parentBusinessJob" }, "personRelation": { "father": 8, "mother": 8 } } }
       ]
     },
     {
@@ -217,7 +237,7 @@
     },
     {
       "id": "ev_m_post_target", "kind": "choice", "emoji": "🎯", "counselor": "parents_teacher",
-      "when": { "age": [17, 17], "season": ["Q2"], "stage": ["hs", "hs_corr", "hs_night"], "var": { "plan": ["univ", "jc", "voc", "abroad", "undecided"] }, "once": true },
+      "when": { "age": [17, 17], "season": ["Q2"], "stage": ["hs", "hs_corr", "hs_night"], "var": { "plan": ["univ", "jc", "voc", "abroad", "undecided"] }, "none": ["naitei_school"], "once": true },
       "text": "高3の夏。先生と親が、成績と家計に合わせて候補を出してくれた。",
       "choices": [
         { "menu": { "source": "schools.postByPlan", "page": 5, "showRate": true, "filter": "eligible" }, "effects": { "var": { "target": "$pick" } } },
@@ -241,6 +261,7 @@
       "when": { "age": [17, 17], "season": ["Q3"], "stage": ["hs", "hs_corr", "hs_night"], "var": { "plan": ["work"] }, "once": true },
       "text": "9月、高卒の採用試験が始まる。学校に来た求人から応募先を選ぼう（はじめは1人1社）。",
       "choices": [
+        { "label": "🏮 親の家業を継ぐ（就職率100%）", "when": { "person": { "role": "father|mother", "alive": true, "employment": ["self_employed"] } }, "effects": { "set": ["naitei"], "var": { "target": "$parentBusinessJob" }, "personRelation": { "father": 8, "mother": 8 }, "log": "🏮 親の仕事を継ぐことに決めた" } },
         { "menu": { "source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "set": ["naitei"], "var": { "target": "$pick" }, "log": "🌸 {target}から内定！" }, "fail": { "schedule": [ { "event": "ev_m_hs_job_hunt2", "inYears": [0, 0], "season": "Q4" } ], "log": "🍂 不採用…" } }
       ]
     },
@@ -249,13 +270,14 @@
       "when": { "age": [17, 17], "season": ["Q4"], "none": ["naitei"] },
       "text": "まだ就職先が決まっていない。卒業までにどうする？",
       "choices": [
+        { "label": "🏮 親の家業を継ぐ（就職率100%）", "when": { "person": { "role": "father|mother", "alive": true, "employment": ["self_employed"] } }, "effects": { "set": ["naitei"], "var": { "target": "$parentBusinessJob" }, "personRelation": { "father": 8, "mother": 8 }, "log": "🏮 親の仕事を継ぐことに決めた" } },
         { "menu": { "source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate+5" }, "success": { "set": ["naitei"], "var": { "target": "$pick" } }, "fail": { "var": { "target": "j_parttime_general" }, "log": "🍂 決まらず、アルバイトで働くことに" } },
         { "label": "🛠️ 専門学校に切りかえる", "effects": { "var": { "plan": "voc" }, "schedule": [ { "event": "ev_m_post_exam", "inYears": [0, 0], "season": "Q4" } ] } }
       ]
     },
     {
       "id": "ev_m_post_exam", "kind": "choice", "emoji": "🌸", "counselor": "self",
-      "when": { "season": ["Q4"], "stage": ["hs", "hs_corr", "hs_night", "ronin"], "var": { "plan": ["univ", "jc", "voc", "abroad", "undecided"], "target": ["!none"] } },
+      "when": { "season": ["Q4"], "stage": ["hs", "hs_corr", "hs_night", "ronin"], "var": { "plan": ["univ", "jc", "voc", "abroad", "undecided"], "target": ["!none"] }, "none": ["naitei_school"] },
       "text": "合格発表の日……",
       "auto": { "roll": { "rate": "$targetRate" } },
       "success": { "text": "🌸 {target}に合格！", "effects": { "stats": { "happiness": 10 }, "set": ["naitei_school"] } },
@@ -345,6 +367,7 @@
       "when": { "season": ["Q1"], "yearsLeft": 1, "stage": ["univ", "univ_med", "junior_college", "vocational", "kosen", "grad_master", "grad_doctor", "grad_prof"], "var": { "plan": ["work", "undecided"] }, "none": ["naitei"] },
       "text": "就職活動の本番。エントリーする会社を選ぼう。（落ちても秋にもう一度チャンスがある）",
       "choices": [
+        { "label": "🏮 親の家業を継ぐ（就職率100%）", "when": { "person": { "role": "father|mother", "alive": true, "employment": ["self_employed"] } }, "effects": { "set": ["naitei"], "var": { "target": "$parentBusinessJob" }, "personRelation": { "father": 8, "mother": 8 }, "log": "🏮 親の仕事を継ぐことに決めた" } },
         { "menu": { "source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate" }, "success": { "set": ["naitei"], "clear": ["job_hunting"], "var": { "target": "$pick" }, "stats": { "happiness": 8 }, "log": "🌸 {target}から内定！" }, "fail": { "stats": { "stress": 6, "happiness": -4 }, "schedule": [ { "event": "ev_m_job_hunt_autumn", "inYears": [0, 0], "season": "Q3" } ], "log": "🍂 お祈りメールが届いた…" } }
       ]
     },
@@ -353,6 +376,7 @@
       "when": { "season": ["Q3"], "none": ["naitei"], "yearsLeft": 1 },
       "text": "まだ内定がない。秋の採用でどうする？",
       "choices": [
+        { "label": "🏮 親の家業を継ぐ（就職率100%）", "when": { "person": { "role": "father|mother", "alive": true, "employment": ["self_employed"] } }, "effects": { "set": ["naitei"], "var": { "target": "$parentBusinessJob" }, "personRelation": { "father": 8, "mother": 8 }, "log": "🏮 親の仕事を継ぐことに決めた" } },
         { "menu": { "source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible" }, "roll": { "rate": "$menuRate+3" }, "success": { "set": ["naitei"], "var": { "target": "$pick" } }, "fail": { "var": { "target": "j_parttime_general" }, "log": "🍂 内定ゼロで卒業へ…" } },
         { "label": "📅 わざと留年して来年もう一度（学費1年分）", "when": { "stage": ["univ"] }, "effects": { "counter": { "repeat_years": 1 }, "extendStage": 1 } },
         { "label": "🔬 大学院に進む", "when": { "stage": ["univ"] }, "effects": { "var": { "plan": "grad" } } },

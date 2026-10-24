@@ -103,14 +103,15 @@
       "scholarship_loan": "貸与型奨学金",
       "scholarship_grant": "給付型奨学金",
       "scholarship_loan_repaying": "奨学金を返済中",
-      "futoko": "不登校",
-      "bullied": "いじめを受けた",
       "student_council": "生徒会",
       "captain": "部長・キャプテン",
       "national_tournament": "全国大会出場",
       "koshien": "甲子園出場",
       "sports_recommend": "スポーツ推薦",
-      "lives_dorm": "寮・下宿"
+      "lives_dorm": "寮・下宿",
+      "edu_ikkan": "中高一貫校に在籍（高校へ内部進学できる）",
+      "edu_affiliated": "大学の付属校に在籍（系列大学へ内部進学できる）",
+      "naitei_internal": "内部進学が決まった"
     },
     "license": {
       "lic_car": "普通自動車免許",
@@ -323,7 +324,17 @@
       "both"
     ],
     "inheritedHouse": "親の家を相続した",
-    "workAway": "勤め先が実家から通えない"
+    "workAway": "勤め先が実家から通えない",
+    "happinessType": [
+      "hp_self",
+      "hp_people",
+      "hp_money",
+      "hp_family"
+    ],
+    "mode": [
+      "real",
+      "gentle"
+    ]
   },
   "personOps": [
     "add",

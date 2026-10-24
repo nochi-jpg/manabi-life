@@ -31,20 +31,48 @@
 #self{position:absolute;left:390px;top:560px;width:240px;height:56px;font-size:19px}
 #ok{position:absolute;left:650px;top:560px;width:240px;height:56px;font-size:19px}
 #back{position:absolute;left:40px;top:640px;width:150px;height:46px;font-size:16px}
+.opts4{position:absolute;left:240px;right:240px;top:200px;display:grid;grid-template-columns:1fr;gap:var(--sp3)}
+.pick{height:84px;border-radius:20px;display:grid;grid-template-columns:64px 1fr;align-items:center;column-gap:var(--sp2);padding:0 var(--sp4);font-size:24px;text-align:left}
+.pick .i{font-size:40px;text-align:center}
+.opts2{position:absolute;left:160px;right:160px;top:220px;display:grid;grid-template-columns:1fr 1fr;gap:var(--sp4)}
+.pick.mode{height:300px;grid-template-columns:1fr;grid-template-rows:auto auto 1fr;justify-items:center;align-content:start;row-gap:var(--sp2);padding:var(--sp4);text-align:center}
+.pick.mode .i{font-size:72px}
+.pick.mode .l{font-size:30px}
+.pick.mode .d{font-size:17px;line-height:1.6;color:var(--ink2);font-weight:700}
 .note{position:absolute;left:0;right:0;top:636px;text-align:center;font-size:14px;color:#9fb4dc}
 </style></head>
 <body>
 <div id="stage">
   <!-- 1. 性別 -->
   <div class="step on" id="st1">
-    <div class="dots"><i class="on"></i><i></i><i></i></div>
+    <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
     <div class="q">どちらで 生まれる？<small>あとから変えることはできません</small></div>
     <div class="pearl sex" id="sM" data-g="M"><div class="pic" style="background-image:url(../assets/faces/M_20.png)"></div><div class="l">👦 男の子</div><div class="d">0歳から人生がはじまります</div></div>
     <div class="pearl sex" id="sF" data-g="F"><div class="pic" style="background-image:url(../assets/faces/F_20.png)"></div><div class="l">👧 女の子</div><div class="d">0歳から人生がはじまります</div></div>
   </div>
-  <!-- 2. 名前 -->
+  <!-- 2. 幸せの基準 -->
+  <div class="step" id="stH">
+    <div class="dots"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    <div class="q">あなたにとって、幸せのいちばんの基準は？<small>答えはゲーム中には出ません。人生の終わりに、この基準でも点数がつきます</small></div>
+    <div class="opts4">
+      <button class="pick" data-n="stM"><span class="i">🎨</span><span>自分のやりたいことをやること</span></button>
+      <button class="pick" data-n="stM"><span class="i">🤝</span><span>たくさんの人とかかわること</span></button>
+      <button class="pick" data-n="stM"><span class="i">💰</span><span>大金持ちになること</span></button>
+      <button class="pick" data-n="stM"><span class="i">🏡</span><span>家族と平穏に暮らすこと</span></button>
+    </div>
+  </div>
+  <!-- 3. モード -->
+  <div class="step" id="stM">
+    <div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    <div class="q">どちらのモードで生きる？<small>あとから変えることはできません</small></div>
+    <div class="opts2">
+      <button class="pick mode" data-n="st2"><span class="i">🌏</span><span class="l">現実的モード</span><span class="d">日本の統計どおり。病気・事故・別れ・犯罪など、つらいできごとも起こります</span></button>
+      <button class="pick mode" data-n="st2"><span class="i">🌷</span><span class="l">おだやかモード</span><span class="d">死・がん・離婚・逮捕などのできごとは起こりません</span></button>
+    </div>
+  </div>
+  <!-- 4. 名前 -->
   <div class="step" id="st2">
-    <div class="dots"><i class="on"></i><i class="on"></i><i></i></div>
+    <div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
     <div class="q">名前は？<small>🔀 でべつの名前に。自分で決めることもできます</small></div>
     <div class="pearl" id="nm">
       <div class="row"><span class="k">苗字</span><div class="field" id="fS"><span class="kana"></span><span class="kj"></span></div><button class="gl g-cyan sh" id="shS">🔀</button></div>
@@ -68,11 +96,14 @@ function draw(){
   document.getElementById('full').textContent=`${S[0]} ${G[0]}（${S[1]} ${G[1]}）`;
 }
 document.querySelectorAll('.sex').forEach(c=>c.onclick=()=>{g=c.dataset.g;document.querySelectorAll('.sex').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');
-  G=pick(GIV[g]);setTimeout(()=>{document.getElementById('st1').classList.remove('on');document.getElementById('st2').classList.add('on');draw()},250)});
+  G=pick(GIV[g]);setTimeout(()=>go('stH'),250)});
+function go(id){document.querySelectorAll('.step').forEach(x=>x.classList.remove('on'));document.getElementById(id).classList.add('on');if(id==='st2')draw()}
+document.querySelectorAll('.pick').forEach(b=>b.onclick=()=>go(b.dataset.n));
 document.getElementById('shS').onclick=()=>{S=pick(SUR);self=false;draw()};
 document.getElementById('shG').onclick=()=>{G=pick(GIV[g]);self=false;draw()};
 document.getElementById('self').onclick=()=>{self=true;draw()};
-document.getElementById('back').onclick=()=>{document.getElementById('st2').classList.remove('on');document.getElementById('st1').classList.add('on')};
+document.getElementById('back').onclick=()=>go('stM');
+if(location.hash==='#hp')go('stH');if(location.hash==='#mode')go('stM');
 document.getElementById('ok').onclick=()=>location.href='birth.html';
 if(location.hash==='#name'){document.getElementById('st1').classList.remove('on');document.getElementById('st2').classList.add('on');draw()}
 if(location.hash==='#self'){document.getElementById('st1').classList.remove('on');document.getElementById('st2').classList.add('on');self=true;draw()}

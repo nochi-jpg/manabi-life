@@ -2,7 +2,7 @@
 
 > このファイルは `node tools/catalog.js` で `data/events_*.json` から生成しています。直接編集せず、JSONを直してから再生成してください。
 
-## 必須イベント（条件を満たすと必ず起こる）（66件）
+## 必須イベント（条件を満たすと必ず起こる）（68件）
 
 | | ID | 時期 | 条件 | 文章 | 選択肢 |
 |---|---|---|---|---|---|
@@ -20,21 +20,23 @@
 | ✏️ | `ev_m_jhs_exam` | 11歳 冬 | 在籍:elem / 必要:juken_track | いよいよ中学受験本番。受ける学校を選ぼう。（合格したら進学先になります） | ［候補リスト:schools.juniorHigh］<br>🏳️ やっぱり受験はやめる |
 | 🎒 | `ev_m_jhs_entry` | 12歳 春 | 在籍:elem/free_school | 中学生になった。{school}に入学。 |  |
 | 🏸 | `ev_m_club_jhs` | 12歳 春 | 在籍:jhs | 部活動の見学期間。どの部に入る？ | ［候補リスト:clubs.jhsClubs］ |
-| 🎯 | `ev_m_hs_target` | 14歳 秋 | 在籍:jhs/free_school | 中3の秋。三者面談で、先生と親から志望校の候補を出された。 | ［候補リスト:schools.highSchool］<br>🔧 高校には行かず働く |
-| ✏️ | `ev_m_hs_exam` | 14歳 冬 | 在籍:jhs/free_school | 高校入試の結果発表…… | 🏫 すべり止めの私立高校に行く<br>📕 公立の二次募集を受ける（合格率70%）<br>💻 通信制高校に行く<br>🌙 定時制高校に行って昼は働く<br>🔧 高校に行かず働く |
+| 🎯 | `ev_m_hs_target` | 14歳 秋 | 在籍:jhs/free_school / 除外:edu_ikkan | 中3の秋。三者面談で、先生と親から志望校の候補を出された。 | ［候補リスト:schools.highSchool］<br>🔧 高校には行かず働く |
+| 🏫 | `ev_m_ikkan_choice` | 14歳 秋 | 在籍:jhs / 必要:edu_ikkan | 中高一貫校の中3。このまま系列の高校に上がるか、高校入試で別の高校を受けるか決める時期だ。 | 🏫 そのまま系列の高校に上がる（内部進学・試験なし）<br>［候補リスト:schools.highSchool］ |
+| 🏛️ | `ev_m_affil_univ` | 17歳 夏 | 在籍:hs / 必要:edu_affiliated | 付属高校の3年生。系列の大学に内部推薦で進むか、大学受験で別の大学をめざすか。（内部推薦の学部は、高校の成績順に決まる） | ［候補リスト:schools.affiliatedDepts］<br>🎯 大学受験で別の大学をめざす（内部推薦はことわる） |
+| ✏️ | `ev_m_hs_exam` | 14歳 冬 | 在籍:jhs/free_school / 除外:naitei_internal | 高校入試の結果発表…… | 🏫 すべり止めの私立高校に行く<br>📕 公立の二次募集を受ける（合格率70%）<br>💻 通信制高校に行く<br>🌙 定時制高校に行って昼は働く<br>🔧 高校に行かず働く |
 | 🎓 | `ev_m_jhs_grad` | 14歳 冬 | 在籍:jhs/free_school | 中学校を卒業した。 |  |
 | 🏫 | `ev_m_hs_entry` | 15歳 春 | 在籍:none / 必要:edu_jhs_grad | 高校生になった！{school}に入学。 |  |
-| 🔧 | `ev_m_after_jhs_work` | 15歳 春 | 在籍:none / 必要:edu_jhs_grad | 中学を出て、働くことにした。どこで働く？（中卒で応募できる仕事） | ［候補リスト:jobs.jobs］<br>🏮 家の手伝いをする |
+| 🔧 | `ev_m_after_jhs_work` | 15歳 春 | 在籍:none / 必要:edu_jhs_grad | 中学を出て、働くことにした。どこで働く？（中卒で応募できる仕事） | ［候補リスト:jobs.jobs］<br>🏮 親の家業を継ぐ（就職率100%） |
 | 🏉 | `ev_m_club_hs` | 15歳 春 | 在籍:hs/kosen/hs_night | 高校の部活。どうする？ | ［候補リスト:clubs.hsClubs］ |
 | 🔀 | `ev_m_bunri` | 15歳 秋 | 在籍:hs / 除外:track_rikei,track_bunkei | 高1の秋。来年からの文系・理系を決める時期だ。 | 📖 文系（法・経済・文・外国語・教育など）<br>🔭 理系（理・工・情報・医・薬・看護など） |
 | 👛 | `ev_m_cash_start` | 16歳 春 |  | 16歳。自分のお金を自分で管理するようになった。おこづかい：月{allowance}万円。 |  |
 | 🏪 | `ev_m_parttime_start` | 16歳 春 | 在籍:hs/hs_corr/hs_night/kosen | 友だちがアルバイトを始めた。自分はどうする？ | ［候補リスト:jobs.partTimeJobs］<br>📚 バイトはしない（勉強・部活に集中） |
 | 🧭 | `ev_m_hs_plan` | 16歳 秋 | 在籍:hs/hs_corr/hs_night | 高2の秋。進路希望調査の紙が配られた。卒業後はどうしたい？ | 🎓 大学に行きたい<br>📚 短大に行きたい<br>🛠️ 専門学校で技術や資格を身につけたい<br>💼 就職したい<br>✈️ 海外の大学に行きたい<br>🤔 まだ決められない |
-| 🎯 | `ev_m_post_target` | 17歳 夏 | 在籍:hs/hs_corr/hs_night | 高3の夏。先生と親が、成績と家計に合わせて候補を出してくれた。 | ［候補リスト:schools.postByPlan］<br>💼 やっぱり就職する |
+| 🎯 | `ev_m_post_target` | 17歳 夏 | 在籍:hs/hs_corr/hs_night / 除外:naitei_school | 高3の夏。先生と親が、成績と家計に合わせて候補を出してくれた。 | ［候補リスト:schools.postByPlan］<br>💼 やっぱり就職する |
 | 💴 | `ev_m_scholarship` | 17歳 秋 | 在籍:hs/hs_corr/hs_night | 進学にかかるお金の話を家族でした。学費は{tuition}万円/年。家は{householdComment} | 👨‍👩‍👧 親に出してもらう<br>📄 貸与型の奨学金を借りる（月5万・卒業後に返す）<br>🏅 給付型奨学金に申し込む（返さなくていい）<br>💪 バイトして自分でなんとかする<br>💼 お金のことを考えて就職に切りかえる |
-| 💼 | `ev_m_hs_job_hunt` | 17歳 秋 | 在籍:hs/hs_corr/hs_night | 9月、高卒の採用試験が始まる。学校に来た求人から応募先を選ぼう（はじめは1人1社）。 | ［候補リスト:jobs.jobs］ |
-| 💼 | `ev_m_hs_job_hunt2` | 17歳 冬 | 除外:naitei | まだ就職先が決まっていない。卒業までにどうする？ | ［候補リスト:jobs.jobs］<br>🛠️ 専門学校に切りかえる |
-| 🌸 | `ev_m_post_exam` | 冬 | 在籍:hs/hs_corr/hs_night/ronin | 合格発表の日…… | 🔁 浪人してもう1年がんばる（予備校 年80万）<br>［候補リスト:schools.postByPlan］<br>🛠️ 専門学校に行く（ほぼ全員合格）<br>💼 就職する<br>🧳 ワーキングホリデーに行く |
+| 💼 | `ev_m_hs_job_hunt` | 17歳 秋 | 在籍:hs/hs_corr/hs_night | 9月、高卒の採用試験が始まる。学校に来た求人から応募先を選ぼう（はじめは1人1社）。 | 🏮 親の家業を継ぐ（就職率100%）<br>［候補リスト:jobs.jobs］ |
+| 💼 | `ev_m_hs_job_hunt2` | 17歳 冬 | 除外:naitei | まだ就職先が決まっていない。卒業までにどうする？ | 🏮 親の家業を継ぐ（就職率100%）<br>［候補リスト:jobs.jobs］<br>🛠️ 専門学校に切りかえる |
+| 🌸 | `ev_m_post_exam` | 冬 | 在籍:hs/hs_corr/hs_night/ronin / 除外:naitei_school | 合格発表の日…… | 🔁 浪人してもう1年がんばる（予備校 年80万）<br>［候補リスト:schools.postByPlan］<br>🛠️ 専門学校に行く（ほぼ全員合格）<br>💼 就職する<br>🧳 ワーキングホリデーに行く |
 | 🎓 | `ev_m_hs_grad` | 冬 | 在籍:hs/hs_corr/hs_night / 最終学年-0 | 高校を卒業した。{gradComment} |  |
 | 🤔 | `ev_m_hs_unknown_path` | 冬 | 在籍:hs/hs_corr/hs_night / 除外:naitei,naitei_school / 最終学年-0 | 卒業が近いのに、進路が決まっていない……。 | 🔁 1年浪人して大学をめざす<br>🧺 フリーターとして働きながら考える<br>🛠️ 専門学校に行く |
 | 🌸 | `ev_m_post_entry` | 春 | 在籍:none/ronin / 必要:naitei_school | {school}に入学！新しい生活が始まった。 |  |
@@ -43,8 +45,8 @@
 | 🍎 | `ev_m_teacher_course` | 春 | 在籍:univ / 除外:teacher_course | 大学で教職課程（先生の免許をとる授業）を取ることができる。授業は増えるけど……。 | 🍎 教職課程をとる<br>🙅 とらない |
 | 👘 | `ev_m_seijin` | 20歳 冬 |  | 二十歳のつどい（成人式）。{seijinComment} |  |
 | 🧭 | `ev_m_career_plan` | 冬 | 在籍:univ/junior_college/vocational/kosen / 最終学年-1 | 卒業まであと1年ちょっと。この先どうする？ | 💼 民間企業に就職活動をする<br>🏛️ 公務員試験を受ける<br>🍎 教員採用試験を受ける<br>🔬 大学院に進む<br>🎓 大学3年に編入する<br>🚀 起業・フリーランスをめざす<br>🤔 まだ考えたい |
-| 👔 | `ev_m_job_hunt` | 春 | 在籍:univ/univ_med/junior_college/vocational/kosen/grad_master/grad_doctor/grad_prof / 除外:naitei / 最終学年-0 | 就職活動の本番。エントリーする会社を選ぼう。（落ちても秋にもう一度チャンスがある） | ［候補リスト:jobs.jobs］ |
-| 🍁 | `ev_m_job_hunt_autumn` | 秋 | 除外:naitei / 最終学年-0 | まだ内定がない。秋の採用でどうする？ | ［候補リスト:jobs.jobs］<br>📅 わざと留年して来年もう一度（学費1年分）<br>🔬 大学院に進む<br>🧺 卒業してアルバイトをしながら探す（既卒） |
+| 👔 | `ev_m_job_hunt` | 春 | 在籍:univ/univ_med/junior_college/vocational/kosen/grad_master/grad_doctor/grad_prof / 除外:naitei / 最終学年-0 | 就職活動の本番。エントリーする会社を選ぼう。（落ちても秋にもう一度チャンスがある） | 🏮 親の家業を継ぐ（就職率100%）<br>［候補リスト:jobs.jobs］ |
+| 🍁 | `ev_m_job_hunt_autumn` | 秋 | 除外:naitei / 最終学年-0 | まだ内定がない。秋の採用でどうする？ | 🏮 親の家業を継ぐ（就職率100%）<br>［候補リスト:jobs.jobs］<br>📅 わざと留年して来年もう一度（学費1年分）<br>🔬 大学院に進む<br>🧺 卒業してアルバイトをしながら探す（既卒） |
 | 🔬 | `ev_m_grad_school_exam` | 夏 | 在籍:univ/grad_master / 最終学年-0 | 大学院の入試。どこを受ける？ | ［候補リスト:schools.graduate］ |
 | 🏛️ | `ev_m_civil_exam` | 17〜35歳 夏 | 除外:arrest,naitei | 公務員試験。どの試験を受ける？ | ［候補リスト:jobs.civil］ |
 | 🍎 | `ev_m_kyosai` | 21〜45歳 夏 | どれか:teacher_course,lic_teacher_elem,lic_teacher_sec / 除外:arrest,naitei | 教員採用試験の日。（合格率は全国平均で約3〜4倍の倍率） | 🧑‍🏫 小学校の先生<br>🧑‍🏫 中学・高校の先生 |
@@ -73,13 +75,10 @@
 | 🚗 | `ev_m_license_return` | 75〜100歳 春 | 必要:lic_car / 除外:license_returned | {age}歳。家族から「運転免許、そろそろ返したら？」と言われた。 | 🪪 免許を返納する<br>🚗 まだ運転を続ける |
 | 🕊️ | `ev_m_death` |  |  | {year}年{month}月。{name}は{age}歳で人生を終えた。{deathCause} |  |
 
-## ランダム選択肢イベント（119件）
+## ランダム選択肢イベント（116件）
 
 | | ID | 時期 | 条件 | 文章 | 選択肢 |
 |---|---|---|---|---|---|
-| 😢 | `ev_r_bullied` | 7〜15歳 | 在籍:elem/jhs | 最近、クラスの何人かに無視されたり、からかわれたりしている……。 | 🧑‍🏫 先生に相談する<br>🏠 家族に話す<br>🤐 だれにも言わずにがまんする<br>🤝 仲のいい友だちといっしょに立ち向かう |
-| 🚪 | `ev_r_futoko` | 7〜17歳 | 在籍:elem/jhs/hs / 除外:futoko | 朝になると、おなかが痛くて学校に行けない日が続いている。 | 🏠 しばらく学校を休む<br>🌱 フリースクールに通う<br>💻 通信制高校に転校する<br>🏥 保健室やカウンセラーの先生のところに行く<br>😣 がんばって登校する |
-| 🌤️ | `ev_r_back_to_school` |  | 必要:futoko | 気持ちが少し落ちついてきた。また学校に行ってみる？ | 🌤️ 少しずつ登校してみる<br>🏠 今の過ごし方を続ける |
 | 🙋 | `ev_r_class_rep` | 8〜17歳 | 在籍:elem/jhs/hs | 学級委員に推薦された。 | 🙋 引き受ける<br>🙅 ことわる |
 | 🏛️ | `ev_r_council` | 13〜16歳 | 在籍:jhs/hs / 除外:student_council | 生徒会長に立候補しないかと先生に言われた。 | 🎤 立候補する<br>🙅 やめておく |
 | 🎒 | `ev_r_new_lesson` | 6〜14歳 |  | 友だちに「いっしょに習わない？」と誘われた。 | ［候補リスト:clubs.lessons］<br>🙅 今はいいや |

@@ -1,0 +1,49 @@
+{
+  "_comment": "ゲームのはじめに選ぶモード。幸せの基準の次に聞く。あとから変更はできない（人生は一度きり）。",
+  "question": "どちらのモードで生きる？",
+  "modes": {
+    "real": {
+      "label": "🌏 現実的モード",
+      "desc": "日本の統計どおり。病気・事故・別れ・犯罪など、つらいできごとも起こります"
+    },
+    "gentle": {
+      "label": "🌷 おだやかモード",
+      "desc": "死・がん・離婚・逮捕などのできごとは起こりません",
+      "excludeEvents": [
+        "ev_r_shoplift_invite",
+        "ev_r_night_out",
+        "ev_r_yami_baito",
+        "ev_r_drunk_drive",
+        "ev_r_parents_divorce",
+        "ev_r_marital_crisis",
+        "ev_r_divorce",
+        "ev_r_surname_divorce",
+        "ev_r_cancer",
+        "ev_r_stroke",
+        "ev_r_heart",
+        "ev_f_grandparent_death",
+        "ev_f_parent_death",
+        "ev_f_spouse_death",
+        "ev_f_child_death",
+        "ev_f_pet_death",
+        "ev_f_inheritance",
+        "ev_r_inherit_house",
+        "ev_f_danshin"
+      ],
+      "excludeChoices": {
+        "ev_r_smoke_invite": "吸ってみる の補導判定をなくす",
+        "ev_r_drink_invite_minor": "補導判定をなくす"
+      },
+      "rules": {
+        "playerDeath": "老衰だけ。85〜100歳のあいだで、健康が高いほど長生き",
+        "familyDeath": "家族・ペットは亡くならない（年をとった家族は『介護』イベントまで）",
+        "flags": "arrest・hodou・divorced・widowed・dz_cancer_* は付かない"
+      }
+    }
+  },
+  "resultBadge": {
+    "real": "🌏 現実的モード",
+    "gentle": "🌷 おだやかモード"
+  },
+  "_note": "いじめ・不登校のイベントは、どちらのモードにも入れない（2026-10-24 決定）"
+}

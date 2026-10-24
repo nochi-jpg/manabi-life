@@ -58,7 +58,7 @@ const QUAL_IDS = new Set(random.qualifications.map((q) => q.id));
 const MENU_SOURCES = new Set([
   'schools.preschool', 'schools.elementary', 'schools.juniorHigh', 'schools.highSchool', 'schools.postByPlan',
   'schools.vocational', 'schools.graduate', 'schools.abroad', 'jobs.jobs', 'jobs.partTimeJobs', 'jobs.midCareer', 'jobs.civil',
-  'clubs.lessons', 'clubs.jhsClubs', 'clubs.hsClubs', 'clubs.univCircles', 'clubs.current', 'clubs.hobbies', 'focus', 'qualifications',
+  'clubs.lessons', 'clubs.jhsClubs', 'clubs.hsClubs', 'clubs.univCircles', 'clubs.current', 'clubs.hobbies', 'schools.affiliatedDepts', 'focus', 'qualifications',
 ]);
 const SPECIAL_SCHOOL = new Set(['jh_free_or_el_free']);
 
@@ -258,6 +258,12 @@ const hasRoll = (o) => o && typeof o === 'object' && (o.roll || o.auto || Object
 for (const id of Object.keys(sus.events)) { const e = allEvents.find((x) => x.id === id); if (!e) err('suspense', `イベントがない「${id}」`); else if (!hasRoll(e)) err('suspense.' + id, '判定（roll）のないイベントにドキドキ演出がついている'); }
 const aud = D('audio.json');
 if (!aud.se[sus.sound]) err('suspense', `効果音がない「${sus.sound}」`);
+const modes = D('modes.json');
+for (const id of modes.modes.gentle.excludeEvents) if (!EVENT_IDS.has(id)) err('modes.gentle', `イベントがない「${id}」`);
+for (const id of Object.keys(modes.modes.gentle.excludeChoices)) if (!EVENT_IDS.has(id)) err('modes.gentle', `イベントがない「${id}」`);
+const ending = D('ending.json');
+for (const c of ending.question.choices) { if (!ending.criteria[c.id]) err('ending', `基準「${c.id}」の計算がない`); else { const sum = ending.criteria[c.id].parts.reduce((t, x) => t + x.w, 0); if (Math.abs(sum - 1) > 1e-9) err('ending.' + c.id, `重みの合計が1でない（${sum}）`); } }
+for (const [jh, hs] of Object.entries(schools.ikkanHigh)) { if (!SCHOOL_IDS.has(jh) || !SCHOOL_IDS.has(hs)) err('schools.ikkanHigh', `未定義の学校「${jh}→${hs}」`); }
 for (let a = 0; a <= 120; a++) if (vis.portraits.ages.filter((p) => a >= p.from && a <= p.to).length !== 1) err('visuals.portraits', `${a}歳の顔グラが0枚または重複`);
 for (const g of ps.graduate) if (g.requires) { checkFlags(`graduate.${g.id}`, g.requires); if (g.stage === 'grad_doctor' && !g.requires.includes('edu_master_grad')) err(`graduate.${g.id}`, 'I-8違反：博士は修士修了が必要'); }
 for (const c of [...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles]) {

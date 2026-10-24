@@ -34,38 +34,6 @@
   ],
   "events": [
 
-    { "id": "ev_r_bullied", "kind": "choice", "emoji": "😢", "cat": "school",
-      "when": { "age": [7, 15], "stage": ["elem", "jhs"], "cooldownYears": 3 },
-      "weight": { "base": 2, "mul": [["social<35", 2.5], ["t_comm<40", 1.5], ["social>=70", 0.4]] },
-      "text": "最近、クラスの何人かに無視されたり、からかわれたりしている……。",
-      "choices": [
-        { "label": "🧑‍🏫 先生に相談する", "roll": { "base": 0.65 }, "success": { "stats": { "stress": -5, "social": 2 }, "log": "🧑‍🏫 先生が動いてくれて、いじめはおさまった" }, "fail": { "stats": { "stress": 8 }, "set": ["bullied"], "log": "😢 相談したけど、あまり変わらなかった" } },
-        { "label": "🏠 家族に話す", "roll": { "base": 0.6 }, "success": { "stats": { "stress": -6 }, "log": "🏠 家族が学校に話してくれた" }, "fail": { "stats": { "stress": 6 }, "set": ["bullied"] } },
-        { "label": "🤐 だれにも言わずにがまんする", "effects": { "set": ["bullied"], "stats": { "stress": 15, "social": -6, "happiness": -8 }, "schedule": [ { "event": "ev_r_futoko", "inYears": [0, 1], "chance": 0.35 } ] } },
-        { "label": "🤝 仲のいい友だちといっしょに立ち向かう", "when": { "stat": { "social": [">=", 45] } }, "roll": { "base": 0.5, "w": { "t_comm": 0.4 } }, "success": { "stats": { "social": 5, "stress": -4 }, "log": "🤝 友だちと声を上げたら、空気が変わった" }, "fail": { "stats": { "stress": 10 }, "set": ["bullied"] } }
-      ] },
-
-    { "id": "ev_r_futoko", "kind": "choice", "emoji": "🚪", "cat": "school",
-      "when": { "age": [7, 17], "stage": ["elem", "jhs", "hs"], "none": ["futoko"], "stat": { "stress": [">=", 70] }, "cooldownYears": 2 },
-      "weight": { "base": 2, "mul": [["bullied", 2.5]] },
-      "text": "朝になると、おなかが痛くて学校に行けない日が続いている。",
-      "choices": [
-        { "label": "🏠 しばらく学校を休む", "effects": { "set": ["futoko"], "stats": { "stress": -15, "academic": -5, "social": -6 } } },
-        { "label": "🌱 フリースクールに通う", "when": { "stage": ["elem", "jhs"] }, "effects": { "set": ["futoko"], "school": { "enter": "jh_free_or_el_free" }, "stats": { "stress": -12, "happiness": 5 } } },
-        { "label": "💻 通信制高校に転校する", "when": { "stage": ["hs"] }, "effects": { "school": { "enter": "hs_corr", "transfer": true }, "stats": { "stress": -15 } } },
-        { "label": "🏥 保健室やカウンセラーの先生のところに行く", "effects": { "set": ["mental_care"], "stats": { "stress": -8 } } },
-        { "label": "😣 がんばって登校する", "effects": { "stats": { "stress": 8, "health": -3 } } }
-      ] },
-
-    { "id": "ev_r_back_to_school", "kind": "choice", "emoji": "🌤️", "cat": "school",
-      "when": { "all": ["futoko"], "stat": { "stress": ["<", 50] }, "cooldownYears": 1 },
-      "weight": { "base": 4 },
-      "text": "気持ちが少し落ちついてきた。また学校に行ってみる？",
-      "choices": [
-        { "label": "🌤️ 少しずつ登校してみる", "roll": { "base": 0.6, "w": { "social": 0.3 } }, "success": { "clear": ["futoko"], "stats": { "social": 4, "happiness": 5 } }, "fail": { "stats": { "stress": 6 } } },
-        { "label": "🏠 今の過ごし方を続ける", "effects": { "stats": { "stress": -3 } } }
-      ] },
-
     { "id": "ev_r_class_rep", "kind": "choice", "emoji": "🙋", "cat": "school",
       "when": { "age": [8, 17], "stage": ["elem", "jhs", "hs"], "cooldownYears": 2 },
       "weight": { "base": 2, "mul": [["social>=60", 1.8], ["t_comm>=60", 1.5]] },
@@ -813,7 +781,7 @@
 
     { "id": "ev_r_dropout_crisis", "kind": "choice", "emoji": "🎒", "cat": "school",
       "when": { "stage": ["hs", "univ"], "stat": { "stress": [">=", 75] }, "cooldownYears": 2 },
-      "weight": { "base": 1.5, "mul": [["futoko", 2], ["academic<30", 2]] },
+      "weight": { "base": 1.5, "mul": [["academic<30", 2]] },
       "text": "学校をやめたい気持ちが強くなってきた。",
       "choices": [
         { "label": "💻 通信制に転校する", "when": { "stage": ["hs"] }, "effects": { "school": { "enter": "hs_corr", "transfer": true }, "stats": { "stress": -15 } } },

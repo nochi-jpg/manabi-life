@@ -163,6 +163,11 @@
       "text": "社内の面談中……",
       "emoji": "🤖",
       "onlyChoice": 0
+    },
+    "ev_m_affil_univ": {
+      "text": "内部推薦の学部が決まる……",
+      "emoji": "🏛️",
+      "onlyChoice": 0
     }
   }
 }
