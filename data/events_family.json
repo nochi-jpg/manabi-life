@@ -51,24 +51,34 @@
 
     { "id": "ev_m_child_after_hs", "kind": "choice", "emoji": "🧭", "cat": "family", "counselor": "family",
       "when": { "season": ["Q3"], "child": { "age": [17, 17], "alive": true, "noFlag": "pathDone" } },
-      "text": "{child}は高校3年生。卒業したらどうする？",
+      "text": "{child}は高校3年生。本人は「{childWish}」ことを希望しているが……",
       "fact": { "text": "大学進学率は全国で約58%、{pref}は{univRate}%。家を出て通う学生への仕送りは、平均で月7万円くらい。", "src": "文部科学省 学校基本調査・全国大学生活協同組合連合会" },
       "choices": [
-        { "label": "🏫 地元の大学（自宅から通う）", "when": { "tier": ["A", "B"] }, "effects": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ" } } },
-        { "label": "🏫 地元の大学（数が少なく、せまき門）", "when": { "tier": ["C"] }, "roll": { "base": 0.45 }, "showRate": true, "success": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ" }, "log": "🌸 {child}は地元の大学に合格した。家から通える。" }, "fail": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ_away" }, "log": "🧳 地元の大学はだめだったが、県外の大学に合格。ひとり暮らしで仕送りが必要になる。" } },
-        { "label": "🏙️ 県外の大学に行きたい（ひとり暮らし）", "effects": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ" }, "schedule": [ { "event": "ev_m_child_away_pay", "inYears": [0, 0] } ] } },
-        { "label": "✈️ 海外の大学に留学したい", "effects": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ" }, "schedule": [ { "event": "ev_m_child_abroad_pay", "inYears": [0, 0] } ] } },
-        { "label": "🛠️ 専門学校", "effects": { "childPlan": { "pathDone": true, "plan": "voc", "costStage": "voc" } } },
-        { "label": "💼 就職する", "effects": { "childPlan": { "pathDone": true, "plan": "work" } } }
+        { "label": "🙂 本人に任せる：{childWish}", "effects": { "childPath": "wish", "personRelation": { "child": 3 } } },
+        { "label": "🏫 地元の大学（家から通う）をすすめる", "when": { "child": { "alive": true, "wishNot": "local" } }, "roll": { "base": 0.65, "w": { "childRelation": 0.3 } }, "showRate": true, "success": { "childPath": "local", "personRelation": { "child": -2 }, "log": "🧭 {child}は話し合って、地元の大学に家から通うことにした" }, "fail": { "childPath": "wish", "personRelation": { "child": -4 }, "log": "🧭 {child}は「やっぱり自分の希望どおりにしたい」と、{childWish}ことにした" } },
+        { "label": "🏙️ 県外の大学（ひとり暮らし）をすすめる", "when": { "child": { "alive": true, "wishNot": "away" } }, "roll": { "base": 0.65, "w": { "childRelation": 0.3 } }, "showRate": true, "success": { "childPath": "away", "personRelation": { "child": -2 }, "log": "🧭 {child}は話し合って、県外の大学に進むことにした" }, "fail": { "childPath": "wish", "personRelation": { "child": -4 }, "log": "🧭 {child}は「やっぱり自分の希望どおりにしたい」と、{childWish}ことにした" } },
+        { "label": "🛠️ 専門学校をすすめる", "when": { "child": { "alive": true, "wishNot": "voc" } }, "roll": { "base": 0.65, "w": { "childRelation": 0.3 } }, "showRate": true, "success": { "childPath": "voc", "personRelation": { "child": -2 }, "log": "🧭 {child}は話し合って、専門学校に進むことにした" }, "fail": { "childPath": "wish", "personRelation": { "child": -4 }, "log": "🧭 {child}は「やっぱり自分の希望どおりにしたい」と、{childWish}ことにした" } },
+        { "label": "💼 就職をすすめる", "when": { "child": { "alive": true, "wishNot": "work" } }, "roll": { "base": 0.65, "w": { "childRelation": 0.3 } }, "showRate": true, "success": { "childPath": "work", "personRelation": { "child": -2 }, "log": "🧭 {child}は話し合って、就職することにした" }, "fail": { "childPath": "wish", "personRelation": { "child": -4 }, "log": "🧭 {child}は「やっぱり自分の希望どおりにしたい」と、{childWish}ことにした" } }
+      ] },
+
+    { "id": "ev_m_child_tuition", "kind": "choice", "emoji": "🎓", "cat": "family", "type": "scheduled", "counselor": "family",
+      "when": { "child": { "age": [17, 18], "alive": true } },
+      "text": "{child}は{childSchoolKind}に進む。学費はどうする？（いまの家計：毎月{monthlyLeft}万円）",
+      "fact": { "text": "大学4年間の学費は、国公立で約250万円、私立で約400〜550万円。専門学校は2年で約200〜300万円。大学生の約半分が奨学金を借りている。", "src": "文部科学省・日本学生支援機構 学生生活調査" },
+      "choices": [
+        { "label": "💴 学費は全部出す", "effects": { "childPlan": { "scholar": false, "selfTuition": false }, "personRelation": { "child": 3 }, "log": "🎓 {child}の学費は親が出すことにした" } },
+        { "label": "🎓 半分くらい出して、奨学金も借りてもらう", "effects": { "childPlan": { "scholar": true, "selfTuition": false }, "log": "🎓 {child}は奨学金も借りて進学することにした" } },
+        { "label": "🙏 奨学金とバイトで、自分でなんとかしてもらう", "effects": { "childPlan": { "scholar": true, "selfTuition": true }, "personRelation": { "child": -4 }, "log": "🎓 {child}は奨学金とバイトで学費をまかなうことになった" } }
       ] },
 
     { "id": "ev_m_child_away_pay", "kind": "choice", "emoji": "🏙️", "cat": "family", "type": "scheduled", "counselor": "family",
       "when": { "child": { "age": [17, 18], "alive": true } },
-      "text": "{child}が「県外の大学に行って、ひとり暮らしをしたい」と言っている。お金はどうする？（いまの家計：毎月{monthlyLeft}万円）",
+      "text": "{child}は県外の大学でひとり暮らしをしたいと言っている。学費と生活費はどうする？（いまの家計：毎月{monthlyLeft}万円）",
       "fact": { "text": "大学4年間の学費は、国公立で約250万円、私立で約400〜550万円。ひとり暮らしの学生の約半分が奨学金を借りている。", "src": "文部科学省・日本学生支援機構 学生生活調査" },
       "choices": [
         { "label": "💴 受け入れて、学費も生活費も全部出す", "effects": { "childPlan": { "costStage": "univ_away", "scholar": false }, "personRelation": { "child": 4 }, "schedule": [ { "event": "ev_m_child_send_money", "inYears": [0, 0] } ] } },
         { "label": "🎓 受け入れるが、奨学金も借りてもらう", "effects": { "childPlan": { "costStage": "univ_away", "scholar": true }, "personRelation": { "child": 1 }, "schedule": [ { "event": "ev_m_child_send_money", "inYears": [0, 0] } ] } },
+        { "label": "🙏 奨学金とバイトで、自分でなんとかしてもらう", "effects": { "childPlan": { "costStage": "univ_away", "scholar": true, "selfTuition": true }, "personRelation": { "child": -3 }, "schedule": [ { "event": "ev_m_child_send_money", "inYears": [0, 0] } ] } },
         { "label": "🏠 あきらめてもらい、家から通える大学に", "effects": { "childPlan": { "costStage": "univ" }, "personRelation": { "child": -6 }, "log": "🏠 {child}は家から通える大学に行くことになった" } }
       ] },
 
@@ -104,6 +114,18 @@
         { "label": "👪 子ども・孫といっしょに国内旅行（約50万円）", "when": { "child": { "alive": true, "age": [20, 80] } }, "effects": { "cash": -50, "stats": { "happiness": 12, "stress": -6, "social": 4 }, "personRelation": { "child": 5 }, "log": "👪 子どもや孫と旅行に行った" } },
         { "label": "👫 友だちと国内旅行（約20万円）", "effects": { "cash": -20, "stats": { "happiness": 6, "stress": -6, "social": 5 }, "log": "👫 友だちと旅行に行った" } },
         { "label": "🧳 ひとりで海外旅行（約45万円）", "when": { "money": { "cash": [">=", 45] } }, "effects": { "cash": -45, "stats": { "happiness": 9, "stress": -7, "health": -2 }, "log": "🧳 ひとりで海外旅行に行った" } }
+      ] },
+
+    { "id": "ev_m_divorce_home", "kind": "choice", "emoji": "🏠", "cat": "family", "type": "scheduled", "counselor": "self",
+      "when": { "none": ["married"] },
+      "text": "離婚して、これからの住まいを決めなければならない。（所持金：{cashNow}万円）",
+      "fact": { "text": "離婚したあと、ひとり親の約3割が親と同居している。賃貸を借りるときは、敷金・礼金などで家賃の4〜5か月分くらいかかる。", "src": "厚生労働省 全国ひとり親世帯等調査" },
+      "choices": [
+        { "label": "🏢 賃貸を借りる（家賃 月{rentAfterDivorce}万円）", "effects": { "set": ["renting"], "clear": ["lives_with_parents"], "rentMonthly": "$rentAfterDivorce", "cash": "-$moveInCost", "log": "🏢 新しく部屋を借りた" } },
+        { "label": "🏠 ローンで家を買う", "effects": { "set": ["renting"], "clear": ["lives_with_parents"], "rentMonthly": "$rentAfterDivorce", "schedule": [ { "event": "ev_r_house", "inYears": [0, 0] } ] } },
+        { "label": "🏡 地元（{parentPrefName}）の実家に帰る（仕事はやめる）", "when": { "awayFromHome": true, "employment": ["seishain", "keiyaku", "part", "haken", "civil_servant", "freelance", "self_employed", "executive", "leave"] }, "effects": { "job": { "quit": "self" }, "move": { "to": "home" }, "set": ["lives_with_parents"], "clear": ["renting"], "rentMonthly": 0, "stats": { "stress": -4 }, "log": "🏡 仕事をやめて、地元の実家に帰った" } },
+        { "label": "🏡 地元（{parentPrefName}）の実家に帰る", "when": { "awayFromHome": true, "employment": ["unemployed", "none", "homemaker", "retired"] }, "effects": { "move": { "to": "home" }, "set": ["lives_with_parents"], "clear": ["renting"], "rentMonthly": 0, "stats": { "stress": -4 }, "log": "🏡 地元の実家に帰った" } },
+        { "label": "🏠 いまの実家にこのまま住む", "when": { "all": ["lives_with_parents"] }, "effects": { "log": "🏠 実家でそのまま暮らすことにした" } }
       ] },
 
     { "id": "ev_r_separation", "kind": "choice", "emoji": "🧳", "cat": "family", "counselor": "spouse",

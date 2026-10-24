@@ -92,6 +92,10 @@ const Text = (() => {
       case 'severance': return Math.round(severance());
       case 'pension': return Econ.pensionMonthly(); case 'pension2m': return Math.round(Econ.pensionMonthly() * 2 * 10) / 10;
       case 'bonus': return Math.round((G.lastDelta && G.lastDelta.bonus) || 0);
+      case 'childWish': return ({ local: '地元の大学に家から通う', away: '県外の大学でひとり暮らし', abroad: '海外の大学に留学', voc: '専門学校に行く', work: '就職する' })[ch && ch.wish] || '大学';
+      case 'childSchoolKind': return ch && ch.plan === 'voc' ? '専門学校' : '大学';
+      case 'rentAfterDivorce': return people('child').some((c) => c.together && c.age < 18) ? rentOf('family') : rentOf('single');
+      case 'reportName': return ['univ', 'univ_med', 'junior_college', 'vocational', 'grad_master', 'grad_prof'].includes(G.stage) ? '成績表' : '通知表';
       case 'cashNow': return man(Math.max(0, G.cash));
       case 'pocket': return round1(Econ.myPocket()).toFixed(1);
       case 'sendMoney': return ch ? String(ch.sendMoney ?? 7) : '7';
@@ -166,6 +170,7 @@ const Text = (() => {
       case 'loanApprovalUsed': return loanApproval(housePrice() * 0.6 * 0.9);
       case 'houseValue': return Math.round(G.vars.inheritHouseValue || 1500);
       case 'rentSingle': return rentOf('single'); case 'rentFamily': return rentOf('family'); case 'rentShare': return Math.round(rentOf('single') * 0.7);
+      case 'rentAfterDivorce': return people('child').some((c) => c.together && c.age < 18) ? rentOf('family') : rentOf('single');
       case 'rentCompany': return Math.round(rentOf('single') * D().housing.companyHousing.rentMul * 10) / 10;
       case 'moveInCost': return Math.round(rentOf('single') * 4);
       case 'moveInCostFamily': return Math.round(rentOf('family') * 4);

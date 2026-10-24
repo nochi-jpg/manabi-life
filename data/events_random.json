@@ -279,7 +279,7 @@
     { "id": "ev_r_pregnancy", "kind": "flow", "emoji": "🤰", "cat": "family",
       "when": { "all": ["married"], "any": ["wants_children"], "person": { "role": "spouse", "alive": true, "fertile": true }, "childrenLess": 4 },
       "risk": "fertility",
-      "roll": { "ageCurve": { "25": 0.8, "30": 0.75, "35": 0.6, "38": 0.45, "40": 0.32, "43": 0.14, "45": 0.04 }, "of": "birthParentAge" },
+      "roll": { "ageCurve": { "25": 0.82, "30": 0.78, "35": 0.66, "38": 0.5, "40": 0.36, "43": 0.16, "45": 0.04 }, "of": "birthParentAge" },
       "success": { "text": "🤰 赤ちゃんができた！", "effects": { "schedule": [ { "event": "ev_f_childbirth", "inYears": [0, 1] } ] } },
       "fail": { "text": "", "effects": { "counter": {}, "silent": true, "var": { "tryYears": "+1" } } } },
 
@@ -604,7 +604,7 @@
       "weight": { "base": 0.8, "mul": [["circle:u_startup", 2], ["focus_invest", 1.5], ["var:plan=startup", 4]] },
       "text": "温めていたアイデアで、会社を立ち上げる？（資金：最低100万）",
       "choices": [
-        { "label": "🚀 起業する", "when": { "money": { "cash": [">=", 100] } }, "roll": { "base": 0.3, "w": { "t_comm": 0.3, "academic": 0.2, "social": 0.2 } }, "success": { "set": ["startup_exp"], "job": { "hire": "j_ceo", "form": "self_employed" }, "cash": -100, "stats": { "happiness": 8, "stress": 10 }, "log": "🚀 会社が軌道に乗った" }, "fail": { "set": ["startup_exp"], "cash": -100, "debt": 200, "stats": { "stress": 15, "happiness": -8 }, "job": { "quit": "self" }, "log": "📉 2年で会社をたたむことになった" } },
+        { "label": "🚀 起業する", "when": { "money": { "cash": [">=", 100] } }, "roll": { "base": 0.3, "w": { "t_comm": 0.3, "academic": 0.2, "social": 0.2 } }, "success": { "set": ["startup_exp"], "job": { "hire": "j_ceo", "form": "self_employed" }, "cash": -100, "stats": { "happiness": 8, "stress": 10 }, "log": "🚀 会社が軌道に乗った" }, "fail": { "set": ["startup_exp"], "cash": -30, "stats": { "stress": 10, "happiness": -6 }, "log": "📉 事業計画書の内容が甘く、出資してもらえなかった（準備にかかったお金は30万円）" } },
         { "label": "💼 副業として小さく始める", "effects": { "set": ["side_job"], "stats": { "stress": 4 }, "sideIncome": [0, 120] } },
         { "label": "🙅 今の生活を続ける", "effects": {} }
       ] },

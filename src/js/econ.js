@@ -120,7 +120,7 @@ const Econ = (() => {
     // 収入が多いほど使うお金も増える
     const net = (jobGross() + sideGross() + pensionAnnual()) * 0.78 + (sp ? (sp.income || 0) * 0.78 : 0);
     // 収入が多いほど使うお金も増える（ふえた分の6割）。子どもがいる家は、その分を子どもの費用にあてる
-    if (net > 260) v += Math.max(0, (net - 260) * 0.65 - childCosts() * 0.65);
+    if (net > 260) v += Math.max(0, (net - 260) * 0.68 - childCosts() * 0.68);
     if (G.age >= 65) v += 15; // 医療・介護
     if (G.cash < 0) v *= 0.85; // お金がないときは節約する
     v *= LEVELS[lifeLevel()].mul;
@@ -141,14 +141,14 @@ const Econ = (() => {
   // 子ども1人の1年の費用（奨学金を借りたら学費は半分くらい・仕送り・おこづかいをふくむ）
   function childCost1(c, income) {
     const st = childStage(c);
-    let v = (CHILD_COST[st] ?? 0) * (c.scholar && SCHOOL_STAGES.includes(st) ? 0.6 : 1);
+    let v = (CHILD_COST[st] ?? 0) * (SCHOOL_STAGES.includes(st) ? (c.selfTuition ? 0.25 : c.scholar ? 0.6 : 1) : 1);
     if (AWAY.includes(st)) v += (c.sendMoney ?? 7) * 12;
     else v += pocketMoney(st, income) * 12;
     v += c.extraCost || 0;
     if (G.flags.near_parents && c.age < 6) v -= 15;
     return Math.max(0, v);
   }
-  const childNote = (c, income) => { const st = childStage(c); const n = [STAGE_L[st] || '']; if (AWAY.includes(st)) n.push(`仕送り 月${c.sendMoney ?? 7}万`); else if (POCKET[st]) n.push(`おこづかい 月${round1(pocketMoney(st, income)).toFixed(1)}万`); if (c.scholar && SCHOOL_STAGES.includes(st)) n.push('奨学金あり'); return n.filter(Boolean).join('・'); };
+  const childNote = (c, income) => { const st = childStage(c); const n = [STAGE_L[st] || '']; if (AWAY.includes(st)) n.push(`仕送り 月${c.sendMoney ?? 7}万`); else if (POCKET[st]) n.push(`おこづかい 月${round1(pocketMoney(st, income)).toFixed(1)}万`); if (c.selfTuition && SCHOOL_STAGES.includes(st)) n.push('学費は本人'); else if (c.scholar && SCHOOL_STAGES.includes(st)) n.push('奨学金あり'); return n.filter(Boolean).join('・'); };
   const childStage = (c) => c.costStage || (c.age < 3 ? 'baby' : c.age < 6 ? 'nursery' : c.age < 12 ? 'elem' : c.age < 15 ? 'jhs' : c.age < 18 ? 'hs' : 'none');
   // 費用がかかる子ども：いっしょに住む未成年＋仕送りしている学生（別れた相手が育てる子は養育費のほう）
   const costKids = () => people('child').filter((c) => !c.withEx && !c.livesApart && (c.together || ['univ', 'univ_away', 'abroad', 'voc'].includes(c.costStage)));

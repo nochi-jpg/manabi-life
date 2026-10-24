@@ -169,7 +169,7 @@ const Engine = (() => {
     // 社会人の「新しい1年の重点方針」は5年に1回（毎年だと選択が多すぎて1プレイが長くなる）
     if (e.id === 'ev_m_focus_adult' && G.stage !== 'none' && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < 2) return false;
     if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 70) return false; // 70歳からは聞かない（いつでも▼から変えられる）
-    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 19 && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < (G.age >= 40 ? 15 : 10)) return false;
+    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 19 && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < (G.age >= 40 ? 15 : 12)) return false;
     // 30代からは、新しい趣味を聞くのは10年に1回
     if (['ev_r_new_hobby', 'ev_r_senior_hobby', 'ev_r_adult_lesson'].includes(e.id) && G.age >= 30) { const last = Math.max(...['ev_r_new_hobby', 'ev_r_senior_hobby', 'ev_r_adult_lesson'].map((x) => G.lastFired[x] ?? -99)); if (G.year - last < 10) return false; }
     if (w.season || w.date) return true;
@@ -616,7 +616,7 @@ const Engine = (() => {
       const h = G.stats.health;
       p *= h < 20 ? 4 : h < 35 ? 2 : h < 45 ? 1.3 : h > 75 ? 0.8 : 1;
       p *= G.vars.deathRiskMul || 1;
-      p *= G.gender === 'M' ? 0.66 : 0.44; // 統計の平均寿命（男81歳・女87歳）に合わせる
+      p *= G.gender === 'M' ? 0.66 : 0.47; // 統計の平均寿命（男81歳・女87歳）に合わせる
       if (['dz_cancer_lung', 'dz_cancer_stomach', 'dz_cancer_colon', 'dz_cancer_breast'].some((f) => G.flags[f])) p += 0.05 * (G.vars.cancerStage || 2) / 2;
       if (G.flags.dz_heart || G.flags.dz_stroke_after) p *= 1.2;
       if (G.age < 35) p = Math.min(p, 0.003);
@@ -942,6 +942,8 @@ const Engine = (() => {
     },
     ev_m_death(ctx) { die(G.deathCause); },
     ev_m_baby_work(ctx) { const ps = people('father|mother').filter((p) => p.age < 78 && !p.careLevel && !p.together); if (ps.length && !ctx.who) ctx.who = ps.sort((a, b) => (a.pref === G.pref ? -1 : 0) - (b.pref === G.pref ? -1 : 0))[0]; },
+    // 子どもの進路の希望（本人が決める）
+    ev_m_child_after_hs(ctx) { const c = ctx.child; if (!c || c.wish) return; const W = { local: tier() === 'C' ? 18 : 34, away: tier() === 'C' ? 30 : 18, abroad: 3, voc: 22, work: 16 }; c.wish = weighted(Object.keys(W), (k) => W[k]); },
     ev_f_sibling_birth(ctx) { ctx.sibData = ctx.sibData || {}; },
     ev_r_car_accident() { Audio2.se('crash'); },
     ev_r_traffic_victim() { Audio2.se('crash'); },

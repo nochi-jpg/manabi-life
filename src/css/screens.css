@@ -262,8 +262,8 @@
 /* 家族カード */
 .pbox{width:1024px}
 .pcard{display:grid;grid-template-columns:304px 1fr;gap:var(--sp4)}
-.pcard .pic{height:352px;border-radius:16px;overflow:hidden;position:relative;background:var(--soft) center/cover}
-.pcard .pic img{position:absolute;left:50%;bottom:-8px;height:340px;transform:translateX(-50%)}
+.pcard .pic{height:236px;align-self:start;border-radius:16px;overflow:hidden;position:relative;background:var(--soft) center/cover}
+.pcard .pic img{position:absolute;left:50%;bottom:-10px;height:246px;transform:translateX(-50%);filter:drop-shadow(0 6px 10px rgba(0,0,0,.18))}
 .pcard .nm{margin-bottom:var(--sp1)}.pcard .nm .pn{font-size:32px}.pcard .nm small{font-size:15px;color:var(--ink2);margin-left:var(--sp1)}
 .pcard .kv{grid-template-columns:112px 1fr;height:40px;min-height:40px;font-size:16px;white-space:nowrap}
 .pcard .kv>span:last-child{display:flex;align-items:center;gap:var(--sp1);overflow:hidden}

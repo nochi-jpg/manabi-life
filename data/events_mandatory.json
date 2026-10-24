@@ -75,16 +75,16 @@
     },
     {
       "id": "ev_m_report_card", "kind": "choice", "emoji": "📋", "counselor": "self",
-      "when": { "season": ["Q4"], "stage": ["elem", "jhs", "hs", "hs_corr", "hs_night", "kosen", "free_school"] },
+      "when": { "season": ["Q4"], "stage": ["elem", "jhs", "hs", "hs_corr", "hs_night", "kosen", "free_school", "univ", "univ_med", "junior_college", "vocational", "grad_master", "grad_prof"] },
       "popup": "reportCard",
-      "text": "{year}年3月。通知表が配られた。来年度は何を大事にする？",
+      "text": "{year}年3月。{reportName}が配られた。来年度は何を大事にする？",
       "choices": [
         { "menu": { "source": "focus", "filter": "stage" }, "effects": { "focus": "$pick" } }
       ]
     },
     {
       "id": "ev_m_focus_adult", "kind": "choice", "emoji": "🧭", "counselor": "self",
-      "when": { "season": ["Q4"], "stage": ["univ", "univ_med", "junior_college", "vocational", "grad_master", "grad_doctor", "grad_prof", "ronin", "none", "hikikomori"], "cooldownYears": 1 },
+      "when": { "season": ["Q4"], "stage": ["grad_doctor", "ronin", "none", "hikikomori"], "cooldownYears": 1 },
       "text": "{year}年。新しい1年、どんなことを大事にする？",
       "choices": [
         { "menu": { "source": "focus", "filter": "stage" }, "effects": { "focus": "$pick" } }

@@ -250,15 +250,24 @@ const Fam = (() => {
     const sp = person('spouse'); if (!sp) return;
     const kids = people('child').filter((c) => c.age < 18 && c.together);
     const mine = how === 'court' ? chance(G.gender === 'F' ? 0.85 : 0.25) : chance(G.gender === 'F' ? 0.8 : 0.3);
-    // 財産分与：結婚してからの財産を半分ずつ（家とローンは自分に残す）
-    const mineNow = Math.max(0, G.cash) + G.assets;
-    const total = mineNow + (sp.assets || 0);
+    // 財産分与：家・貸している部屋・投資を手放して現金化し、借金もふくめて半分ずつに分ける
+    const out = [];
+    const sold = [];
+    if (G.flags.owns_house && !G.flags.lives_with_parents) { const v = G.vars.houseValue || 1500; Effects.apply({ sellHouse: true }, {}); sold.push(`家（${man(v)}万円）`); }
+    if (G.flags.owns_rental) { const l = (G.loans || []).find((x) => x.type === 'investment' && x.left > 0); const v = G.vars.rentalValue || 0; G.cash += v - (l ? l.left : 0); if (l) l.left = 0; Effects.setFlag('owns_rental', false); G.vars.rentalValue = 0; G.vars.rentIncomeMonthly = 0; sold.push(`貸している部屋（${man(v)}万円）`); }
+    if (G.assets > 1) { sold.push(`投資（${man(G.assets)}万円）`); G.cash += G.assets; G.assets = 0; }
+    if (sold.length) out.push(`${sold.join('・')}を手放して現金化し、財産を分与した。`);
+    // 借金（奨学金は自分のものなので別）も半分ずつ
+    const loans = (G.loans || []).filter((l) => l.left > 0 && !['scholar', 'mortgage'].includes(l.type));
+    const card = Math.max(0, -G.cash);
+    const debt = card + loans.reduce((a, l) => a + l.left, 0);
+    if (debt > 1) { G.cash += card / 2; loans.forEach((l) => { l.left /= 2; if (l.yearly) l.yearly /= 2; }); out.push(`借金 ${man(debt)}万円も半分ずつ負担する（自分の分は ${man(debt / 2)}万円）。`); }
+    const mineNow = Math.max(0, G.cash);
+    const total = mineNow + Math.max(0, sp.assets || 0);
     const share = total / 2;
-    let diff = share - mineNow;
-    if (diff < 0) { const c = Math.min(Math.max(0, G.cash), -diff); G.cash -= c; diff += c; if (diff < 0) G.assets = Math.max(0, G.assets + diff); }
-    else G.cash += diff;
+    G.cash += share - mineNow;
     sp.assets = share;
-    const out = [`財産分与：夫婦の財産 ${man(total)}万円を半分ずつに分けた（自分の分は ${man(share)}万円）。`];
+    out.push(`夫婦の財産 ${man(total)}万円を半分ずつに分けた（自分の分は ${man(share)}万円）。`);
     sp.role = 'ex_spouse'; sp.together = false; sp.exYear = G.year;
     delete G.flags.married; delete G.flags.separated; G.flags.divorced = true;
     if (kids.length) {
@@ -272,6 +281,7 @@ const Fam = (() => {
       else { kids.forEach((c) => { c.together = false; c.livesApart = true; c.pref = sp.pref; }); out.push(`子ども（${kids.map((c) => c.name).join('・')}）は${sp.name}が育てる。1人月${per}万円の養育費を、18歳になるまで払う。`); }
       void payer;
     } else out.push('子どもはいないので、養育費はない。');
+    Engine.schedule('ev_m_divorce_home', 0, null, {}); // これからの住まいを決める
     return out;
   }
   // 別居

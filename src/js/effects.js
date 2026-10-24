@@ -108,6 +108,13 @@ const Effects = (() => {
         case 'bankrupt': { const before = Math.round(Econ.totalDebt()); logs.push(`⚖️ 自己破産の手続きをした。${man(before)}万円の借金はなくなったが、家・車・投資など財産のほとんどを手放した。7〜10年はローンやカードが作れない。`); break; }
         case 'familyBailout': { const need = Math.round(Econ.totalDebt(true)); const r = Fam.bailout(need * 0.6); if (r.amt > 0) { G.cash += r.amt; if (G.cash > 0) { let x = G.cash; for (const l of G.loans || []) if (l.type !== 'mortgage' && l.left > 0 && x > 0) { const pay = Math.min(l.left, x); l.left -= pay; x -= pay; } G.cash = x; } logs.push(`👨‍👩‍👧 ${r.who.join('・')}が${man(r.amt)}万円を出してくれて、借金の一部を返せた（家族の貯金はその分へった）。`); } else logs.push('👨‍👩‍👧 家族にも、出せるお金はなかった。'); break; }
         case 'sellAssetsForDebt': { const debt = Econ.totalDebt(true); const s = Math.min(G.assets, debt); G.assets -= s; G.cash += s; let x = Math.max(0, G.cash); for (const l of G.loans || []) if (l.type !== 'mortgage' && l.left > 0 && x > 0) { const pay = Math.min(l.left, x); l.left -= pay; x -= pay; } G.cash = Math.min(G.cash, x); logs.push(`📉 投資を${man(s)}万円分売って、借金を返した。`); break; }
+        // 子どもの進路を決める（wish＝本人の希望どおり）。進学なら学費の相談、ひとり暮らし・留学なら仕送りの相談へ
+        case 'childPath': { const c = ctx.child; if (!c) break; let k = v === 'wish' ? c.wish || 'local' : v;
+          if (k === 'local' && tier() === 'C' && !chance(0.45)) { k = 'away'; logs.push(`🧳 ${c.name}は地元の大学はだめだったが、県外の大学に合格した。`); }
+          c.pathDone = true;
+          if (k === 'work') { c.plan = 'work'; break; }
+          c.plan = k === 'voc' ? 'voc' : 'univ'; c.costStage = k === 'voc' ? 'voc' : 'univ';
+          Engine.schedule(k === 'away' ? 'ev_m_child_away_pay' : k === 'abroad' ? 'ev_m_child_abroad_pay' : 'ev_m_child_tuition', 0, null, ctx); break; }
         case 'childPlan': { const c = ctx.child; if (c) { Object.assign(c, v); if (v.costStage === 'abroad') { c.awayAt = 18; c.abroad = true; } if (v.costStage === 'univ_away') { c.awayAt = 18; c.awayPref = c.awayPref || (Fam.near(G.pref, 'tokyo') || tier() === 'C' ? pick(['tokyo', 'osaka', 'aichi', 'fukuoka', 'miyagi', 'hiroshima']) : 'tokyo'); } } break; }
         case 'loan': { const amt = num(v.amount, ctx); const l = Econ.addLoan(v.type, amt, v.rate); l.yearly = annuity(amt, v.rate || 0, v.years || 10); l.start = G.year; if (v.type === 'mortgage') { G.vars.houseValue = Text.housePrice(); } break; }
         case 'loanClose': G.loans = (G.loans || []).map((l) => (l.type === v ? { ...l, left: 0 } : l)); break;
@@ -136,7 +143,7 @@ const Effects = (() => {
         case 'abroad': if (v === true) { const c = ctx.child; if (c) c.extraCost = (c.extraCost || 0) + 0; G.cash -= 200; } else { const a = resolve(v, ctx); const s = Menu.school(a); if (s) { (s.grant || []).forEach((f) => setFlag(f, true)); for (const [x, d] of Object.entries(s.growth || {})) stat(x in G.stats ? x : 'subj.' + x, d); if (G.age >= 16) G.cash -= s.cost; else G.household.cash -= s.cost; } } break;
         case 'insuranceIf': if (G.flags[v]) G.cash += 200; break;
         case 'insurancePayout': { const p = num(v, ctx); G.cash += p; G.received.insurance = (G.received.insurance || 0) + p; break; }
-        case 'sellHouse': if (G.flags.owns_house) { const l = (G.loans || []).find((x) => x.type === 'mortgage'); G.cash += (G.vars.houseValue || 1500) - (l ? l.left : 0); if (l) l.left = 0; setFlag('owns_house', false); setFlag('mortgage', false); G.vars.houseValue = 0; G.vars.rentMonthly = 8; setFlag('renting', true); } break;
+        case 'sellHouse': if (G.flags.owns_house) { const l = (G.loans || []).find((x) => x.type === 'mortgage' && x.left > 0); G.cash += (G.vars.houseValue || 1500) - (l ? l.left : 0); if (l) l.left = 0; setFlag('owns_house', false); setFlag('mortgage', false); G.vars.houseValue = 0; G.vars.rentMonthly = 8; setFlag('renting', true); } break;
         case 'inheritanceSmooth': G.vars.will = true; break;
         case 'inheritance': People.inherit(ctx); break;
         case 'survivorPension': G.vars.survivorPension = true; break;

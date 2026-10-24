@@ -99,7 +99,7 @@ const Popup = (() => {
       const sorter = canSort ? `<div class="flt"><button data-sort="def" class="${sort === 'def' ? 'on' : ''}">おすすめ順</button><button data-sort="rate" class="${sort === 'rate' ? 'on' : ''}">🎯 受かりやすい順</button>${canPay ? `<button data-sort="pay" class="${sort === 'pay' ? 'on' : ''}">💴 年収が高い順</button>` : ''}</div>` : '';
       let box;
       if (report) {
-        box = show(`<div class="pleft">${paperHtml(report)}</div>${MINI_BTN}<div class="pright"><div class="q">${esc(view.text.replace(/^\d+年3月。通知表が配られた。/, ''))}<small>選んだ方針で、1年間のステータスの伸び方が変わります</small></div>
+        box = show(`<div class="pleft">${paperHtml(report)}</div>${MINI_BTN}<div class="pright"><div class="q">${esc(view.text.replace(/^\d+年3月。(通知表|成績表)が配られた。/, ''))}<small>選んだ方針で、1年間のステータスの伸び方が変わります</small></div>
           ${btns.replace('class="opts"', 'class="opts one"')}${pagerHtml(page, pages)}${factHtml(view.fact)}</div>`, 'paper');
       } else {
         box = show(`
@@ -192,23 +192,27 @@ const Popup = (() => {
   // ---- 習い事を続ける？・増やす（ui/lessons.html） ----
   function lessons(view, cb) {
     const keep = {}; view.items.forEach((x) => (keep[x.id] = !x.quit));
+    const LPER = 4; let lpage = 0; // 1ページ4つまで（多いときはページ送り）
     const render = () => {
+      const lpages = Math.max(1, Math.ceil(view.items.length / LPER)); lpage = clamp(lpage, 0, lpages - 1);
+      const vis = view.items.slice(lpage * LPER, lpage * LPER + LPER);
       const cost = view.items.filter((x) => keep[x.id]).reduce((a, x) => a + x.cost, 0);
       const n = view.items.filter((x) => keep[x.id]).length;
       const box = show(`<div class="cs">🎒 ${esc(view.date)} ・ ${esc(view.ageLabel)}</div>${MINI_BTN}
         <div class="q">${esc(view.text)}<small>${esc(view.note)}</small></div>
-        <div class="ls">${view.items.map((x) => `<div class="l"><span class="e">${x.emoji}</span><span class="n">${esc(x.label)}<small>${x.years}年目 ・ 年${x.cost}万円 ・ ${esc(x.eff)}</small></span>
-          ${x.lock ? `<span class="lock">${esc(x.lock)}</span><button class="q2 on" disabled>やめる</button>` : `<button data-k="${x.id}" data-v="1" class="${keep[x.id] ? 'on' : ''}">続ける</button><button data-k="${x.id}" data-v="0" class="q2 ${keep[x.id] ? '' : 'on'}">やめる</button>`}</div>`).join('')}</div>
+        <div class="ls">${vis.map((x) => `<div class="l"><span class="e">${x.emoji}</span><span class="n">${esc(x.label)}<small>${x.years}年目 ・ 年${x.cost}万円 ・ ${esc(x.eff)}</small></span>
+          ${x.lock ? `<span class="lock">${esc(x.lock)}</span><button class="q2 on" disabled>やめる</button>` : `<button data-k="${x.id}" data-v="1" class="${keep[x.id] ? 'on' : ''}">続ける</button><button data-k="${x.id}" data-v="0" class="q2 ${keep[x.id] ? '' : 'on'}">やめる</button>`}</div>`).join('')}</div>${pagerHtml(lpage, lpages, 'lp')}
         <div class="sum"><span>💡</span><span>続けると：<b>年${cost}万円</b>（${G.age < 16 ? '家計から' : '所持金から'}）${view.cap ? `　家計で出せるめやす：年${view.cap}万円まで${Engine.jukuOk() ? '（中学受験の塾は別わく）' : ''}` : ''}</span></div>
         <div class="lbtns"><button id="lAdd" ${n >= 4 ? 'disabled' : ''}>＋ 習い事を増やす（${n}/4）</button><button class="ok main" id="lOk">これで決める ▶</button></div>`, 'lbox');
       bindMini(box, render);
+      bindPager(box, 'lp', () => lpage, (v) => { lpage = v; render(); });
       $$('[data-k]', box).forEach((b) => (b.onclick = () => { keep[b.dataset.k] = b.dataset.v === '1'; render(); }));
       $('#lOk', box).onclick = () => { close(); cb(Engine.chooseLessons(keep)); };
       $('#lAdd', box).onclick = () => picker({ title: '🎒 習い事を増やす', note: '増やすほどストレスも増えます（4つまで）', items: Engine.lessonCandidates() }, (it) => {
         if (!it) { render(); return; }
         const r = Engine.addLesson(it.id, keep);
         if (!r.ok) { info('🎒 習い事を増やす', r.msg, render); return; }
-        view.items.push({ ...r.item, quit: false }); keep[it.id] = true; render();
+        view.items.push({ ...r.item, quit: false }); keep[it.id] = true; lpage = Math.ceil(view.items.length / LPER) - 1; render();
       });
     };
     render();

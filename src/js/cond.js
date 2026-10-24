@@ -31,6 +31,7 @@ function statVal(k) {
   if (k in (G.counters || {})) return G.counters[k] || 0;
   if (['promotion_level', 'job_changes', 'partners_past', 'ronin_years', 'repeat_years', 'hodou_count', 'hospital_count', 'moves', 'lottery_spent', 'examTries'].includes(k)) return G.counters[k] || 0;
   if (k === 'partnerRelation') { const p = person('partner'); return p ? p.relation : 50; }
+  if (k === 'childRelation') { const cs = people('child').filter((c) => c.alive && c.age >= 17 && c.age <= 18); return cs.length ? cs[0].relation : 50; }
   if (k === 'spouseRelation') { const p = person('spouse'); return p ? p.relation : 50; }
   if (k === 'parentsRelation') return G.vars.parentsRelation ?? 60;
   if (k === 'parentAge') { const ps = people('father|mother'); return ps.length ? Math.max(...ps.map((p) => p.age)) : 0; }
@@ -79,6 +80,7 @@ function personMatch(p, c) {
   if (c.age && !inRange(p.age, c.age)) return false;
   if (c.ageMax != null && p.age > c.ageMax) return false;
   if (c.noFlag && p[c.noFlag]) return false;
+  if (c.wishNot && p.wish === c.wishNot) return false;
   if (c.livesTogether && !p.together) return false;
   if (c.together === true && !p.together) return false;
   if (c.together === false && p.together) return false;
@@ -129,6 +131,7 @@ function testKey(k, v, ctx) {
     case 'var': return Object.entries(v).every(([t, s]) => { let val = G.vars[t]; if (val === undefined) val = t === 'target' || t === 'pendingExam' ? 'none' : (t === 'schoolAway' || t === 'workAway') ? false : val; return matchSpec(val, s, ctx); });
     case 'counter': return Object.entries(v).every(([t, s]) => matchSpec(G.counters[t] || 0, s, ctx));
     case 'stage': return v.includes(G.stage);
+    case 'awayFromHome': { const par = people('father|mother').find((p) => p.alive); return (!!par && par.pref !== G.pref) === !!v; } // 親が生きていて、ちがう県に住んでいる
     case 'poorHome': return Engine.poorHome() === !!v; // とても貧しい家（親に「自分で出して」と言われる）
     case 'jukuOk': return Engine.jukuOk() === !!v; // 中学受験の塾に通わせられる家計か（世帯年収）
     case 'employment': return v.includes(G.employment);
@@ -145,7 +148,7 @@ function testKey(k, v, ctx) {
       for (const c of cs) { const m = G.people.filter((p) => personMatch(p, c)); if (!m.length) return false; if (!ctx.who) ctx.who = pick(m); }
       return true;
     }
-    case 'child': { const m = G.people.filter((p) => childMatch(p, v)); if (!m.length) return false; ctx.child = ctx.child || pick(m); return true; }
+    case 'child': { if (ctx.child && ctx.child.role === 'child') return childMatch(ctx.child, v); const m = G.people.filter((p) => childMatch(p, v)); if (!m.length) return false; ctx.child = pick(m); return true; }
     case 'childrenLess': return people('child', false).length < v;
     case 'marriedYears': { if (!G.flags.married) return false; const y = G.year - (G.vars.marriedYear ?? G.year); return Array.isArray(v) ? inRange(y, v) : y === v; }
     case 'marriedYearsIn': { if (!G.flags.married) return false; const y = G.year - (G.vars.marriedYear ?? G.year); return v.includes(y) && G.q === 0; }
