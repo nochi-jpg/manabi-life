@@ -168,7 +168,9 @@ button:active{transform:translateY(3px) scale(.98)}
 .rate{height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.3)}
 .rate.hi{background:linear-gradient(180deg,#5fe0a8,#2fbf86)}.rate.mid{background:linear-gradient(180deg,#ffd760,#f0a81c)}.rate.lo{background:linear-gradient(180deg,#ff8a8a,#e44d62)}
 .opts button.more{--b1:#323766;--b2:#262a52;--b3:#1d2044;--b4:#272b58;grid-template-columns:1fr;text-align:center;font-size:19px}
-.pager{margin-top:12px;display:flex;justify-content:center;gap:6px}
+.src{margin-top:14px;padding-top:10px;border-top:2px dashed #ecdcc2;display:grid;grid-template-columns:22px 1fr;column-gap:6px;font-size:13px;line-height:1.5;color:var(--ink2)}
+.src small{color:#9aa3bd}
+.pager{margin-top:10px;display:flex;justify-content:center;gap:6px}
 .pager i{width:10px;height:10px;border-radius:50%;background:#e2d4ba}.pager i.on{background:var(--cyan)}
 
 /* ===== 一時停止中のしるし ===== */
@@ -284,6 +286,7 @@ button:active{transform:translateY(3px) scale(.98)}
       </div>
       <div class="opts" id="opts"></div>
       <div class="pager" id="pager"><i class="on"></i><i></i><i></i></div>
+      <div class="src"><span>📊</span><span>中学を卒業した人の約99%が高校などに進みます。通信制高校で学ぶ高校生は約1割まで増えています。<small>（文部科学省 学校基本調査）</small></span></div>
     </div>
   </div>
 </div>

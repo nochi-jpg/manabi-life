@@ -233,6 +233,10 @@ for (const [k, v] of Object.entries(clubs.hobbyRules.firstFrom)) { if (!LIKES.ha
 for (const j of vis.hqEligibleJobs) if (!JOB_IDS.has(j)) err('visuals.hqEligibleJobs', `未定義の職業「${j}」`);
 for (const c of vis.sportByClub.arena) if (!CLUB_IDS.has(c)) err('visuals.sportByClub', `未定義のclub「${c}」`);
 for (const b of vis.backgrounds) if (!fs.existsSync(path.join(__dirname, '..', b.file))) err('visuals.backgrounds', `画像がない「${b.file}」`);
+const facts = D('facts.json').facts;
+for (const id of Object.keys(facts)) { if (!EVENT_IDS.has(id)) err('facts', `イベントがない「${id}」`); if (!facts[id].src) err('facts.' + id, '出典(src)がない'); }
+const noFact = allEvents.filter((e) => e.kind === 'choice' && !facts[e.id]).map((e) => e.id);
+if (noFact.length) warn('facts', `データ表示のない選択肢イベント ${noFact.length}件: ${noFact.join(', ')}`);
 for (let a = 0; a <= 120; a++) if (vis.portraits.ages.filter((p) => a >= p.from && a <= p.to).length !== 1) err('visuals.portraits', `${a}歳の顔グラが0枚または重複`);
 for (const g of ps.graduate) if (g.requires) { checkFlags(`graduate.${g.id}`, g.requires); if (g.stage === 'grad_doctor' && !g.requires.includes('edu_master_grad')) err(`graduate.${g.id}`, 'I-8違反：博士は修士修了が必要'); }
 for (const c of [...clubs.lessons, ...clubs.jhsClubs, ...clubs.hsClubsExtra, ...clubs.univCircles]) {
