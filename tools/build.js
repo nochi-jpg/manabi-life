@@ -31,14 +31,23 @@ const cached = (src, ext, fn) => {
   if (!fs.existsSync(out)) fn(out);
   return fs.readFileSync(out);
 };
+const PY_WEBP = `import sys\nfrom PIL import Image\nim=Image.open(sys.argv[1]);im.save(sys.argv[2],'WEBP',quality=int(sys.argv[3]),method=6)`;
 const img = (rel) => {
   const src = P(rel);
+  const q = rel.includes('faces') ? '88' : '78';
+  if (!has('cwebp') && has('python3')) {
+    try { return b64(cached(src, '.webp', (o) => execFileSync('python3', ['-c', PY_WEBP, src, o, q])), 'image/webp'); } catch (e) { /* PIL がないときはそのまま */ }
+  }
   if (has('cwebp')) return b64(cached(src, '.webp', (o) => execFileSync('cwebp', ['-quiet', '-q', rel.includes('faces') ? '88' : '78', '-alpha_q', '100', src, '-o', o])), 'image/webp');
   return b64(fs.readFileSync(src), rel.endsWith('.png') ? 'image/png' : 'image/jpeg');
 };
 const sound = (rel, isBgm) => {
   const src = P(rel);
-  if (isBgm && has('ffmpeg')) return b64(cached(src, '.mp3', (o) => execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', src, '-ac', '2', '-b:a', '64k', o])), 'audio/mpeg');
+  if (isBgm && has('ffmpeg')) return b64(cached(src, '.48k.mp3', (o) => execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', src, '-ac', '2', '-ar', '32000', '-b:a', '48k', o])), 'audio/mpeg');
+  if (!isBgm && has('ffmpeg')) {
+    const max = (Object.values(data.audio.se).find((x) => x.file === rel) || {}).maxMs;
+    return b64(cached(src, '.se.mp3', (o) => execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', src, ...(max ? ['-t', String(max / 1000 + 0.3)] : []), '-ac', '1', '-b:a', '64k', o])), 'audio/mpeg');
+  }
   const ext = path.extname(rel).slice(1);
   return b64(fs.readFileSync(src), ext === 'mp3' ? 'audio/mpeg' : `audio/${ext}`);
 };
@@ -54,11 +63,29 @@ if (fs.existsSync(P('sounds'))) {
   for (const [k, v] of Object.entries(data.audio.se)) if (v.file && fs.existsSync(P(v.file))) { add(v.file, sound(v.file, false)); soundN++; }
 } else console.log('⚠ sounds/ がない（音なしでビルド）。README の手順で manabi-life-assets をリンクする');
 
+// フォントは使う文字だけにしぼる（pyftsubset があれば）。かな・英数字・記号はぜんぶ入れる
+const usedText = (() => {
+  let t = '';
+  const walk = (d) => { for (const f of fs.readdirSync(d)) { const q = path.join(d, f); if (fs.statSync(q).isDirectory()) { if (f !== 'lib') walk(q); } else if (/\.(js|json|html|css)$/.test(f)) t += fs.readFileSync(q, 'utf8'); } };
+  walk(P('src')); walk(P('data'));
+  for (let c = 0x20; c < 0x7f; c++) t += String.fromCharCode(c);
+  for (let c = 0x3000; c < 0x3100; c++) t += String.fromCharCode(c); // 記号・ひらがな・カタカナ
+  for (let c = 0xff01; c < 0xff5f; c++) t += String.fromCharCode(c); // 全角英数
+  return [...new Set(t)].join('');
+})();
+const font = (file) => {
+  if (!has('pyftsubset')) return fs.readFileSync(file);
+  const txt = path.join(CACHE, 'chars.txt'); fs.writeFileSync(txt, usedText);
+  const key = require('crypto').createHash('md5').update(usedText).digest('hex').slice(0, 8);
+  const out = path.join(CACHE, path.basename(file) + '.' + key + '.woff');
+  if (!fs.existsSync(out)) execFileSync('pyftsubset', [file, `--text-file=${txt}`, '--flavor=woff', `--output-file=${out}`, '--layout-features=*']);
+  return fs.readFileSync(out);
+};
 let html = fs.readFileSync(P('src/index.html'), 'utf8');
 html = html.replace(/<link rel="stylesheet" href="([^"]+)">/g, (m, href) => {
   const file = path.join(P('src'), href);
   let css = fs.readFileSync(file, 'utf8');
-  css = css.replace(/url\("?([^")]+\.woff)"?\)/g, (m2, u) => `url("${b64(fs.readFileSync(path.join(path.dirname(file), u)), 'font/woff')}")`);
+  css = css.replace(/url\("?([^")]+\.woff)"?\)/g, (m2, u) => `url("${b64(font(path.join(path.dirname(file), u)), 'font/woff')}")`);
   return `<style>${css}</style>`;
 });
 html = html.replace(/<script src="([^"]+)"><\/script>/g, (m, src) => {
@@ -67,4 +94,7 @@ html = html.replace(/<script src="([^"]+)"><\/script>/g, (m, src) => {
 });
 html = html.replace('<!--ASSETS-->', `<script>window.ASSETS=${JSON.stringify(assets)};</script>`);
 fs.writeFileSync(P('dist/index.html'), html);
-console.log(`dist/index.html: ${(html.length / 1024 / 1024).toFixed(1)}MB（音 ${soundN} 個）`);
+console.log(`dist/index.html: ${(Buffer.byteLength(html) / 1024 / 1024).toFixed(1)}MB（音 ${soundN} 個）`);
+// GitHub Pages のテスト用（play/index.html）。中身は dist と同じ
+fs.mkdirSync(P('play'), { recursive: true });
+fs.writeFileSync(P('play/index.html'), html);
