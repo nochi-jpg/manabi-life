@@ -1,0 +1,244 @@
+{
+  "_comment": "家族・お金・人生後半のできごと（2026-10-25 追加）。人物ごとの状態（住んでいる県・同居・仕事・収入・健康・介護）で起きる。ctx.who＝条件で選ばれた人。fact＝ポップアップの下に出すデータ。",
+  "events": [
+
+    { "id": "ev_m_welfare_end", "kind": "choice", "emoji": "🏛️", "cat": "money", "type": "scheduled", "counselor": "self",
+      "text": "{welfareEndReason}ので、生活保護が終わった。これからは自分の収入で暮らしていく。",
+      "fact": { "text": "生活保護は、収入や貯金が最低限の生活費（地域や家族の人数で決まる）をこえると終わります。また生活が苦しくなったら、もう一度相談できます。", "src": "厚生労働省" },
+      "choices": [ { "label": "🙂 わかった", "effects": {} } ] },
+
+    { "id": "ev_m_baby_work", "kind": "choice", "emoji": "🍼", "cat": "family", "type": "scheduled", "counselor": "spouse",
+      "when": { "all": ["married"], "person": { "role": "spouse", "alive": true } },
+      "text": "{child}が生まれた。仕事と子育て、どうする？（いまの家計：毎月{monthlyLeft}万円）",
+      "fact": { "text": "1人目の出産のあとも仕事を続ける女性は約7割。男性の育休取得率は約3割（2023年度）まで増えています。", "src": "国立社会保障・人口問題研究所 出生動向基本調査・厚生労働省 雇用均等基本調査" },
+      "choices": [
+        { "label": "👫 共働きで、保育園に預ける", "when": { "selfWorking": true, "spouseWorking": true }, "showResult": true, "effects": { "stats": { "stress": 4, "happiness": 2 }, "log": "👫 共働きで子育てをすることにした。保育園代と、朝と夕方のあわただしさがふえる。" } },
+        { "label": "🍼 自分が育休をとる（1年・給料の約67%）", "when": { "selfEmp": ["seishain", "civil_servant", "keiyaku"] }, "showResult": true, "effects": { "job": { "leave": 1 }, "stats": { "happiness": 6, "stress": 2 }, "personRelation": { "spouse": 10, "child": 10 }, "log": "🍼 1年の育休をとった。給料のかわりに約67%の給付金が出る。" } },
+        { "label": "🍼 {spouse}が育休をとる（1年）", "when": { "spouseEmp": ["seishain", "civil_servant", "keiyaku"] }, "showResult": true, "effects": { "spouse": "leave", "personRelation": { "spouse": 3 } } },
+        { "label": "🏠 自分が仕事をやめて、子育てに専念する", "when": { "selfWorking": true }, "showResult": true, "effects": { "job": { "quit": "self" }, "employment": "homemaker", "stats": { "stress": -2, "happiness": 2 }, "schedule": [ { "event": "ev_r_return_work", "inYears": [3, 6] } ], "log": "🏠 仕事をやめて、子育てに専念することにした。世帯の収入はへる。" } },
+        { "label": "🏠 {spouse}が仕事をやめて、子育てに専念する", "when": { "spouseWorking": true }, "showResult": true, "effects": { "spouse": "quit" } },
+        { "label": "👵 実家の近くに引っ越して、親に手伝ってもらう", "when": { "parentHelpable": true, "whoSamePref": true }, "showResult": true, "effects": { "set": ["near_parents"], "stats": { "stress": -3 }, "personRelation": { "$parent": 5 }, "log": "👵 実家の近くに引っ越した。保育園のお迎えなどを手伝ってもらえる。" } },
+        { "label": "👵 {whoPrefName}の実家の近くに引っ越す（仕事も考える）", "when": { "parentHelpable": true, "whoOtherPref": true }, "showResult": true, "effects": { "moveToWho": { "together": false }, "set": ["near_parents"], "stats": { "stress": -2 }, "personRelation": { "$parent": 6 } } },
+        { "label": "🏡 親と同居して、手伝ってもらう（二世帯）", "when": { "parentHelpable": true }, "showResult": true, "effects": { "moveToWho": { "together": true }, "set": ["near_parents"], "stats": { "stress": 1 }, "personRelation": { "$parent": 8 } } }
+      ] },
+
+    { "id": "ev_m_next_child", "kind": "choice", "emoji": "👶", "cat": "family", "type": "scheduled", "counselor": "spouse",
+      "when": { "all": ["married"], "none": ["no_more_children", "no_children_choice", "wants_children", "separated"], "person": { "role": "spouse", "alive": true, "fertile": true } },
+      "text": "{spouse}と{nextChildNo}人目の子どもについて話し合った。（いまの家計：毎月{monthlyLeft}万円）",
+      "fact": { "text": "子ども1人を大学まで育てると、教育費と生活費で約2,000万円〜（公立か私立かで大きく変わる）。夫婦が理想とする子どもの数は平均2.25人、実際は約1.9人で、理由の1位は「お金がかかりすぎる」。", "src": "国立社会保障・人口問題研究所 出生動向基本調査（2021）" },
+      "choices": [
+        { "label": "👶 {nextChildNo}人目がほしい", "effects": { "set": ["wants_children"], "personRelation": { "spouse": 3 } } },
+        { "label": "🙂 今の人数で、大切に育てる", "effects": { "set": ["no_more_children"] } },
+        { "label": "⏳ もう少し考える（2年後にまた話す）", "effects": { "schedule": [ { "event": "ev_m_next_child", "inYears": [2, 2], "season": "Q1" } ] } }
+      ] },
+
+    { "id": "ev_m_child_hs", "kind": "choice", "emoji": "🏫", "cat": "family", "counselor": "family",
+      "when": { "season": ["Q3"], "child": { "age": [14, 14], "alive": true, "noFlag": "hsDone", "together": true } },
+      "text": "{child}は中学3年生。どの高校をめざす？（{pref}）",
+      "fact": { "text": "公立高校の授業料は国の支援で実質無料。私立は支援があっても、入学金・施設費などで年に数十万円かかることが多い。地方では私立高校が少なく、遠くまで通う子もいます。", "src": "文部科学省" },
+      "choices": [
+        { "label": "📕 地元の公立高校", "effects": { "childPlan": { "hsDone": true, "hsType": "public", "schoolLabel": "地元の公立高校" } } },
+        { "label": "🎓 私立高校（学費 年+50万円くらい）", "when": { "tier": ["A", "B"] }, "effects": { "childPlan": { "hsDone": true, "hsType": "private", "extraCost": 50, "schoolLabel": "私立高校" }, "personRelation": { "child": 3 } } },
+        { "label": "🚃 となりの市の私立高校（学費 年+60万円・通学に時間）", "when": { "tier": ["C"] }, "effects": { "childPlan": { "hsDone": true, "hsType": "private", "extraCost": 60, "schoolLabel": "となりの市の私立高校" }, "personRelation": { "child": 3 } } },
+        { "label": "⚙️ 高専（5年制・就職に強い）", "effects": { "childPlan": { "hsDone": true, "hsType": "kosen", "schoolLabel": "高専" } } },
+        { "label": "🗣️ 本人にまかせる", "effects": { "childPlan": { "hsDone": true, "hsType": "public", "schoolLabel": "高校" }, "personRelation": { "child": 4 } } }
+      ] },
+
+    { "id": "ev_m_child_after_hs", "kind": "choice", "emoji": "🧭", "cat": "family", "counselor": "family",
+      "when": { "season": ["Q3"], "child": { "age": [17, 17], "alive": true, "noFlag": "pathDone" } },
+      "text": "{child}は高校3年生。卒業したらどうする？",
+      "fact": { "text": "大学進学率は全国で約58%、{pref}は{univRate}%。家を出て通う学生への仕送りは、平均で月7万円くらい。", "src": "文部科学省 学校基本調査・全国大学生活協同組合連合会" },
+      "choices": [
+        { "label": "🏫 地元の大学（自宅から通う）", "when": { "tier": ["A", "B"] }, "effects": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ" } } },
+        { "label": "🏫 地元の大学（数が少なく、せまき門）", "when": { "tier": ["C"] }, "roll": { "base": 0.45 }, "showRate": true, "success": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ" }, "log": "🌸 {child}は地元の大学に合格した。家から通える。" }, "fail": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ_away" }, "log": "🧳 地元の大学はだめだったが、県外の大学に合格。ひとり暮らしで仕送りが必要になる。" } },
+        { "label": "🏙️ 県外の大学（ひとり暮らし・仕送り 月7万円くらい）", "effects": { "childPlan": { "pathDone": true, "plan": "univ", "costStage": "univ_away" }, "personRelation": { "child": 3 } } },
+        { "label": "🛠️ 専門学校", "effects": { "childPlan": { "pathDone": true, "plan": "voc", "costStage": "voc" } } },
+        { "label": "💼 就職する", "effects": { "childPlan": { "pathDone": true, "plan": "work" } } }
+      ] },
+
+    { "id": "ev_r_separation", "kind": "choice", "emoji": "🧳", "cat": "family", "counselor": "spouse",
+      "when": { "all": ["married"], "none": ["separated"], "person": { "role": "spouse", "alive": true, "relationMax": 30, "together": true }, "cooldownYears": 3 },
+      "weight": { "base": 5, "mul": [["focus_work", 1.6], ["stress>=70", 1.3]] },
+      "text": "{spouse}から「少し離れて暮らしたい」と言われた。このごろ家族で過ごす時間がほとんどなかった。",
+      "fact": { "text": "結婚した夫婦の約3組に1組が離婚している計算になります。離婚の理由で多いのは「性格が合わない」「生活費を渡さない」「精神的にきずつける」など。", "src": "厚生労働省 人口動態統計・司法統計" },
+      "choices": [
+        { "label": "🗣️ 仕事を減らすので、やり直したいと伝える", "showRate": true, "roll": { "base": 0.45, "w": { "spouseRelation": 0.5, "t_comm": 0.3 } }, "success": { "focus": "focus_family", "jobOvertimeDelta": -10, "person": { "relation": "spouse", "delta": 18 }, "log": "🤝 {spouse}は「もう一度がんばってみよう」と言ってくれた。仕事を減らして、家族の時間をつくる。" }, "fail": { "separate": { "kidsGo": "auto" }, "stats": { "happiness": -8, "stress": 6 }, "log": "💔 話し合いはうまくいかなかった。" } },
+        { "label": "🏥 夫婦カウンセリングに行く（10万円）", "showRate": true, "cash": -10, "roll": { "base": 0.6, "w": { "spouseRelation": 0.3 } }, "success": { "person": { "relation": "spouse", "delta": 20 }, "log": "🏥 カウンセリングで、おたがいの気持ちを話せた。もう少しいっしょにがんばることにした。" }, "fail": { "separate": { "kidsGo": "auto" }, "stats": { "happiness": -8 }, "log": "💔 カウンセリングでも気持ちは変わらなかった。" } },
+        { "label": "🧳 別居を受け入れる", "showResult": true, "effects": { "separate": { "kidsGo": "auto" }, "stats": { "happiness": -8, "stress": 4 } } }
+      ] },
+
+    { "id": "ev_r_divorce_request", "kind": "choice", "emoji": "📄", "cat": "family", "counselor": "spouse",
+      "when": { "all": ["married", "separated"], "person": { "role": "spouse", "alive": true, "relationMax": 40 }, "cooldownYears": 1 },
+      "weight": { "base": 7 },
+      "text": "別居中の{spouse}から、離婚を申し出られた。{childrenComment}",
+      "fact": { "text": "離婚するときは、結婚してから2人でためた財産を半分ずつに分けます（財産分与）。子どもと離れて暮らす親は、子どもが成人するまで養育費を払うのが原則です。", "src": "民法・裁判所 養育費算定表" },
+      "choices": [
+        { "label": "📄 受け入れる（話し合いで決める）", "showResult": true, "effects": { "divorce": "negotiate", "stats": { "happiness": -10, "stress": 8 }, "schedule": [ { "event": "ev_r_surname_divorce", "inYears": [0, 0] } ] } },
+        { "label": "⚖️ 調停で話し合う（弁護士費用50万円）", "showResult": true, "effects": { "cash": -50, "divorce": "court", "stats": { "happiness": -8, "stress": 8 }, "schedule": [ { "event": "ev_r_surname_divorce", "inYears": [0, 0] } ] } },
+        { "label": "🙏 もう一度やり直したいと伝える", "showRate": true, "roll": { "base": 0.25, "w": { "spouseRelation": 0.6, "t_comm": 0.2 } }, "success": { "reunite": true, "person": { "relation": "spouse", "delta": 18 }, "focus": "focus_family", "log": "🤝 時間をかけて話し合い、もう一度やり直すことになった。" }, "fail": { "log": "💔 気持ちは変わらなかった。話し合いで離婚することになった。", "divorce": "negotiate", "stats": { "happiness": -12, "stress": 10 }, "schedule": [ { "event": "ev_r_surname_divorce", "inYears": [0, 0] } ] } }
+      ] },
+
+    { "id": "ev_r_reconcile", "kind": "choice", "emoji": "📞", "cat": "family",
+      "when": { "all": ["married", "separated"], "person": { "role": "spouse", "alive": true, "relationMin": 45 }, "cooldownYears": 2 },
+      "weight": { "base": 2, "mul": [["focus_family", 3]] },
+      "text": "別居中の{spouse}から「もう一度、いっしょに暮らさない？」と連絡があった。",
+      "choices": [
+        { "label": "🏠 もう一度いっしょに暮らす", "showResult": true, "effects": { "reunite": true, "person": { "relation": "spouse", "delta": 10 }, "stats": { "happiness": 8 } } },
+        { "label": "🙂 今のままがいい", "effects": { "person": { "relation": "spouse", "delta": -5 } } }
+      ] },
+
+    { "id": "ev_r_spouse_return", "kind": "choice", "emoji": "💼", "cat": "family", "type": "scheduled", "counselor": "spouse",
+      "when": { "all": ["married"], "spouseEmp": ["homemaker", "none"] },
+      "text": "子どもも少し大きくなった。{spouse}が「そろそろまた働きたい」と言っている。",
+      "fact": { "text": "子育てが落ち着いてから働き始める人の多くは、パートなど短い時間の働き方から始めます。", "src": "総務省 労働力調査" },
+      "choices": [
+        { "label": "🛒 パートで働いてもらう", "showResult": true, "effects": { "spouse": "part" } },
+        { "label": "💼 正社員の仕事をさがしてもらう", "showRate": true, "roll": { "base": 0.45 }, "success": { "spouse": "full" }, "fail": { "spouse": "part", "log": "🍂 正社員の仕事は見つからず、まずはパートから始めた。" } },
+        { "label": "🏠 もう少し家にいてもらう", "effects": { "schedule": [ { "event": "ev_r_spouse_return", "inYears": [3, 4] } ] } }
+      ] },
+
+    { "id": "ev_r_return_work", "kind": "choice", "emoji": "💼", "cat": "work", "type": "scheduled", "counselor": "self",
+      "when": { "employment": ["homemaker", "none", "unemployed"], "age": [22, 60] },
+      "text": "子どもも少し大きくなった。また働く？",
+      "choices": [
+        { "label": "🔍 仕事をさがす", "effects": { "employment": "unemployed", "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0] } ] } },
+        { "label": "🛒 まずはパートで働く", "effects": { "job": { "hire": "j_parttime_general" } } },
+        { "label": "🏠 もう少し家にいる", "effects": { "schedule": [ { "event": "ev_r_return_work", "inYears": [3, 4] } ] } }
+      ] },
+
+    { "id": "ev_r_spouse_transfer", "kind": "choice", "emoji": "🧳", "cat": "family", "counselor": "spouse",
+      "when": { "all": ["married"], "none": ["separated"], "spouseEmp": ["seishain", "civil_servant"], "age": [25, 58], "cooldownYears": 6 },
+      "weight": { "base": 0.8 },
+      "text": "{spouse}に、{newPref}への転勤の話が来た。",
+      "choices": [
+        { "label": "🧳 家族で引っ越す", "showResult": true, "effects": { "move": { "to": "$newPref", "spouseJob": true }, "counter": { "moves": 1 }, "stats": { "social": -6 } } },
+        { "label": "🏠 単身赴任してもらう（月8万円の負担）", "effects": { "cashYearly": -96, "yearsOf": 3, "person": { "relation": "spouse", "delta": -6 }, "stats": { "stress": 4 } } },
+        { "label": "🚪 転勤をことわって、仕事をやめてもらう", "showResult": true, "effects": { "spouse": "quitJob", "person": { "relation": "spouse", "delta": -4 } } }
+      ] },
+
+    { "id": "ev_r_spouse_job_change", "kind": "choice", "emoji": "🔄", "cat": "family", "counselor": "spouse",
+      "when": { "all": ["married"], "spouseWorking": true, "age": [25, 55], "cooldownYears": 6 },
+      "weight": { "base": 0.8 },
+      "text": "{spouse}が「転職しようか迷っている」と言っている。",
+      "choices": [
+        { "label": "📣 応援する", "showRate": true, "roll": { "base": 0.6 }, "success": { "spouse": "raise", "person": { "relation": "spouse", "delta": 5 }, "log": "🎉 {spouse}の転職がうまくいった。給料も上がった。" }, "fail": { "person": { "relation": "spouse", "delta": 2 }, "log": "🍂 {spouse}の転職はうまくいかず、今の職場で働き続けることになった。" } },
+        { "label": "🙂 今のままがいいと思う", "effects": { "person": { "relation": "spouse", "delta": -3 } } }
+      ] },
+
+    { "id": "ev_r_nisetai", "kind": "choice", "emoji": "🏡", "cat": "family", "counselor": "family",
+      "when": { "age": [28, 70], "stage": ["none"], "none": ["caregiving"], "person": { "role": "father|mother", "alive": true, "together": false, "age": [70, 105], "widowed": true, "notInFacility": true }, "cooldownYears": 6 },
+      "weight": { "base": 3, "mul": [["parentCareNeed", 2]] },
+      "text": "{whoPrefName}でひとりで暮らす{whoName}（{whoAge}歳）のことが心配になってきた。",
+      "fact": { "text": "65歳以上の人の約2割が、ひとり暮らしです。親と同じ家（二世帯住宅など）や近くに住むと、見守りや介護がしやすくなります。", "src": "内閣府 高齢社会白書" },
+      "choices": [
+        { "label": "🏡 {whoPrefName}の実家にもどって、いっしょに暮らす", "when": { "whoOtherPref": true }, "showResult": true, "effects": { "moveToWho": { "together": true }, "personRelation": { "$parent": 12 }, "stats": { "stress": 3 } } },
+        { "label": "🏙️ {whoName}を{pref}に呼んで、二世帯で暮らす", "when": { "whoOtherPref": true }, "showResult": true, "effects": { "whoMoveIn": true, "personRelation": { "$parent": 8 }, "stats": { "stress": 3 } } },
+        { "label": "🏘️ {pref}の近くに引っ越してきてもらう", "when": { "whoOtherPref": true }, "showResult": true, "effects": { "whoNear": true, "personRelation": { "$parent": 5 } } },
+        { "label": "🏡 実家で、いっしょに暮らす（二世帯）", "when": { "whoSamePref": true }, "showResult": true, "effects": { "moveToWho": { "together": true }, "personRelation": { "$parent": 10 }, "stats": { "stress": 2 } } },
+        { "label": "🚃 今のまま、ときどき様子を見に行く", "effects": { "personRelation": { "$parent": 2 } } }
+      ] },
+
+    { "id": "ev_r_spouse_care", "kind": "choice", "emoji": "🤲", "cat": "family", "counselor": "self",
+      "when": { "all": ["married"], "none": ["caregiving"], "person": { "role": "spouse", "alive": true, "careLevelMin": 2, "notInFacility": true } },
+      "weight": { "base": 8 },
+      "text": "{spouse}の体が思うように動かなくなり、介護が必要になった。（要介護{careLevel}）",
+      "fact": { "text": "家で介護をしている人の約6割は、同じ家に住む家族。そのうちの約4割は配偶者です（老老介護）。", "src": "厚生労働省 国民生活基礎調査" },
+      "choices": [
+        { "label": "🏠 自分が家で介護する", "effects": { "set": ["caregiving"], "var": { "careTarget": "$who" }, "stats": { "stress": 10 }, "person": { "relation": "spouse", "delta": 8 } } },
+        { "label": "🤝 ヘルパーやデイサービスを使う（月5万円）", "effects": { "set": ["caregiving"], "var": { "careTarget": "$who" }, "cashYearly": -60, "stats": { "stress": 5 } } },
+        { "label": "🏢 施設に入ってもらう", "showResult": true, "effects": { "careFacility": true, "stats": { "stress": -2, "happiness": -4 } } }
+      ] },
+
+    { "id": "ev_r_parent_money_help", "kind": "choice", "emoji": "🎁", "cat": "family",
+      "when": { "age": [25, 50], "person": { "role": "father|mother", "alive": true, "age": [50, 85] }, "any": ["married", "has_partner"], "cooldownYears": 8 },
+      "weight": { "base": 0.6, "mul": [["kids>=1", 2], ["familyWealth>=65", 2.5], ["familyWealth<35", 0.2]] },
+      "text": "{whoName}が「子育ては大変でしょう」と、お金の援助を申し出てくれた。",
+      "choices": [
+        { "label": "🙏 ありがたく受け取る（100万円）", "when": { "flags": { "whoRich": true } }, "showResult": true, "effects": { "whoGive": 100, "personRelation": { "$parent": 2 } } },
+        { "label": "🙂 気持ちだけ受け取る", "effects": { "personRelation": { "$parent": 4 } } }
+      ] },
+
+    { "id": "ev_r_parent_license", "kind": "choice", "emoji": "🚗", "cat": "family",
+      "when": { "age": [35, 75], "person": { "role": "father|mother", "alive": true, "age": [76, 100], "noFlag": "licenseDone" }, "cooldownYears": 3 },
+      "weight": { "base": 1.5 },
+      "text": "{whoName}（{whoAge}歳）の車の運転が心配だ。",
+      "fact": { "text": "75歳以上の運転者による死亡事故は、免許を持つ人の数でくらべると、75歳未満の約2倍。自主的に免許を返す人は年に約40万人。", "src": "警察庁" },
+      "choices": [
+        { "label": "🗣️ 免許の返納をすすめる", "showRate": true, "roll": { "base": 0.55, "w": { "t_comm": 0.3 } }, "success": { "personSet": { "licenseDone": true }, "log": "🪪 {whoName}は免許を返した。買い物は家族やバスで行くことになった。" }, "fail": { "personRelation": { "$parent": -3 }, "log": "😤 「まだ大丈夫だ」と言われてしまった。" } },
+        { "label": "🙂 まだ大丈夫だと思う", "effects": { "personSet": { "licenseDone": true } } }
+      ] },
+
+    { "id": "ev_f_parents_golden", "kind": "flow", "emoji": "💐", "cat": "family",
+      "when": { "person": [ { "role": "father", "alive": true, "age": [74, 90] }, { "role": "mother", "alive": true } ], "once": true },
+      "text": "両親が結婚50周年をむかえた。家族みんなでお祝いした。",
+      "effects": { "stats": { "happiness": 3 }, "personRelation": { "father": 3, "mother": 3 } } },
+
+    { "id": "ev_r_child_moveback", "kind": "choice", "emoji": "🏠", "cat": "family",
+      "when": { "child": { "age": [22, 40], "alive": true, "together": false, "noFlag": "movedBack" }, "cooldownYears": 6 },
+      "weight": { "base": 0.8 },
+      "text": "{child}から「仕事をやめて、しばらく家にもどりたい」と連絡があった。",
+      "choices": [
+        { "label": "🏠 受け入れる", "showResult": true, "effects": { "childPlan": { "movedBack": true, "together": true, "employment": "none", "lookingWork": true, "income": 0, "job": null, "jobLabel": "" }, "personRelation": { "child": 8 }, "stats": { "happiness": 2, "stress": 3 }, "log": "🏠 {child}が家にもどってきた。次の仕事をさがしている。" } },
+        { "label": "💪 自分の力でがんばるように言う", "effects": { "childPlan": { "movedBack": true }, "personRelation": { "child": -6 } } }
+      ] },
+
+    { "id": "ev_r_child_wedding_help", "kind": "choice", "emoji": "💒", "cat": "family",
+      "when": { "child": { "age": [24, 40], "alive": true, "married": false }, "cooldownYears": 3 },
+      "weight": { "base": 1.2 },
+      "text": "{child}が結婚することになった！結婚式のお金を少し出してあげる？",
+      "fact": { "text": "結婚式の費用は平均で約300万円。親や親族から援助を受ける人は約7割です。", "src": "ゼクシィ結婚トレンド調査" },
+      "choices": [
+        { "label": "💴 100万円出してあげる", "when": { "liquid": [">=", 150] }, "effects": { "cash": -100, "childPlan": { "married": true }, "personRelation": { "child": 10 }, "stats": { "happiness": 8 } } },
+        { "label": "🎁 お祝い金だけ（20万円）", "effects": { "cash": -20, "childPlan": { "married": true }, "personRelation": { "child": 4 }, "stats": { "happiness": 6 } } }
+      ] },
+
+    { "id": "ev_r_grandchild_care", "kind": "choice", "emoji": "👶", "cat": "family",
+      "when": { "age": [50, 85], "person": { "role": "grandchild", "alive": true, "age": [0, 5] }, "cooldownYears": 4 },
+      "weight": { "base": 1.5 },
+      "text": "子どもから「仕事のある日、孫をあずかってほしい」とたのまれた。",
+      "choices": [
+        { "label": "👵 引き受ける", "effects": { "stats": { "happiness": 5, "stress": 4, "health": -1 }, "personRelation": { "child": 8 } } },
+        { "label": "🙇 ときどきなら、と伝える", "effects": { "stats": { "happiness": 2 }, "personRelation": { "child": 2 } } },
+        { "label": "🙅 ことわる", "effects": { "personRelation": { "child": -5 } } }
+      ] },
+
+    { "id": "ev_r_child_house_help", "kind": "choice", "emoji": "🏠", "cat": "family",
+      "when": { "child": { "age": [28, 45], "alive": true, "married": true, "noFlag": "houseHelp" }, "cooldownYears": 5 },
+      "weight": { "base": 1 },
+      "text": "{child}が家を買うので、頭金を少し援助してほしいと言ってきた。",
+      "fact": { "text": "親や祖父母から家を買うお金をもらうときは、一定の金額まで贈与税がかからない特例があります。", "src": "国税庁" },
+      "choices": [
+        { "label": "💴 300万円援助する", "when": { "liquid": [">=", 500] }, "effects": { "cash": -300, "childPlan": { "houseHelp": true }, "personRelation": { "child": 12 }, "stats": { "happiness": 4 } } },
+        { "label": "💴 100万円援助する", "when": { "liquid": [">=", 150] }, "effects": { "cash": -100, "childPlan": { "houseHelp": true }, "personRelation": { "child": 6 }, "stats": { "happiness": 2 } } },
+        { "label": "🙇 自分たちの老後のお金なので、ことわる", "effects": { "childPlan": { "houseHelp": true }, "personRelation": { "child": -4 } } }
+      ] },
+
+    { "id": "ev_f_child_visit", "kind": "flow", "emoji": "🎍", "cat": "family",
+      "when": { "child": { "age": [20, 70], "alive": true, "together": false } },
+      "weight": { "base": 1.5 },
+      "text": "お正月に{child}が帰ってきた。久しぶりに家がにぎやかになった。",
+      "effects": { "stats": { "happiness": 3 }, "personRelation": { "child": 2 } } },
+
+    { "id": "ev_f_child_promotion", "kind": "flow", "emoji": "📣", "cat": "family",
+      "when": { "child": { "age": [30, 55], "alive": true, "stage": ["work_start", "work"] } },
+      "weight": { "base": 0.6 },
+      "text": "{child}が職場でリーダーをまかされたらしい。電話の声がうれしそうだった。",
+      "effects": { "stats": { "happiness": 2 } } },
+
+    { "id": "ev_f_child_send_money", "kind": "flow", "emoji": "💌", "cat": "family",
+      "when": { "age": [65, 105], "child": { "age": [30, 80], "alive": true, "together": false, "noFlag": "sendsMoney" }, "money": { "cash": ["<", 300] }, "once": true },
+      "weight": { "base": 1.5 },
+      "text": "{child}が「少しだけど」と、毎月仕送りをしてくれるようになった。",
+      "effects": { "cashYearly": 24, "yearsOf": 10, "childPlan": { "sendsMoney": true }, "stats": { "happiness": 4 } } },
+
+    { "id": "ev_f_grandchild_school", "kind": "flow", "emoji": "🎒", "cat": "family",
+      "when": { "person": { "role": "grandchild", "alive": true, "age": [6, 6] } },
+      "text": "孫の{whoName}が小学校に入学した。ランドセルを買ってあげた。",
+      "effects": { "cash": -6, "stats": { "happiness": 4 } } },
+
+    { "id": "ev_f_grandchild_adult", "kind": "flow", "emoji": "🎊", "cat": "family",
+      "when": { "person": { "role": "grandchild", "alive": true, "age": [20, 20] } },
+      "text": "孫の{whoName}が二十歳になった。時がたつのは早い。",
+      "effects": { "stats": { "happiness": 3 } } }
+  ]
+}

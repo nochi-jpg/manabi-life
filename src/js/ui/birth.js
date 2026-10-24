@@ -5,8 +5,8 @@ function familyLine(p) {
   let what = '';
   if (p.role === 'father' || p.role === 'mother') what = `${p.jobEmoji || '💼'} ${esc(p.jobLabel || '')}`;
   else if (p.role === 'sibling') what = p.age < 1 ? '👶 赤ちゃん' : p.age < 3 ? '🏠 家で過ごす' : p.age < 6 ? '🧸 保育園・幼稚園' : p.age < 12 ? '🎒 小学生' : p.age < 15 ? '🏫 中学生' : '📚 学生';
-  else if (p.role === 'grandparent') what = p.livesTogether ? '🏠 いっしょに住んでいる' : '🏘️ 別の家に住んでいる';
-  return `<div class="kv"><span class="k">${roleEmoji(p)} ${roleLabel(p)}（${p.age}）</span><span>${what}</span></div>`;
+  else if (p.role === 'grandparent') what = p.together ? '🏠 いっしょに住んでいる' : `🏘️ ${esc(Fam.prefName(p.pref))}に住んでいる`;
+  return `<div class="kv"><span class="k">${roleEmoji(p)} ${p.role === 'grandparent' ? (p.side === 'mother' ? '母方の' : '父方の') : ''}${roleLabel(p)}（${p.age}）</span><span>${what}</span></div>`;
 }
 Screens.birth = {
   enter(el) {
@@ -14,17 +14,17 @@ Screens.birth = {
     const ps = D().prefectures.prefectures;
     const rank = ps.slice().sort((a, b) => b.population - a.population).findIndex((x) => x.id === p.id) + 1;
     const tierD = D().prefectures.tiers[p.tier];
-    const fam = G.people.filter((x) => x.role !== 'grandparent').concat(G.people.filter((x) => x.role === 'grandparent' && x.livesTogether).slice(0, 1));
+    const fam = G.people.filter((x) => x.role !== 'grandparent').concat(G.people.filter((x) => x.role === 'grandparent' && x.together).slice(0, 1));
     const famShow = fam.slice(0, 4);
     const nat = 58;
     el.innerHTML = `
-      <div class="date">2010年 4月</div>
+      <div class="date">2010年 4月 ー 誕生</div>
       <div id="roul"><div id="reel"></div></div>
       <div id="born">🎉 <b>${esc(p.name)}</b> に誕生した！</div>
       <div class="panel" id="card">
         <div>
           <div class="pic" style="background-image:url(${faceFile(G.gender, 0)})"></div>
-          <div class="fn"><small>${esc(G.kana[0])} ${esc(G.kana[1])}</small>${esc(G.surname)} ${esc(G.given)}</div>
+          <div class="fn pn">${esc(G.surname)} ${esc(G.given)}</div>
           <div class="sx ${G.gender}">${G.gender === 'M' ? '👦 男の子' : '👧 女の子'}</div>
         </div>
         <div>

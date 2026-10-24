@@ -8,7 +8,7 @@
     },
     "gentle": {
       "label": "🌷 おだやかモード",
-      "desc": "死・がん・離婚・逮捕などのできごとは起こりません",
+      "desc": "がん・離婚・逮捕・家族との死別などのつらいできごとは起こらず、天寿をまっとうします",
       "excludeEvents": [
         "ev_r_shoplift_invite",
         "ev_r_night_out",

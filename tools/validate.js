@@ -8,7 +8,7 @@ const path = require('path');
 const D = (f) => JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', f), 'utf8'));
 
 const flagsDoc = D('flags.json');
-const files = ['events_mandatory.json', 'events_random.json', 'events_flow.json', 'events_world.json'];
+const files = ['events_mandatory.json', 'events_random.json', 'events_flow.json', 'events_world.json', 'events_family.json'];
 const eventsByFile = Object.fromEntries(files.map((f) => [f, D(f).events]));
 const schools = D('schools.json');
 const jobs = D('jobs.json');

@@ -10,13 +10,13 @@
     { "id": "ev_f_grandparent_death", "kind": "flow", "emoji": "🕯️", "cat": "family",
       "when": { "person": { "role": "grandparent", "alive": true } },
       "risk": "death_byPerson",
-      "text": "{personName}が亡くなった。{age}歳の{name}は、初めてお葬式に出た。",
+      "text": "{personName}が亡くなった。{funeralText}",
       "effects": { "person": { "kill": "$who" }, "stats": { "happiness": -4 } } },
 
     { "id": "ev_f_parent_death", "kind": "flow", "emoji": "🕯️", "cat": "family",
       "when": { "person": { "role": "father|mother", "alive": true } },
       "risk": "death_byPerson",
-      "text": "{personName}が{personAge}歳で亡くなった。",
+      "text": "{personName}が{personAge}歳で亡くなった。{funeralText}",
       "effects": { "person": { "kill": "$who" }, "stats": { "happiness": -10, "stress": 8 }, "clearIfCareTarget": ["caregiving"], "schedule": [ { "event": "ev_f_inheritance", "inYears": [0, 0], "ifAdult": true } ], "childOrphanCheck": true },
       "note": "未成年でひとり親が亡くなった場合は、親せきに引き取られる（engine: guardian）。遺族年金を自動付与" },
 
@@ -35,7 +35,7 @@
     { "id": "ev_f_childbirth", "kind": "flow", "emoji": "👶", "cat": "family", "type": "scheduled",
       "when": { "any": ["married", "has_partner"], "person": { "role": "spouse|partner", "alive": true } },
       "text": "{year}年{month}月、{child}が生まれた！",
-      "effects": { "person": { "add": "child" }, "stats": { "happiness": 12, "stress": 5 }, "childAllowance": true, "log": "👶 {child}が誕生" },
+      "effects": { "person": { "add": "child" }, "stats": { "happiness": 12, "stress": 5 }, "childAllowance": true, "afterBirth": true },
       "note": "I-2：配偶者・恋人がいない場合（死別・別れた直後）は、その時点の相手がいないと発生しない。予約時に相手のIDを保存し、その人が生存中のみ発生" },
 
     { "id": "ev_f_child_entry", "kind": "flow", "emoji": "🎒", "cat": "family",
@@ -92,7 +92,7 @@
       "effects": { "clear": ["debt_card"], "stats": { "stress": -6, "happiness": 4 } } },
     { "id": "ev_f_scholar_done", "kind": "flow", "emoji": "🎉", "cat": "money",
       "when": { "all": ["scholarship_loan_repaying"], "repayFinished": true },
-      "text": "奨学金を{repayYears}年かけて、ついに返し終わった。返した合計は{repayTotal}万円（借りたのは{borrowTotal}万円）。",
+      "text": "奨学金を{repayYears}年かけて、ついに返し終わった！ 借りていた{scholarBorrowed}万円を、すべて返した。",
       "effects": { "clear": ["scholarship_loan_repaying"], "stats": { "happiness": 6, "stress": -4 } } },
 
     { "id": "ev_f_danshin", "kind": "flow", "emoji": "🛡️", "cat": "money",
@@ -153,7 +153,7 @@
       "when": { "age": [1, 12], "talent": { "t_health": ["<", 35] }, "once": true }, "weight": { "base": 3 },
       "text": "季節の変わり目になると、すぐ熱を出してしまう。" },
     { "id": "ev_f_hint_music_hi", "kind": "flow", "emoji": "🎵", "cat": "hint",
-      "when": { "age": [4, 12], "talent": { "t_art": [">=", 70] }, "club": ["ls_piano", "ls_dance"], "once": true }, "weight": { "base": 3 },
+      "when": { "age": [4, 12], "talent": { "t_music": [">=", 68] }, "club": ["ls_piano", "ls_dance", "ls_violin", "ls_chorus"], "once": true }, "weight": { "base": 3 },
       "text": "一度聞いただけの曲を、すぐに口ずさめた。先生が目を丸くしていた。" },
     { "id": "ev_f_hint_looks", "kind": "flow", "emoji": "✨", "cat": "hint",
       "when": { "age": [13, 18], "talent": { "looks": [">=", 70] }, "once": true }, "weight": { "base": 2 },

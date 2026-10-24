@@ -142,7 +142,7 @@
       "weight": { "base": 1 },
       "text": "親に転勤の辞令が出た。引っ越し先は{newPref}。",
       "choices": [
-        { "label": "🚚 家族みんなで引っ越す（転校）", "effects": { "move": { "to": "$newPref" }, "counter": { "moves": 1 }, "stats": { "social": -12, "stress": 6 } } },
+        { "label": "🚚 家族みんなで引っ越す（転校）", "effects": { "move": { "to": "$newPref", "withParents": true }, "counter": { "moves": 1 }, "stats": { "social": -12, "stress": 6 } } },
         { "label": "🏠 親が単身赴任する", "effects": { "stats": { "stress": 2, "happiness": -2 }, "householdCost": 60 } }
       ] },
 
@@ -245,7 +245,7 @@
       "weight": { "base": 2.5, "mul": [["partnerRelation<40", 3], ["stress>=70", 1.4]] },
       "text": "{partner}とけんかが増えてきた。",
       "choices": [
-        { "label": "🗣️ ちゃんと話し合う", "roll": { "base": 0.55, "w": { "t_comm": 0.4 } }, "success": { "person": { "relation": "partner", "delta": 15 } }, "fail": { "clear": ["has_partner"], "person": { "end": "partner>past" }, "counter": { "partners_past": 1 }, "stats": { "happiness": -8 } } },
+        { "label": "🗣️ ちゃんと話し合う", "roll": { "base": 0.55, "w": { "t_comm": 0.4 } }, "success": { "person": { "relation": "partner", "delta": 15 }, "log": "🗣️ じっくり話し合って、{partner}と仲直りできた。" }, "fail": { "log": "💔 話し合いはすれちがい、{partner}と別れることになった。", "clear": ["has_partner"], "person": { "end": "partner>past" }, "counter": { "partners_past": 1 }, "stats": { "happiness": -8 } } },
         { "label": "👋 別れる", "effects": { "clear": ["has_partner"], "person": { "end": "partner>past" }, "counter": { "partners_past": 1 }, "stats": { "happiness": -6, "stress": -3 } } }
       ] },
 
@@ -296,7 +296,7 @@
 
     { "id": "ev_r_child_juken", "kind": "choice", "emoji": "📝", "cat": "family",
       "when": { "child": { "age": [9, 9] }, "region": ["A", "B"] },
-      "weight": { "base": 5 },
+      "weight": { "base": 5, "mul": [["region:B", 0.35]] },
       "text": "{child}が小4。中学受験をさせる？（3年で塾代約250万）",
       "choices": [
         { "label": "📝 させる", "when": { "money": { "cash": [">=", 100] } }, "effects": { "childSet": { "juken": true }, "cashYearly": -80, "yearsOf": 3, "stats": { "stress": 4 } } },
@@ -320,7 +320,7 @@
       "weight": { "base": 1.5, "mul": [["spouseRelation<40", 3], ["stress>=70", 1.5], ["focus_work", 1.3], ["debt_card", 1.5]] },
       "text": "{spouse}との言い合いが増え、家の空気が重い。",
       "choices": [
-        { "label": "🗣️ 時間をとって話し合う", "roll": { "base": 0.55, "w": { "t_comm": 0.4, "spouseRelation": 0.4 } }, "success": { "person": { "relation": "spouse", "delta": 15 }, "stats": { "stress": -5 } }, "fail": { "person": { "relation": "spouse", "delta": -10 } } },
+        { "label": "🗣️ 時間をとって話し合う", "roll": { "base": 0.55, "w": { "t_comm": 0.4, "spouseRelation": 0.4 } }, "success": { "person": { "relation": "spouse", "delta": 15 }, "stats": { "stress": -5 }, "log": "🗣️ おたがいの気持ちを話せて、家の空気が少し明るくなった。" }, "fail": { "person": { "relation": "spouse", "delta": -10 }, "log": "😶 話し合いは言い合いになってしまい、ますます気まずくなった。" } },
         { "label": "🏥 夫婦カウンセリングに行く（10万）", "effects": { "cash": -10, "person": { "relation": "spouse", "delta": 20 } } },
         { "label": "💔 離婚する", "when": { "person": { "role": "spouse", "relationMax": 40 } }, "effects": { "schedule": [ { "event": "ev_r_divorce", "inYears": [0, 0] } ] } },
         { "label": "😶 何もしない", "effects": { "person": { "relation": "spouse", "delta": -8 }, "stats": { "stress": 4 } } }
@@ -330,8 +330,8 @@
       "when": { "all": ["married"], "person": { "role": "spouse", "alive": true } },
       "text": "離婚の話し合い。{childrenComment}",
       "choices": [
-        { "label": "📄 話し合いで決める（協議離婚）", "effects": { "clear": ["married"], "set": ["divorced"], "person": { "end": "spouse>ex_spouse" }, "splitAssets": true, "custody": "negotiate", "stats": { "happiness": -10, "stress": 10 } } },
-        { "label": "⚖️ 弁護士に頼む（費用50万）", "effects": { "cash": -50, "clear": ["married"], "set": ["divorced"], "person": { "end": "spouse>ex_spouse" }, "splitAssets": true, "custody": "court", "stats": { "happiness": -8, "stress": 8 } } }
+        { "label": "📄 話し合いで決める（協議離婚）", "effects": { "divorce": "negotiate", "stats": { "happiness": -10, "stress": 10 }, "schedule": [ { "event": "ev_r_surname_divorce", "inYears": [0, 0] } ] }, "showResult": true },
+        { "label": "⚖️ 弁護士に頼む（費用50万）", "effects": { "cash": -50, "divorce": "court", "stats": { "happiness": -8, "stress": 8 }, "schedule": [ { "event": "ev_r_surname_divorce", "inYears": [0, 0] } ] }, "showResult": true }
       ],
       "note": "子どもがいれば親権の判定 → single_parent か、養育費の支払い（月3〜6万）が自動で始まる。結婚で苗字を変えていたら ev_r_surname_divorce が続く" },
 
@@ -542,7 +542,7 @@
       "weight": { "base": 1, "mul": [["black_company", 3]] },
       "text": "上司に毎日のように大声でどなられている。",
       "choices": [
-        { "label": "🗂️ 相談窓口・人事に報告する", "roll": { "base": 0.55 }, "success": { "stats": { "stress": -8 }, "log": "🗂️ 上司が異動になった" }, "fail": { "stats": { "stress": 6 } } },
+        { "label": "🗂️ 相談窓口・人事に報告する", "roll": { "base": 0.55 }, "success": { "stats": { "stress": -10, "happiness": 3 }, "jobLoadDelta": { "mental": -10 }, "log": "🗂️ 人事が話を聞いてくれて、上司は別の部署に異動になった。職場の空気がよくなった。" }, "fail": { "stats": { "stress": 6 }, "log": "😞 人事は「様子を見ます」と言っただけで、何も変わらなかった……。" } },
         { "label": "🔄 転職する", "effects": { "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0] } ] } },
         { "label": "😣 がまんする", "effects": { "stats": { "stress": 12, "happiness": -6 } } }
       ] },
@@ -568,7 +568,7 @@
       "weight": { "base": 1.2, "mul": [["promotion_level>=2", 1.5], ["toeic_800", 1.5], ["skill.it>=70", 2]] },
       "text": "転職サイト経由で、年収{offerIncome}万円のスカウトが届いた。",
       "choices": [
-        { "label": "🤝 面接を受けてみる", "roll": { "base": 0.5, "w": { "t_comm": 0.3 } }, "success": { "job": { "hire": "$offerJob" }, "counter": { "job_changes": 1 }, "stats": { "happiness": 4 } }, "fail": {} },
+        { "label": "🤝 面接を受けてみる", "roll": { "base": 0.5, "w": { "t_comm": 0.3 } }, "success": { "job": { "hire": "$offerJob" }, "incomeMul": 1.2, "counter": { "job_changes": 1 }, "stats": { "happiness": 4 }, "log": "🤝 面接に合格！ スカウトの会社に移り、年収が上がった。" }, "fail": { "log": "🍂 面接は不合格だった。今の会社で働き続ける。" } },
         { "label": "🙅 今の会社にいる", "effects": {} }
       ] },
 
@@ -577,7 +577,7 @@
       "weight": { "base": 2 },
       "text": "{newPref}への転勤を命じられた。",
       "choices": [
-        { "label": "🧳 家族で引っ越す", "effects": { "move": { "to": "$newPref" }, "counter": { "moves": 1 }, "set": ["transfer_rural"], "stats": { "social": -8 }, "promotionBonus": 0.1 } },
+        { "label": "🧳 家族で引っ越す", "effects": { "move": { "to": "$newPref", "withJob": true }, "counter": { "moves": 1 }, "set": ["transfer_rural"], "stats": { "social": -8 }, "promotionBonus": 0.1 } },
         { "label": "🏠 単身赴任する（月8万の負担）", "when": { "any": ["married"] }, "effects": { "cashYearly": -96, "person": { "relation": "spouse", "delta": -6 }, "stats": { "stress": 5 } } },
         { "label": "🚪 断って会社をやめる", "effects": { "job": { "quit": "self" }, "set": ["unemployment_exp"] } }
       ] },
@@ -606,7 +606,7 @@
       "weight": { "base": 2, "mul": [["parentAge>=60", 2]] },
       "text": "親から「そろそろ家の仕事を継いでくれないか」と言われた。",
       "choices": [
-        { "label": "🏮 継ぐ", "effects": { "job": { "hire": "j_family_business" }, "move": { "to": "home" }, "personRelation": { "father": 10, "mother": 10 } } },
+        { "label": "🏮 継ぐ", "effects": { "job": { "hire": "j_family_business" }, "move": { "to": "home", "withJob": true }, "personRelation": { "father": 10, "mother": 10 } } },
         { "label": "🙇 自分の道を進むと伝える", "effects": { "personRelation": { "father": -8, "mother": -5 } } }
       ] },
 
@@ -615,16 +615,16 @@
       "weight": { "base": 1.5, "mul": [["region:C", 1.6]] },
       "text": "東京の会社から声がかかった。給料は今の{tokyoRatio}倍くらい。でも家賃も高い。",
       "choices": [
-        { "label": "🗼 上京する", "effects": { "move": { "to": "tokyo" }, "set": ["moved_to_tokyo", "living_alone"], "clear": ["lives_with_parents"], "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0] } ], "stats": { "social": -8, "happiness": 4 } } },
+        { "label": "🗼 上京する", "effects": { "move": { "to": "tokyo", "noSearch": true }, "set": ["moved_to_tokyo", "living_alone"], "clear": ["lives_with_parents"], "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0] } ], "stats": { "social": -8, "happiness": 4 } } },
         { "label": "🏡 地元に残る", "effects": { "stats": { "social": 2 } } }
       ] },
 
     { "id": "ev_r_u_turn", "kind": "choice", "emoji": "🏡", "cat": "life",
-      "when": { "age": [27, 60], "all": ["moved_to_tokyo"], "none": ["u_turn"], "cooldownYears": 5 },
+      "when": { "age": [27, 60], "all": ["moved_to_tokyo"], "none": ["u_turn", "lives_with_parents"], "homeAway": true, "cooldownYears": 5 },
       "weight": { "base": 1.2, "mul": [["parentCareNeed", 3], ["child:any", 1.3]] },
       "text": "ふるさとに帰ろうか考えている。",
       "choices": [
-        { "label": "🏡 地元に戻る（Uターン）", "effects": { "move": { "to": "home" }, "set": ["u_turn"], "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0] } ], "stats": { "stress": -5, "social": 4 } } },
+        { "label": "🏡 地元に戻る（Uターン）", "effects": { "move": { "to": "home", "noSearch": true }, "set": ["u_turn"], "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0] } ], "stats": { "stress": -5, "social": 4 } } },
         { "label": "🗼 今の場所で暮らす", "effects": {} }
       ] },
 
@@ -694,33 +694,39 @@
       "weight": { "base": 5 },
       "text": "借金が{debt}万円にふくらみ、返せなくなってきた。",
       "choices": [
-        { "label": "🏛️ 法テラス・弁護士に相談して債務整理", "effects": { "set": ["debt_consolidation", "blacklisted"], "debtMul": 0.5, "stats": { "stress": -8 } } },
-        { "label": "⚖️ 自己破産する", "when": { "debtOverIncome": 2.0 }, "effects": { "set": ["bankruptcy", "blacklisted"], "debt": "=0", "assetsSeize": true, "clear": ["owns_house", "mortgage", "owns_car"], "stats": { "stress": -10, "happiness": -10 } } },
-        { "label": "👨‍👩‍👧 家族に相談する", "roll": { "base": 0.4, "w": { "familyWealth": 0.5 } }, "success": { "debtMul": 0.6, "personRelation": { "father": -5, "mother": -5 } }, "fail": { "stats": { "stress": 4 } } },
-        { "label": "💳 別のところから借りて返す", "effects": { "debtMul": 1.2, "stats": { "stress": 10 } } }
+        { "label": "📉 投資を売って返す", "when": { "assets": [">=", 30] }, "showResult": true, "effects": { "sellAssetsForDebt": true, "stats": { "stress": -6 } } },
+        { "label": "🏛️ 法テラス・弁護士に相談して債務整理", "showResult": true, "effects": { "set": ["debt_consolidation", "blacklisted"], "debtSettle": 0.5, "stats": { "stress": -8 } } },
+        { "label": "⚖️ 自己破産する", "when": { "debtOverIncome": 2.0 }, "showResult": true, "effects": { "bankrupt": true, "set": ["bankruptcy", "blacklisted"], "debt": "=0", "assetsSeize": true, "clear": ["owns_house", "mortgage", "owns_car"], "stats": { "stress": -10, "happiness": -10 } } },
+        { "label": "👨‍👩‍👧 家族に相談する", "when": { "familyCanHelp": true }, "roll": { "base": 0.75 }, "success": { "familyBailout": true, "personRelation": { "father": -5, "mother": -5, "spouse": -5 } }, "fail": { "stats": { "stress": 4 }, "log": "😞 「自分でなんとかしなさい」と言われてしまった。" } },
+        { "label": "💳 別のところから借りて返す", "showResult": true, "effects": { "debtMul": 1.2, "stats": { "stress": 10 }, "log": "💳 別のところから借りて返した。でも借金は2割ふえ、利息もかさんでいく……。" } }
       ] },
 
     { "id": "ev_r_welfare", "kind": "choice", "emoji": "🏛️", "cat": "money",
-      "when": { "age": [18, 105], "money": { "cash": ["<", 10] }, "incomeBelowMinimum": true, "none": ["welfare"], "cooldownYears": 2 },
+      "when": { "age": [18, 105], "welfareNeed": true, "none": ["welfare"], "cooldownYears": 2 },
       "weight": { "base": 5, "mul": [["health<30", 2], ["age>=65", 1.5]] },
       "text": "収入がなく、生活ができなくなってきた。市役所で生活保護の相談ができる。",
       "choices": [
-        { "label": "🏛️ 生活保護を申請する", "roll": { "base": 0.8 }, "success": { "set": ["welfare"], "clear": ["owns_car"], "stats": { "stress": -10 }, "log": "🏛️ 生活保護が決まった。医療費も無料になる" }, "fail": { "log": "📄 資産や家族の援助を確認され、今回は対象外だった" } },
+        { "label": "🏛️ 生活保護を申請する", "roll": { "base": 0.8 }, "success": { "set": ["welfare"], "clear": ["owns_car"], "lifeLevel": "save", "stats": { "stress": -10 }, "log": "🏛️ 生活保護が決まった。毎月 約{welfareMonthly}万円が支給され、家賃と最低限の生活費がまかなえる（医療費も無料）。毎月の収支は、ほぼ0になる。" }, "fail": { "log": "📄 資産や家族の援助を確認され、今回は対象外だった" } },
         { "label": "🙅 頼らずにがんばる", "effects": { "stats": { "stress": 8, "health": -4 } } }
       ] },
 
     { "id": "ev_r_parent_care", "kind": "choice", "emoji": "🤲", "cat": "family",
-      "when": { "person": { "role": "father|mother", "alive": true, "careLevelMin": 2 }, "none": ["caregiving"] },
-      "weight": { "base": 8 },
-      "text": "{parentName}が{careReason}で、介護が必要になった。（要介護{careLevel}）",
+      "when": {"person": {"role": "father|mother", "alive": true, "careLevelMin": 2, "notInFacility": true}, "none": ["caregiving"]},
+      "weight": {"base": 8},
+      "text": "{whoPrefName}の{parentName}が{careReason}で、介護が必要になった。（要介護{careLevel}）",
       "choices": [
-        { "label": "🏠 同居して自分が介護する", "effects": { "set": ["caregiving"], "var": { "careTarget": "$parentId" }, "jobHoursMul": 0.7, "stats": { "stress": 10 }, "personRelation": { "$parent": 10 } } },
-        { "label": "🏢 介護施設に入ってもらう（月15万）", "effects": { "cashYearly": -180, "personRelation": { "$parent": -3 } } },
-        { "label": "🤝 ヘルパー・デイサービスを使いながら仕事を続ける（月5万）", "effects": { "set": ["caregiving"], "var": { "careTarget": "$parentId" }, "cashYearly": -60, "stats": { "stress": 5 } } },
-        { "label": "👨‍👩‍👧 きょうだいと分担する", "when": { "person": { "role": "sibling", "alive": true } }, "roll": { "base": 0.6 }, "success": { "set": ["caregiving"], "var": { "careTarget": "$parentId" }, "stats": { "stress": 3 } }, "fail": { "set": ["caregiving"], "var": { "careTarget": "$parentId" }, "stats": { "stress": 8 }, "personRelation": { "sibling": -10 }, "log": "😠 きょうだいともめてしまった" } },
-        { "label": "🚪 仕事をやめて介護に専念する（介護離職）", "when": { "employment": ["seishain", "keiyaku", "haken", "part", "civil_servant"] }, "effects": { "set": ["caregiving"], "var": { "careTarget": "$parentId" }, "job": { "quit": "self" }, "stats": { "stress": 8 }, "personRelation": { "$parent": 15 } } }
+        {"label": "🏠 いっしょに住んでいるので、自分が中心になって介護する", "when": {"whoTogether": true}, "effects": {"set": ["caregiving"], "var": {"careTarget": "$parentId"}, "jobHoursMul": 0.8, "stats": {"stress": 10}, "personRelation": {"$parent": 10}}},
+        {"label": "🏠 実家にもどり、同居して介護する", "when": {"whoSamePref": true}, "showResult": true, "effects": {"moveToWho": {"together": true}, "set": ["caregiving"], "var": {"careTarget": "$parentId"}, "jobHoursMul": 0.8, "stats": {"stress": 10}, "personRelation": {"$parent": 12}}},
+        {"label": "🚗 同じ{pref}なので、通いながら介護する（月2万円）", "when": {"whoSamePref": true}, "effects": {"set": ["caregiving"], "var": {"careTarget": "$parentId", "careCost": 24}, "stats": {"stress": 8}, "personRelation": {"$parent": 6}}},
+        {"label": "🏡 {whoPrefName}の実家にもどって介護する（仕事のことも考える）", "when": {"whoOtherPref": true}, "showResult": true, "effects": {"moveToWho": {"together": true}, "set": ["caregiving"], "var": {"careTarget": "$parentId"}, "stats": {"stress": 10}, "personRelation": {"$parent": 15}}},
+        {"label": "🏙️ {parentName}を{pref}に呼んで、同居して介護する", "when": {"whoOtherPref": true}, "showResult": true, "effects": {"whoMoveIn": true, "set": ["caregiving"], "var": {"careTarget": "$parentId"}, "jobHoursMul": 0.85, "stats": {"stress": 9}, "personRelation": {"$parent": 8}}},
+        {"label": "🚄 遠距離介護（ヘルパー＋月1回の帰省で月5万円）", "when": {"whoOtherPref": true}, "effects": {"set": ["caregiving"], "var": {"careTarget": "$parentId", "careCost": 60}, "stats": {"stress": 7, "health": -2}, "personRelation": {"$parent": 3}}},
+        {"label": "🤝 ヘルパー・デイサービスを使いながら仕事を続ける（月5万円）", "when": {"whoOtherPref": false}, "effects": {"set": ["caregiving"], "var": {"careTarget": "$parentId", "careCost": 60}, "stats": {"stress": 5}}},
+        {"label": "🏢 介護施設に入ってもらう（月15万円・親の年金と貯金から）", "showResult": true, "effects": {"careFacility": true, "personRelation": {"$parent": -3}}},
+        {"label": "👨‍👩‍👧 きょうだいと分担する", "when": {"person": {"role": "sibling", "alive": true}}, "roll": {"base": 0.6}, "success": {"set": ["caregiving"], "var": {"careTarget": "$parentId"}, "stats": {"stress": 3}, "log": "🤝 きょうだいと話し合い、交代で介護することになった"}, "fail": {"set": ["caregiving"], "var": {"careTarget": "$parentId"}, "stats": {"stress": 8}, "personRelation": {"sibling": -10}, "log": "😠 きょうだいともめてしまい、ほとんど自分が介護することに"}},
+        {"label": "🚪 仕事をやめて介護に専念する（介護離職）", "when": {"employment": ["seishain", "keiyaku", "haken", "part", "civil_servant"]}, "showResult": true, "effects": {"job": {"quit": "self"}, "moveToWho": {"together": true}, "set": ["caregiving"], "var": {"careTarget": "$parentId"}, "stats": {"stress": 8}, "personRelation": {"$parent": 15}, "log": "🚪 仕事をやめて、介護に専念することにした。収入はなくなる。"}}
       ],
-      "note": "careTarget の人物が亡くなる・施設入所すると caregiving は自動で外れる（I-6）" },
+      "note": "親の住む県・同居かどうかで選択肢が変わる。careTarget の人物が亡くなる・施設に入ると caregiving は自動で外れる（I-6）" },
 
     { "id": "ev_r_care_self", "kind": "choice", "emoji": "🦯", "cat": "health",
       "when": { "age": [65, 105] },
@@ -1025,12 +1031,12 @@
       ] },
 
     { "id": "ev_r_scholar_trouble", "kind": "choice", "emoji": "📄", "cat": "money",
-      "when": { "all": ["scholarship_loan_repaying"], "money": { "cash": ["<", 0] }, "cooldownYears": 2 },
+      "when": { "all": ["scholarship_loan_repaying"], "liquid": ["<", 0], "cooldownYears": 2 },
       "weight": { "base": 6 },
       "text": "所持金がマイナスで、奨学金の返済（月{repay}万円）がきびしい。",
       "choices": [
         { "label": "📮 返還猶予を申請する（返すのを待ってもらう）", "roll": { "base": 0.8, "incomeBelow": 300 }, "success": { "pauseRepay": 1, "log": "📮 1年間、返済を待ってもらえることになった" }, "fail": { "log": "📄 収入の条件に合わず、猶予は通らなかった" } },
-        { "label": "➗ 減額返還を申請する（月の返済を半分に・期間はのびる）", "effects": { "repayMul": 0.5, "repayYearsMul": 2 } },
+        { "label": "➗ 減額返還を申請する（月の返済を半分に・期間はのびる）", "showResult": true, "effects": { "repayMul": 0.5, "repayYearsMul": 2, "log": "➗ 減額返還が決まった。月の返済は{repay}万円になる（返す期間はのびる）。" } },
         { "label": "🙈 そのまま払わない", "effects": { "set": ["blacklisted"], "stats": { "stress": 10 }, "log": "⚠️ 3か月以上の延滞で、信用情報に記録された（ローンやクレジットカードが作りにくくなる）" } }
       ] },
 
@@ -1049,7 +1055,7 @@
       "text": "結婚して、2人でどこに住む？（ファミリー向けの家賃：月{rentFamily}万円）",
       "choices": [
         { "label": "🔑 2人で部屋を借りる（月{rentFamily}万円）", "effects": { "set": ["renting"], "clear": ["lives_with_parents", "living_alone"], "rentMonthly": "$rentFamily", "cash": "-$moveInCostFamily" } },
-        { "label": "👵 どちらかの実家で同居する", "when": { "person": { "role": "father|mother", "alive": true } }, "effects": { "set": ["lives_with_parents"], "clear": ["renting", "living_alone"], "rentMonthly": 0, "stats": { "stress": 3 }, "person": { "relation": "spouse", "delta": -3 } } },
+        { "label": "👵 自分の実家で同居する（{parentPrefName}）", "when": { "person": { "role": "father|mother", "alive": true } }, "showResult": true, "effects": { "moveToWho": { "together": true }, "clear": ["renting", "living_alone"], "rentMonthly": 0, "stats": { "stress": 3 }, "person": { "relation": "spouse", "delta": -3 } } },
         { "label": "🏠 思い切って家を買う", "effects": { "schedule": [ { "event": "ev_r_house", "inYears": [0, 0] } ] } }
       ] },
 

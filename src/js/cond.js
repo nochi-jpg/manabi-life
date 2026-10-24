@@ -36,6 +36,11 @@ function statVal(k) {
   if (k === 'parentAge') { const ps = people('father|mother'); return ps.length ? Math.max(...ps.map((p) => p.age)) : 0; }
   if (k === 'spouseAge') { const p = person('spouse'); return p ? p.age : 0; }
   if (k === 'familyWealth') return G.talents.familyWealth;
+  if (k === 'netWorth') return Econ.netWorth();
+  if (k === 'liquid') return Econ.liquid();
+  if (k === 'assets') return G.assets;
+  if (k === 'householdIncome') return Fam.householdIncome().total;
+  if (k === 'kids') return people('child').length;
   return 0;
 }
 // 「$xxx」などの動的な値
@@ -74,7 +79,16 @@ function personMatch(p, c) {
   if (c.age && !inRange(p.age, c.age)) return false;
   if (c.ageMax != null && p.age > c.ageMax) return false;
   if (c.noFlag && p[c.noFlag]) return false;
-  if (c.livesTogether && !p.livesTogether) return false;
+  if (c.livesTogether && !p.together) return false;
+  if (c.together === true && !p.together) return false;
+  if (c.together === false && p.together) return false;
+  if (c.working === true && !Fam.isWorking(p)) return false;
+  if (c.working === false && Fam.isWorking(p)) return false;
+  if (c.healthMax != null && (p.health ?? 80) > c.healthMax) return false;
+  if (c.ill && !p.illness) return false;
+  if (c.notInFacility && p.inFacility) return false;
+  if (c.widowed && people('father|mother').filter((x) => x !== p).length) return false;
+  if (c.married != null && !!p.married !== c.married) return false;
   return true;
 }
 function childMatch(p, c) {
@@ -84,6 +98,9 @@ function childMatch(p, c) {
   if (c.married != null && !!p.married !== c.married) return false;
   if (c.plan && p.plan !== c.plan) return false;
   if (c.stage && !c.stage.includes(p.stage)) return false;
+  if (c.noFlag && p[c.noFlag]) return false;
+  if (c.together === true && !p.together) return false;
+  if (c.together === false && p.together) return false;
   if (c.birthParentAge) { const a = p.gender === 'F' ? p.age : (p.spouseAge || p.age - 2); if (!inRange(a, c.birthParentAge)) return false; }
   return true;
 }
@@ -142,7 +159,31 @@ function testKey(k, v, ctx) {
     case 'jobCat': return !!G.job && v.includes((Menu.job(G.job.id) || {}).cat);
     case 'jobId': return !!G.job && v.includes(G.job.id);
     case 'careerEnd': { const j = G.job && Menu.job(G.job.id); return !!j && !!j.careerEndAge && G.age >= j.careerEndAge + (G.vars.careerExtra || 0); }
-    case 'debtOverIncome': return Econ.totalDebt(true) > Math.max(50, Econ.annualIncome()) * v;
+    case 'debtOverIncome': { if (Menu.isStudent()) return false; const sch = (G.loans || []).filter((l) => l.type === 'scholar' || l.type === 'settle').reduce((a, l) => a + Math.max(0, l.left), 0); return Econ.totalDebt(true) - sch - Math.max(0, G.assets) - Math.max(0, G.cash) > Math.max(50, Econ.annualIncome()) * v; }
+    case 'welfareNeed': {
+      if (G.age < 18 || Menu.isStudent() || Econ.liquid() >= 10 || Econ.annualIncome() >= 160 + (G.flags.married ? 80 : 0)) return !v;
+      const help = Fam.household().some((p) => (['father', 'mother'].includes(p.role) && (p.assets || 0) > 300) || (p.role === 'spouse' && (p.income || 0) > 200));
+      return !help === !!v;
+    }
+    case 'notStudent': return !Menu.isStudent() === !!v;
+    case 'liquid': return matchSpec(Econ.liquid(), v, ctx);
+    case 'netWorth': return matchSpec(Econ.netWorth(), v, ctx);
+    case 'assets': return matchSpec(G.assets, v, ctx);
+    case 'homeAway': { const par = people('father|mother'); const hp = par.length ? par[0].pref : G.birthPref; return (G.pref !== hp && !par.some((p) => p.together)) === !!v; }
+    case 'whoTogether': return !!ctx.who && !!ctx.who.together === !!v;
+    case 'whoSamePref': return !!ctx.who && (ctx.who.pref === G.pref && !ctx.who.together) === !!v;
+    case 'whoFar': return !!ctx.who && !Fam.near(ctx.who.pref, G.pref) === !!v;
+    case 'whoNearPref': return !!ctx.who && (ctx.who.pref !== G.pref && Fam.near(ctx.who.pref, G.pref)) === !!v;
+    case 'whoOtherPref': return !!ctx.who && (ctx.who.pref !== G.pref) === !!v;
+    case 'selfWorking': return (Econ.working() && !!G.job && !!G.job.id) === !!v;
+    case 'selfEmp': return v.includes(G.employment);
+    case 'spouseWorking': { const sp = person('spouse'); return (!!sp && Fam.isWorking(sp) && sp.employment !== 'leave') === !!v; }
+    case 'spouseEmp': { const sp = person('spouse'); return !!sp && v.includes(sp.employment); }
+    case 'parentHelpable': return people('father|mother').some((p) => p.age < 78 && !p.careLevel && !p.together) === !!v;
+    case 'familyCanHelp': return Fam.familyCanHelp() === !!v;
+    case 'kidsTogether': return matchSpec(people('child').filter((c) => c.together).length, v, ctx);
+    case 'whoRich': return !!ctx.who && ((ctx.who.assets || 0) >= 300) === !!v;
+    case 'kidsN': return matchSpec(people('child').length, v, ctx);
     case 'incomeBelowMinimum': return Econ.annualIncome() < 160 + (G.flags.married ? 80 : 0);
     case 'income': return matchSpec(Econ.annualIncome(), v, ctx);
     case 'notMax': return !G.flags[v];

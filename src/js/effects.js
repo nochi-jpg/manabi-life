@@ -83,13 +83,31 @@ const Effects = (() => {
         case 'riskMul': G.vars.riskMul = G.vars.riskMul || {}; for (const [e, m] of Object.entries(v)) G.vars.riskMul[e] = (G.vars.riskMul[e] || 1) * m; break;
         case 'deathRiskMul': G.vars.deathRiskMul = (G.vars.deathRiskMul || 1) * v; break;
         case 'delay': break;
-        case 'move': Life.move(resolve(v.to, ctx), ctx); break;
+        case 'move': Life.move(resolve(v.to, ctx), ctx, v); break;
         case 'householdCost': G.household.extraCost = (G.household.extraCost || 0) + v; break;
         case 'householdStress': stat('stress', v); break;
         case 'wealthDelta': G.talents.familyWealth = clamp(G.talents.familyWealth + v, 0, 100); G.household.income = wealthIncome(G.talents.familyWealth); break;
         case 'allowance': G.vars.childSupport = true; break;
-        case 'splitAssets': G.cash = G.cash / 2; G.assets /= 2; break;
-        case 'custody': People.custody(v); break;
+        case 'splitAssets': break; // → divorce
+        case 'custody': break;
+        case 'divorce': { const lines = Fam.divorce(v); (lines || []).forEach((l) => logs.push('📄 ' + l)); break; }
+        case 'employment': G.employment = v; if (v === 'homemaker') G.job = null; break;
+        case 'whoGive': { const w = ctx.who; const amt = Math.min(num(v, ctx), Math.max(0, (w && w.assets) || 0)); if (w && amt > 0) { w.assets -= amt; G.cash += amt; logs.push(`🎁 ${Fam.callName(w)}から${man(amt)}万円の援助を受けた（${Fam.callName(w)}の貯金はその分へった）。`); } break; }
+        case 'separate': { const kg = v.kidsGo === 'auto' ? (G.gender === 'M' ? chance(0.8) : chance(0.15)) : !!v.kidsGo; const anyKid = people('child').some((c) => c.together && c.age < 18); Fam.separate(kg); logs.push(kg && anyKid ? `🧳 ${(person('spouse') || {}).name || '配偶者'}は子どもを連れて家を出た。別居が始まった。` : `🧳 ${(person('spouse') || {}).name || '配偶者'}が家を出て、別居が始まった。`); break; }
+        case 'reunite': Fam.reunite(); logs.push('🏠 もう一度いっしょに暮らすことになった。'); break;
+        case 'afterBirth': { setFlag('wants_children', false, ctx); const n = people('child').length; if (n < 4) Engine.schedule('ev_m_next_child', rint(2, 3), 'Q1', ctx); Engine.schedule('ev_m_baby_work', 0, null, ctx); break; }
+        case 'scholarStart': Econ.scholarStart(); break;
+        case 'spouse': People.spouseDo(v, ctx, logs); break;
+        case 'lifeLevel': G.vars.lifeLevel = v; break;
+        case 'whoMoveIn': { const w = ctx.who; if (w) { Fam.whoMoveIn(w); logs.push(`🏡 ${Fam.callName(w)}が${pref().name}に引っ越してきて、いっしょに暮らし始めた。`); } break; }
+        case 'whoNear': { const w = ctx.who; if (w) { w.pref = G.pref; w.together = false; logs.push(`🏘️ ${Fam.callName(w)}が近くに引っ越してきた。`); } break; }
+        case 'moveToWho': { const w = ctx.who || person('father|mother'); if (w) { const pr = w.pref; Fam.moveToWho(w, !!v.together); logs.push(v.together ? `🏡 ${Fam.prefName(pr)}の実家にもどって、${Fam.callName(w)}といっしょに暮らし始めた。` : `🏘️ ${Fam.prefName(pr)}の${Fam.callName(w)}の家の近くに引っ越した。`); } break; }
+        case 'careFacility': { const w = ctx.who; if (w) { w.inFacility = true; w.together = false; const cover = Math.round((w.income || 0) + (w.assets || 0) / 8); const pay = Math.max(0, 180 - cover); if (pay > 0) { G.vars.recurring = G.vars.recurring || []; G.vars.recurring.push({ v: -pay, left: 8, from: 'ev_r_parent_care', who: w.id }); } logs.push(pay > 0 ? `🏢 施設に入ってもらった。費用は年180万円。${Fam.callName(w)}の年金と貯金でたりない年${pay}万円を、自分が出す。` : `🏢 施設に入ってもらった。費用は${Fam.callName(w)}の年金と貯金でまかなえる。`); } break; }
+        case 'debtSettle': { const before = Math.round(Econ.totalDebt(true)); const card = Math.max(0, -G.cash); G.cash = Math.max(0, G.cash); let left = 0; for (const l of G.loans || []) if (l.type !== 'mortgage' && l.type !== 'investment' && l.left > 0) { l.left *= v; left += l.left; } const cut = card * v; if (cut > 0) { const l = Econ.addLoan('settle', cut, 0); l.yearly = Math.round((cut / 5) * 10) / 10; } const after = Math.round(left + cut); logs.push(`⚖️ 債務整理で、借金が${man(before)}万円から${man(after)}万円にへった。のこりは5年の分割（月${round1(after / 60)}万円）で返す。信用情報に5年間のるので、ローンやカードは作れない。`); break; }
+        case 'bankrupt': { const before = Math.round(Econ.totalDebt()); logs.push(`⚖️ 自己破産の手続きをした。${man(before)}万円の借金はなくなったが、家・車・投資など財産のほとんどを手放した。7〜10年はローンやカードが作れない。`); break; }
+        case 'familyBailout': { const need = Math.round(Econ.totalDebt(true)); const r = Fam.bailout(need * 0.6); if (r.amt > 0) { G.cash += r.amt; if (G.cash > 0) { let x = G.cash; for (const l of G.loans || []) if (l.type !== 'mortgage' && l.left > 0 && x > 0) { const pay = Math.min(l.left, x); l.left -= pay; x -= pay; } G.cash = x; } logs.push(`👨‍👩‍👧 ${r.who.join('・')}が${man(r.amt)}万円を出してくれて、借金の一部を返せた（家族の貯金はその分へった）。`); } else logs.push('👨‍👩‍👧 家族にも、出せるお金はなかった。'); break; }
+        case 'sellAssetsForDebt': { const debt = Econ.totalDebt(true); const s = Math.min(G.assets, debt); G.assets -= s; G.cash += s; let x = Math.max(0, G.cash); for (const l of G.loans || []) if (l.type !== 'mortgage' && l.left > 0 && x > 0) { const pay = Math.min(l.left, x); l.left -= pay; x -= pay; } G.cash = Math.min(G.cash, x); logs.push(`📉 投資を${man(s)}万円分売って、借金を返した。`); break; }
+        case 'childPlan': { const c = ctx.child; if (c) { Object.assign(c, v); if (v.costStage === 'univ_away') { c.awayAt = 18; c.awayPref = c.awayPref || (Fam.near(G.pref, 'tokyo') || tier() === 'C' ? pick(['tokyo', 'osaka', 'aichi', 'fukuoka', 'miyagi', 'hiroshima']) : 'tokyo'); } } break; }
         case 'loan': { const amt = num(v.amount, ctx); const l = Econ.addLoan(v.type, amt, v.rate); l.yearly = annuity(amt, v.rate || 0, v.years || 10); l.start = G.year; if (v.type === 'mortgage') { G.vars.houseValue = Text.housePrice(); } break; }
         case 'loanClose': G.loans = (G.loans || []).map((l) => (l.type === v ? { ...l, left: 0 } : l)); break;
         case 'loanPrepay': { const l = (G.loans || []).find((x) => x.type === 'mortgage'); if (l) { l.left = Math.max(0, l.left - v); G.cash -= v; } break; }
@@ -99,6 +117,7 @@ const Effects = (() => {
         case 'pauseRepay': { const l = (G.loans || []).find((x) => x.type === 'scholar'); if (l) { l.paused = true; Engine.schedule('__unpause', v, null, ctx); } break; }
         case 'roll': break; // 効果の中の判定（説明用）
         case 'interest': G.cash -= 3; break;
+        case 'resultLog': break;
         case 'earlyDetect': if (ctx.kenshinBad) G.vars.kenshinFlag = true; break;
         case 'setCancerFlag': if (G.mode !== 'gentle') setFlag('dz_cancer_' + (G.vars.cancerType || 'stomach'), true, ctx); break;
         case 'recoverIn': Engine.schedule('ev_f_recover_depression', rangeInt(v), null, ctx); break;
@@ -225,7 +244,8 @@ const Work = {
     if (j.id === 'j_parttime_general') f = 'part';
     // 出世の段：同じ track なら1段下げて引きつぐ
     const oldTrack = Econ.rankTrack();
-    G.job = { id, form: f, startAge: Math.min(G.age, (G.job && G.job.startAge) ?? G.age), since: G.year, mul: 1 };
+    G.job = { id, form: f, startAge: Math.min(G.age, (G.job && G.job.startAge) ?? G.age), since: G.year, mul: 1, pref: G.pref };
+    delete G.flags.long_commute;
     const nt = Econ.rankTrack();
     G.rank = oldTrack && nt && oldTrack.id === nt.id ? Math.max(0, (G.rank || 0) - 1) : 0;
     G.counters.promotion_level = G.rank;
@@ -277,7 +297,7 @@ const Clubs = {
 const People = {
   apply(v, ctx) {
     if (v.add) this.add(v.add, ctx, v);
-    if (v.promote) { const [a, b] = v.promote.split('>'); const p = person(a); if (p) { p.role = b; p.since = G.year; if (b === 'spouse') { p.income = p.income || Math.max(0, Math.round(chance(0.25) ? normal(100, 60) : normal(320, 120))); } } }
+    if (v.promote) { const [a, b] = v.promote.split('>'); const p = person(a); if (p) { p.role = b; p.since = G.year; if (b === 'spouse') { Fam.fill(p); p.together = true; p.pref = G.pref; if (p.age >= 18 && !p.job && p.employment !== 'homemaker') Fam.assignJob(p); if (p.jobPref && !Fam.near(p.jobPref, G.pref)) Fam.quitPerson(p, '結婚で引っ越したので、'); } } }
     if (v.end) { const [a, b] = v.end.split('>'); const p = person(a); if (p) { if (b === 'apart') { p.apart = true; p.role = a; p.livesApart = true; p.alive = true; p.away = true; G.people = G.people.filter((x) => x !== p); G.vars.apartParent = p; } else { p.role = b || 'ex'; } } }
     if (v.kill) { const target = v.kill === '$who' ? ctx.who : person(v.kill); if (target) this.kill(target, ctx); }
     if (v.relation) { const tg = v.relation === 'spouse' || v.relation === 'partner' ? person(v.relation) : ctx.who; if (tg) tg.relation = clamp(tg.relation + (v.delta || 0), 0, 100); }
@@ -286,15 +306,16 @@ const People = {
     const N = D().names;
     if (role === 'partner') {
       const g = G.gender === 'M' ? 'F' : 'M';
-      const p = newPerson('partner', { name: pick(N.given[g])[0], gender: g, age: clamp(G.age + rint(-3, 3), Math.max(G.age - 5, 11), 120), since: G.year, relation: rint(55, 75), surname: pick(N.surnames.filter((s) => s[0] !== G.surname))[0] });
+      const p = newPerson('partner', { name: pick(N.given[g])[0], gender: g, age: clamp(G.age + rint(-3, 3), Math.max(G.age - 5, 11), 120), since: G.year, relation: rint(55, 75), surname: pick(N.surnames.filter((s) => s[0] !== G.surname))[0], pref: G.pref, together: false, assets: Math.max(0, Math.round(normal(G.age * 6, 80))) });
+      Fam.fill(p); if (p.age >= 18) Fam.assignJob(p);
       G.people.push(p); G.vars.partnerSurname = p.surname; G.counters.partners_past = (G.counters.partners_past || 0) + 1;
     } else if (role === 'sibling') {
       const d = ctx.sibData || {};
-      const p = newPerson('sibling', { name: d.name || pick(N.given[d.gender || 'M'])[0], gender: d.gender || (chance(0.5) ? 'M' : 'F'), age: 0, older: false });
+      const p = newPerson('sibling', { name: d.name || pick(N.given[d.gender || 'M'])[0], gender: d.gender || (chance(0.5) ? 'M' : 'F'), age: 0, older: false, pref: G.pref, together: true, employment: 'none' });
       G.people.push(p); ctx.sib = p;
     } else if (role === 'child') {
       const g = chance(0.51) ? 'M' : 'F';
-      const p = newPerson('child', { name: pick(N.given[g])[0], gender: g, age: 0, relation: 80, born: calYear() });
+      const p = newPerson('child', { name: pick(N.given[g])[0], gender: g, age: 0, relation: 80, born: calYear(), pref: G.pref, together: true, employment: 'none', acad: talent() });
       G.people.push(p); ctx.child = p;
     } else if (role === 'grandchild') {
       const par = ctx.child; const g = chance(0.5) ? 'M' : 'F';
@@ -308,13 +329,29 @@ const People = {
     if (p.role === 'spouse') { G.flags.married = false; delete G.flags.married; G.flags.widowed = true; }
     if (p.role === 'partner') delete G.flags.has_partner;
     if (G.vars.careTarget === p.id) { delete G.flags.caregiving; G.vars.careTarget = 'none'; }
-    if (p.role === 'father' || p.role === 'mother') ctx.estate = this.estate(p);
+    if (p.role === 'father' || p.role === 'mother') { ctx.estate = this.estate(p); G.vars.lastParentPref = p.pref; }
+    p.together = false;
   },
   estate(p) {
-    const w = G.talents.familyWealth;
-    const base = w < 15 ? normal(-100, 200) : w < 35 ? normal(200, 300) : w < 65 ? normal(900, 600) : w < 85 ? normal(3000, 1500) : normal(9000, 4000);
+    // 亡くなった親の貯金＋（最後の親なら）家。配偶者が生きていれば、まず配偶者が半分
+    const other = people('father|mother').find((x) => x !== p && x.alive);
+    let base = p && p.assets != null ? p.assets : 500;
+    if (!other && p) { const pp = prefOf(p.pref) || pref(); G.vars.inheritHouseValue = Math.round(({ tokyo: 3000, A: 2000, B: 1300, C: 900 }[pp.id === 'tokyo' ? 'tokyo' : pp.tier] || 1200) * (0.6 + G.talents.familyWealth / 150)); }
+    if (G.talents.familyWealth < 15 && chance(0.3)) base -= rint(50, 300);
+    if (p) p.assets = 0;
+    if (other) other.assets = (other.assets || 0) + Math.max(0, base) / 2;
     const sibs = people('sibling').length + 1;
-    return Math.round(base / sibs / (person('father') && person('mother') ? 2 : 1));
+    return Math.round(base / sibs / (other ? 2 : 1));
+  },
+  // 配偶者の働き方を変える
+  spouseDo(v, ctx, logs) {
+    const sp = person('spouse'); if (!sp) return;
+    if (v === 'leave') { sp.formBeforeLeave = sp.employment; sp.employment = 'leave'; sp.leaveUntil = G.year + 1; sp.income = Fam.jobIncome(sp); logs.push(`🍼 ${sp.name}が1年の育休をとった（給料の約67%の給付金が出る）。`); }
+    if (v === 'quit') { const was = sp.jobLabel; sp.employment = 'homemaker'; sp.income = 0; sp.job = null; sp.jobLabel = ''; logs.push(`🏠 ${sp.name}は${was || '仕事'}をやめて、子育てに専念することにした。世帯の収入はへる。`); Engine.schedule('ev_r_spouse_return', rint(3, 6), null, ctx); }
+    if (v === 'part') { sp.employment = 'part'; if (!sp.job) Fam.assignJob(sp, { form: 'part' }); sp.income = Fam.jobIncome(sp); logs.push(`🛒 ${sp.name}がパートで働き始めた（年${sp.income}万円くらい）。`); }
+    if (v === 'quitJob') Fam.quitPerson(sp, '転勤をことわったので、');
+    if (v === 'raise') { sp.mul = (sp.mul || 1) * 1.15; sp.income = Fam.jobIncome(sp); }
+    if (v === 'full') { Fam.assignJob(sp, { form: 'seishain' }); logs.push(`💼 ${sp.name}が${sp.jobLabel}として正社員で働き始めた（年${sp.income}万円くらい）。`); }
   },
   inherit(ctx) {
     const e = ctx.estate ?? 0;
@@ -332,12 +369,15 @@ const People = {
 
 // ===== 住まい・投資など =====
 const Life = {
-  move(to, ctx) {
+  move(to, ctx, o = {}) {
     if (!to) return;
     let id = to;
-    if (to === 'home') id = G.birthPref; else if (to === 'random') id = Text.dynValue('newPref', ctx);
+    if (to === 'home') { const par = people('father|mother').find((p) => p.alive); id = par ? par.pref : G.birthPref; }
+    else if (to === 'random') id = Text.dynValue('newPref', ctx);
+    else if (to === 'parentHome') id = G.vars.lastParentPref || G.birthPref;
     if (!prefOf(id)) return;
-    if (id !== G.pref) { G.pref = id; Effects.stat('social', -15); G.counters.moves = (G.counters.moves || 0) + 1; }
+    const from = G.pref;
+    if (id !== G.pref) { G.pref = id; Effects.stat('social', -15); G.counters.moves = (G.counters.moves || 0) + 1; Fam.moved(from, id, o); }
     if (id === 'tokyo' && G.birthPref !== 'tokyo') Effects.setFlag('moved_to_tokyo', true);
     if (to === 'home' && G.flags.moved_to_tokyo) Effects.setFlag('u_turn', true);
   },

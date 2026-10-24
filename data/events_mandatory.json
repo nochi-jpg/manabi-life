@@ -495,7 +495,7 @@
       "id": "ev_m_scholar_repay", "kind": "flow", "emoji": "📄",
       "when": { "season": ["Q2"], "all": ["scholarship_loan"], "none": ["scholarship_loan_repaying"], "stage": ["none"], "once": true },
       "text": "奨学金の返済が始まった。毎月{repay}万円、{repayYears}年間。",
-      "effects": { "set": ["scholarship_loan_repaying"], "clear": ["scholarship_loan"] }
+      "effects": { "scholarStart": true, "set": ["scholarship_loan_repaying"], "clear": ["scholarship_loan"] }
     },
     {
       "id": "ev_m_job_review", "kind": "choice", "emoji": "🔄", "counselor": "self",

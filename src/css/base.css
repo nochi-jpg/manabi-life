@@ -6,6 +6,8 @@
 :root{
   --sp1:8px;--sp2:16px;--sp3:24px;--sp4:32px;--sp5:40px;
   --f:"MBRound","BIZ UDPGothic","Hiragino Maru Gothic ProN","Meiryo",sans-serif;
+  /* 名前：人名漢字が多い UDデジタル教科書体（Windows に標準で入っている）。ない端末は BIZ UD → 丸ゴシック */
+  --fn:"UD デジタル 教科書体 N-B","UD Digi Kyokasho N-B","UD デジタル 教科書体 NK-B","UD Digi Kyokasho NK-B","UD デジタル 教科書体 N-R","UD Digi Kyokasho N-R","BIZ UDPGothic","BIZ UDゴシック",var(--f);
   --ink:#23305a;--ink2:#5d6b8f;--ink3:#9aa6c0;
   --blue:#2f6aa8;--blue2:#1f4f82;--blue3:#0a8fd1;
   --line:#dfe7f3;--line2:#c9d7ea;--soft:#f5f8fd;--soft2:#eef4ff;--soft3:#e3ebf6;
@@ -47,10 +49,14 @@ button.sq{border-radius:16px}
 .chip{display:inline-flex;align-items:center;gap:3px;height:26px;padding:0 10px;white-space:nowrap;border-radius:999px;background:var(--soft2);color:var(--blue);font-size:14px}
 .chip.more{background:var(--blue);color:#fff;cursor:pointer}
 .chip.no{background:#f3f5f9;color:var(--ink3)}
+.chip.gr{background:#e4f8ee;color:#1f9d6a}.chip.rd{background:#ffe8eb;color:#d0384f}.chip.gy{background:#f3f5f9;color:var(--ink2)}
+.chip.cut{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;display:block;line-height:26px}
+.pn{font-family:var(--fn);font-weight:700}
 
 /* ---------- ポップアップ ---------- */
 .ov{position:absolute;inset:0;background:rgba(253,253,251,.85);display:none;align-items:center;justify-content:center;z-index:20}
 .ov.on{display:flex}
+.ov.dark{background:rgba(35,48,90,.45)}
 .box{position:relative;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:24px;box-shadow:var(--shadow2);animation:pop .22s ease-out}
 .cs{position:absolute;left:24px;top:-20px;height:38px;padding:0 16px;border-radius:999px;display:flex;align-items:center;gap:6px;font-size:16px;color:#fff;background:var(--blue)}
 

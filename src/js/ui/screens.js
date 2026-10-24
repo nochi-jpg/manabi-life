@@ -46,8 +46,15 @@ function lifeRecord(g) {
   return {
     v: 1, id: g.seed, name: `${g.surname} ${g.given}`, kana: g.kana.join(' '), gender: g.gender, pref: prefOf(g.birthPref).name,
     born: 2010, died: calYear(g), age: g.age, cause: g.deathCause || '病気', score: e.score, rank: e.rank.label, rankId: e.rank.id,
-    ha: e.ha, cr: e.cr, hp: g.happinessType, mode: g.mode, jobs: jobs.slice(0, 4).join(' → ') || 'なし',
+    ha: e.ha, cr: e.cr, hp: g.happinessType, mode: g.mode, jobs: jobs.slice(0, 4).join(' → ') || 'なし', snap: snapOf(g),
   };
+}
+// リザルトをもう一度見るための写し（ログは大事なできごとだけ）
+function snapOf(g) {
+  try {
+    const keep = (p) => p.kind === 'big' || p.kind === 'world' || p.kind === 'choice' || /childbirth|first_job|parent_death|spouse_death/.test(p.id || '');
+    return JSON.parse(JSON.stringify({ ...g, log: g.log.filter(keep).slice(-160), queue: [], scheduled: [], pending: null, picked: {}, noticeQ: [], reports: [] }));
+  } catch (e) { return null; }
 }
 
 // ===== リザルト（ui/result.html） =====
@@ -56,12 +63,16 @@ Screens.result = {
     if (!G) return;
     const rec = lifeRecord(G);
     if (!G.savedToHistory) { pushHistory(rec); G.savedToHistory = true; }
+    // 写しは新しい30人ぶんまで（保存できる量に限りがあるため）
+    const H = histories(); let changed = false; H.forEach((r, i) => { if (i >= 30 && r.snap) { delete r.snap; changed = true; } }); if (changed) Store.set('history', H);
     Store.del('life'); // 人生は一度きり：終わったらセーブを消す
     App.show('result');
   },
-  enter(el) {
+  enter(el, mode) {
     if (!G) { App.show('title'); return; }
+    const viewing = mode === 'view';
     Audio2.bgm('result');
+    if (!viewing) Screens.result.live = null;
     const e = Ending.compute(G);
     const H = G.hist;
     const crit = D().ending.criteria[G.happinessType];
@@ -101,20 +112,21 @@ Screens.result = {
         </div><div>
           <div class="kv"><span class="k">💍 家族</span><span>${esc(fam)}</span></div>
           <div class="kv"><span class="k">📍 住んだ所</span><span>${esc(prefOf(G.birthPref).name)}${G.pref !== G.birthPref ? ' → ' + esc(pref().name) : ''}</span></div>
-          <div class="kv"><span class="k">✨ 趣味</span><span>${esc(hob.slice(0, 2).join('・') || 'なし')}${hob.length > 2 ? ` ほか${hob.length - 2}つ` : ''}</span></div>
+          <div class="kv"><span class="k">✨ 趣味</span><span class="wrap">${esc(hob.join('・') || 'なし')}</span></div>
           <div class="kv"><span class="k">🏥 病気</span><span>${esc(ill.join('・') || 'とくになし')}</span></div>
-          <div class="kv"><span class="k">📜 資格</span><span>${esc(LIC.slice(0, 3).map(licText).join('・') || 'なし')}</span></div>
+          <div class="kv"><span class="k">📜 資格</span><span class="wrap">${esc(LIC.map(licText).join('・') || 'なし')}</span></div>
           <div class="kv"><span class="k">🧮 点数の内わけ</span><span>満足感${e.ha}×0.6＋基準${e.cr}×0.4 <small>${esc(D().modes.resultBadge[G.mode])}</small></span></div>
         </div></div></div>
         <div class="page" id="r2">${talentsHtml()}</div>
         <div class="page" id="r3">${chartSvg()}</div>
         <div class="page" id="r4"></div>
       </div>
-      <div id="rbot"><span class="saved">✓ 「これまでの人生」に保存しました</span><button id="rHist">📜 これまでの人生</button><button class="main" id="rTitle">🏠 タイトルへ</button></div>`;
+      <div id="rbot">${viewing ? '<span class="saved">📜 これまでの人生から見ています</span>' : '<span class="saved">✓ 「これまでの人生」に保存しました</span>'}<button id="rHist">📜 これまでの人生</button><button class="main" id="rTitle">${viewing ? '◀ もどる' : '🏠 タイトルへ'}</button></div>`;
     $$('.tabs button', el).forEach((b) => (b.onclick = () => { $$('.tabs button,.page', el).forEach((x) => x.classList.remove('on')); b.classList.add('on'); $('#' + b.dataset.p, el).classList.add('on'); }));
     $('#taxBtn', el).onclick = () => taxPopup();
-    $('#rHist', el).onclick = () => { G = null; App.show('history'); };
-    $('#rTitle', el).onclick = () => { G = null; App.show('title'); };
+    const leave = () => { G = viewing ? Screens.result.live || null : null; Screens.result.live = null; };
+    $('#rHist', el).onclick = () => { leave(); App.show('history'); };
+    $('#rTitle', el).onclick = () => { leave(); App.show(viewing ? 'history' : 'title'); };
     eventsPage($('#r4', el), 0);
   },
 };
@@ -142,12 +154,13 @@ function topPct(v) { const z = (v - 50) / 15; const cdf = 0.5 * (1 + erf(z / Mat
 function erf(x) { const t = 1 / (1 + 0.3275911 * Math.abs(x)); const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return x >= 0 ? y : -y; }
 function talentsHtml() {
   const T = G.talents;
-  const L = [['t_academic', '📚 学力の才能', 'c-blue'], ['t_comm', '🤝 コミュ力の才能', 'c-mint'], ['t_art', '🎨 芸術センス', 'c-pink'], ['t_sport', '🏃 運動能力', 'c-gold'], ['t_health', '❤️ 体の丈夫さ', 'c-red']];
+  const L = [['t_academic', '📚 学力の才能', 'c-blue'], ['t_comm', '🤝 コミュ力の才能', 'c-mint'], ['t_art', '🎨 美術センス', 'c-pink'], ['t_music', '🎵 音楽センス', 'c-purple'], ['t_sport', '🏃 運動能力', 'c-gold'], ['t_health', '❤️ 体の丈夫さ', 'c-red']];
+  if (T.t_music == null) T.t_music = T.t_art;
   const best = L.slice().sort((a, b) => T[b[0]] - T[a[0]])[0];
   const likeName = { like_outdoor: '外で遊ぶ', like_book: '本を読む', like_draw: '絵をかく', like_math: '計算・パズル', like_game: 'テレビゲーム', like_none: '' }[Cond.likeMain()];
   return L.map(([k, l, c]) => `<div class="tal"><span>${l}</span><span class="bar ${c}"><i style="--w:${T[k]}%"></i></span><span class="v num">${T[k]}</span><span class="r">上位 <b>${topPct(T[k])}%</b></span></div>`).join('') +
     `<div class="tal"><span>🏠 生まれた家</span><span class="bar c-purple"><i style="--w:${T.familyWealth}%"></i></span><span class="v num">${T.familyWealth}</span><span class="r">${bandOf(T.familyWealth).label}</span></div>
-    <div class="cm">🧬 いちばんの才能は<b>${best[1].slice(2).replace('の才能', '')}</b>（上位${topPct(T[best[0]])}%）。${likeName ? `好きだった「${likeName}」は、人生のあちこちで顔を出していました。` : ''}才能は生まれつき。でも、教科の力や技術は、環境と努力で育ちます。</div>`;
+    <div class="cm">🧬 いちばんの才能は<b>${best[1].replace(/^\S+\s/, '').replace('の才能', '')}</b>（上位${topPct(T[best[0]])}%）。${likeName ? `好きだった「${likeName}」は、人生のあちこちで顔を出していました。` : ''}才能は生まれつき。でも、教科の力や技術は、環境と努力で育ちます。</div>`;
 }
 function chartSvg() {
   const H = G.hist; const n = H.cash.length;
@@ -218,7 +231,7 @@ Screens.history = {
       const avgS = H.length ? Math.round(H.reduce((a, x) => a + x.score, 0) / H.length) : 0;
       const longest = H.length ? Math.max(...H.map((x) => x.age)) : 0;
       el.innerHTML = `<div class="hhd"><h1>📜 これまでの人生</h1><div class="st"><div>生きた人生 <b>${H.length}</b> 人</div><div>平均 <b>${avgS}</b> 点</div><div>いちばん長生き <b>${longest}</b> 歳</div></div></div>
-        <div class="hgrid">${cards.map((r) => `<div class="hcard"><div class="pic" style="background-image:url(${faceFile(r.gender, r.age)})"></div><div><div class="nm"><small>${esc(r.kana)}</small>${esc(r.name)}</div><div class="life">${esc(r.pref)}生まれ<br>${r.born}〜${r.died}年（${r.age}歳）<br>${esc(r.cause)}</div></div>
+        <div class="hgrid">${cards.map((r, i) => `<div class="hcard ${r.snap ? 'tap' : ''}" data-h="${i}"><div class="pic" style="background-image:url(${faceFile(r.gender, r.age)})"></div><div><div class="nm pn">${esc(r.name)}</div><div class="life">${esc(r.pref)}生まれ<br>${r.born}〜${r.died}年（${r.age}歳）<br>${esc(r.cause)}</div></div>
           <div class="end"><span>${esc(r.rank)}</span><b class="num">${r.score}<small>点</small></b></div><div class="job"><span>💼</span><span>${esc(r.jobs)}</span></div></div>`).join('')}
           ${cards.length < per ? '<div class="hcard empty">つぎの人生が ここに入ります</div>' : ''}</div>
         <div class="hpager"><button id="hBack">◀ ${G && G.alive ? 'もどる' : 'タイトルへ'}</button>
@@ -226,6 +239,12 @@ Screens.history = {
           <button class="main" id="hQR" ${H.length ? '' : 'disabled'}>📤 書き出す（QR）</button></div>`;
       $('#hBack', el).onclick = () => App.show(G && G.alive ? 'main' : 'title');
       $('#hP', el).onclick = () => { page--; draw(); }; $('#hN', el).onclick = () => { page++; draw(); };
+      $$('[data-h]', el).forEach((c) => (c.onclick = () => {
+        const r = cards[+c.dataset.h];
+        if (!r || !r.snap) { toast('この人生は、くわしい記録が残っていません'); return; }
+        Screens.result.live = G && G.alive ? G : null;
+        G = r.snap; App.show('result', 'view');
+      }));
       $('#hQR', el).onclick = () => exportQR(cards.length ? cards : H.slice(0, per));
     };
     draw();

@@ -45,7 +45,7 @@
       ],
       "yearly": {
         "skill.music": 6,
-        "subj.art": 2
+        "subj.music": 3
       },
       "event": "ev_r_recital"
     },
@@ -284,6 +284,258 @@
       "tags": [],
       "yearly": {
         "subjAll": 1
+      }
+    },
+    {
+      "id": "ls_violin",
+      "emoji": "🎻",
+      "label": "バイオリン",
+      "age": [
+        4,
+        18
+      ],
+      "cost": 18,
+      "time": 1,
+      "tags": [
+        "music"
+      ],
+      "tier": [
+        "A"
+      ],
+      "yearly": {
+        "skill.music": 7,
+        "subj.music": 3
+      },
+      "event": "ev_r_recital",
+      "note": "教室は都市部に多い。月謝が高め"
+    },
+    {
+      "id": "ls_chorus",
+      "emoji": "🎤",
+      "label": "合唱団",
+      "age": [
+        6,
+        15
+      ],
+      "cost": 4,
+      "time": 1,
+      "tags": [
+        "music"
+      ],
+      "yearly": {
+        "skill.music": 4,
+        "subj.music": 2,
+        "social": 2
+      },
+      "event": "ev_r_recital"
+    },
+    {
+      "id": "ls_ballet",
+      "emoji": "🩰",
+      "label": "バレエ",
+      "age": [
+        3,
+        18
+      ],
+      "cost": 15,
+      "time": 2,
+      "tags": [
+        "music",
+        "like_draw"
+      ],
+      "tier": [
+        "A",
+        "B"
+      ],
+      "yearly": {
+        "skill.sport": 3,
+        "skill.music": 3,
+        "health": 1
+      },
+      "event": "ev_r_recital"
+    },
+    {
+      "id": "ls_gym",
+      "emoji": "🤸",
+      "label": "体操教室",
+      "age": [
+        3,
+        12
+      ],
+      "cost": 7,
+      "time": 1,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 4,
+        "subj.pe": 3,
+        "health": 1
+      }
+    },
+    {
+      "id": "ls_tennis",
+      "emoji": "🎾",
+      "label": "テニススクール",
+      "age": [
+        6,
+        18
+      ],
+      "cost": 10,
+      "time": 1,
+      "tags": [
+        "like_outdoor"
+      ],
+      "tier": [
+        "A",
+        "B"
+      ],
+      "yearly": {
+        "skill.sport": 5,
+        "health": 2
+      }
+    },
+    {
+      "id": "ls_kendo",
+      "emoji": "🥋",
+      "label": "剣道",
+      "age": [
+        5,
+        15
+      ],
+      "cost": 5,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "yearly": {
+        "skill.sport": 4,
+        "stress": -1,
+        "subj.pe": 1
+      }
+    },
+    {
+      "id": "ls_skate",
+      "emoji": "⛸️",
+      "label": "スケート教室",
+      "age": [
+        4,
+        15
+      ],
+      "cost": 14,
+      "time": 2,
+      "tags": [
+        "like_outdoor"
+      ],
+      "climate": [
+        "snow",
+        "cold"
+      ],
+      "yearly": {
+        "skill.sport": 5,
+        "health": 1
+      }
+    },
+    {
+      "id": "ls_robot",
+      "emoji": "🤖",
+      "label": "ロボット教室",
+      "age": [
+        6,
+        15
+      ],
+      "cost": 16,
+      "time": 1,
+      "tags": [
+        "like_math",
+        "like_game"
+      ],
+      "tier": [
+        "A"
+      ],
+      "yearly": {
+        "skill.it": 5,
+        "subj.math": 2,
+        "subj.sci": 2
+      }
+    },
+    {
+      "id": "ls_science",
+      "emoji": "🧪",
+      "label": "科学実験教室",
+      "age": [
+        6,
+        12
+      ],
+      "cost": 10,
+      "time": 1,
+      "tags": [
+        "like_math",
+        "like_book"
+      ],
+      "tier": [
+        "A"
+      ],
+      "yearly": {
+        "subj.sci": 4
+      }
+    },
+    {
+      "id": "ls_cooking",
+      "emoji": "🍳",
+      "label": "子ども料理教室",
+      "age": [
+        6,
+        15
+      ],
+      "cost": 6,
+      "time": 1,
+      "tags": [
+        "cook"
+      ],
+      "yearly": {
+        "skill.cooking": 6,
+        "happiness": 1
+      }
+    },
+    {
+      "id": "ls_abacus_mental",
+      "emoji": "🧠",
+      "label": "暗算・そろばん検定コース",
+      "age": [
+        6,
+        12
+      ],
+      "cost": 8,
+      "time": 1,
+      "tags": [
+        "like_math"
+      ],
+      "yearly": {
+        "subj.math": 5,
+        "stress": 1
+      }
+    },
+    {
+      "id": "ls_drawing_manga",
+      "emoji": "✏️",
+      "label": "マンガ・イラスト教室",
+      "age": [
+        8,
+        18
+      ],
+      "cost": 9,
+      "time": 1,
+      "tags": [
+        "like_draw"
+      ],
+      "tier": [
+        "A",
+        "B"
+      ],
+      "yearly": {
+        "skill.art": 6,
+        "subj.art": 2
       }
     }
   ],

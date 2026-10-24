@@ -27,7 +27,7 @@ Screens.start = {
         <div class="panel" id="nm">
           <div class="row"><span class="k">苗字</span><div class="field" id="fS"></div><button class="sh" id="shS">🔀</button></div>
           <div class="row"><span class="k">名前</span><div class="field" id="fG"></div><button class="sh" id="shG">🔀</button></div>
-          <div class="full">この名前で生まれます：<b id="full"></b></div>
+          <div class="full">この名前で生まれます：<b id="full" class="pn"></b></div>
         </div>
         <div class="stbtns"><button id="self">✏️ 自分で決める</button><button class="main" id="ok">この名前で生まれる ▶</button></div>
         <button class="back" data-back="stM">◀ もどる</button>
@@ -35,17 +35,17 @@ Screens.start = {
     const go = (id) => { $$('.step', el).forEach((x) => x.classList.toggle('on', x.id === id)); if (id === 'st2') draw(); };
     const readInputs = () => {
       if (!st.self) return;
-      const iS = $$('#fS input', el), iG = $$('#fG input', el);
-      if (iS.length) st.S = [iS[1].value.trim().slice(0, N.maxLength) || st.S[0], iS[0].value.trim()];
-      if (iG.length) st.Gv = [iG[1].value.trim().slice(0, N.maxLength) || st.Gv[0], iG[0].value.trim()];
+      const iS = $('#fS input', el), iG = $('#fG input', el);
+      if (iS) st.S = [iS.value.trim().slice(0, N.maxLength) || st.S[0], ''];
+      if (iG) st.Gv = [iG.value.trim().slice(0, N.maxLength) || st.Gv[0], ''];
     };
     function draw() {
       for (const [id, v] of [['fS', st.S], ['fG', st.Gv]]) {
         $('#' + id, el).innerHTML = st.self
-          ? `<input class="kana" value="${esc(v[1])}" placeholder="ふりがな"><input value="${esc(v[0])}" maxlength="${N.maxLength}">`
-          : `<span class="kana">${esc(v[1])}</span><span class="kj">${esc(v[0])}</span>`;
+          ? `<input class="pn" value="${esc(v[0])}" maxlength="${N.maxLength}">`
+          : `<span class="kj pn">${esc(v[0])}</span>`;
       }
-      const upd = () => { readInputs(); $('#full', el).textContent = `${st.S[0]} ${st.Gv[0]}（${st.S[1]} ${st.Gv[1]}）`; };
+      const upd = () => { readInputs(); $('#full', el).textContent = `${st.S[0]} ${st.Gv[0]}`; };
       $$('input', el).forEach((i) => (i.oninput = upd));
       upd();
     }
@@ -59,11 +59,11 @@ Screens.start = {
     $$('[data-back]', el).forEach((b) => (b.onclick = () => { readInputs(); go(b.dataset.back); }));
     $('#shS', el).onclick = () => { st.S = pk(N.surnames); st.self = false; draw(); };
     $('#shG', el).onclick = () => { st.Gv = pk(N.given[st.g]); st.self = false; draw(); };
-    $('#self', el).onclick = () => { st.self = true; draw(); const i = $('#fS input:last-child', el); if (i) i.focus(); };
+    $('#self', el).onclick = () => { st.self = true; draw(); const i = $('#fS input', el); if (i) i.focus(); };
     $('#ok', el).onclick = () => {
       readInputs();
       Audio2.se('decide');
-      G = newLife({ gender: st.g, surname: st.S[0], given: st.Gv[0], kana: [st.S[1], st.Gv[1]], happinessType: st.hp, mode: st.mode });
+      G = newLife({ gender: st.g, surname: st.S[0], given: st.Gv[0], happinessType: st.hp, mode: st.mode });
       App.show('birth');
     };
   },

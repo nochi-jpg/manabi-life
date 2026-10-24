@@ -50,7 +50,23 @@ const Text = (() => {
       case 'gradComment': case 'seijinComment': case 'tripMemory': case 'festMemory': case 'tripPlace': case 'snowText': case 'firstBonusUse': case 'anniversaryText': case 'hobbyTrigger': case 'layoffType': case 'careReason': case 'creatorFlavor': return pk(P()[k]);
       case 'otoshidama': { if (ctx.otoshidama == null) ctx.otoshidama = pk(P().otoshidama) * (G.talents.familyWealth >= 65 ? 1.5 : G.talents.familyWealth < 25 ? 0.5 : 1); return Math.round(ctx.otoshidama).toLocaleString('ja-JP'); }
       case 'allowance': { const w = G.talents.familyWealth; return w < 15 ? 0.3 : w < 35 ? 0.5 : w < 65 ? 0.8 : 1.5; }
-      case 'personName': return who ? (who.role === 'grandparent' ? (who.gender === 'M' ? 'おじいちゃん' : 'おばあちゃん') : roleLabel(who)) : '';
+      case 'personName': return who ? Fam.callName(who) : '';
+      case 'univRate': return pref().univRate;
+      case 'hsEmployRate': return pref().hsEmployRate ?? 18;
+      case 'whoName': return who ? Fam.callName(who) : '';
+      case 'whoPrefName': return who ? Fam.prefName(who.pref) : '';
+      case 'whoAge': return who ? who.age : '';
+      case 'funeralText': { const n = (G.counters.funerals = (G.counters.funerals || 0) + 1); return n === 1 ? `${G.age}歳の${G.given}は、初めてお葬式に出た。` : pick(['お葬式で、家族で思い出を語り合った。', 'お葬式のあと、昔の写真をみんなで見た。', 'たくさんの人がお別れに来てくれた。']); }
+      case 'hqName': { const j = G.job && Menu.job(G.job.id); const H = P().hqName || {}; if (!j) return H.default || '本社'; return ({ j_police: '県警本部', j_firefighter: '消防本部', j_sdf: '司令部', j_nurse: '病院の法人本部', j_doctor: '病院の法人本部', j_teacher_elem: '教育委員会', j_teacher_sec: '教育委員会' })[j.id] || (j.cat === 'civil' ? H.civil || '本部' : j.cat === 'medical' ? '法人本部' : H.default || '本社'); }
+      case 'welfareMonthly': return round1(Econ.welfareQ() / 3);
+      case 'welfareEndReason': return G.vars.welfareEndReason || '収入や貯金が最低限の生活費をこえた';
+      case 'monthlyLeft': { const n = Econ.netIncomeYear(); const left = (n.self + n.spouse + n.allowance + n.support + n.rent - Econ.expenses().total) / 12; return (left >= 0 ? '＋' : '−') + round1(Math.abs(left)); }
+      case 'nextChildNo': return people('child').length + 1;
+      case 'kidsN': return people('child').length;
+      case 'spouseJob': { const sp = person('spouse'); return sp ? Fam.statusLabel(sp).replace(/^\S+\s/, '') : ''; }
+      case 'livingLabel': return Fam.livingLabel();
+      case 'parentPrefName': { const p = (who && ['father', 'mother'].includes(who.role) ? who : person('father|mother')); return p ? Fam.prefName(p.pref) : pref().name; }
+      case 'childAwayPref': return ch && ch.awayPref ? Fam.prefName(ch.awayPref) : '都会';
       case 'personAge': return who ? who.age : '';
       case 'parentName': { const p = who && ['father', 'mother'].includes(who.role) ? who : person('father|mother'); return p ? roleLabel(p) === '父' ? 'お父さん' : 'お母さん' : ''; }
       case 'siblingRelation': return ctx.sib ? roleLabel(ctx.sib) : '弟';
@@ -64,9 +80,10 @@ const Text = (() => {
       case 'householdComment': return bandOf(G.talents.familyWealth).label === 'ふつう' ? '家計はふつう' : '家計は' + bandOf(G.talents.familyWealth).label;
       case 'commute': return G.vars.schoolAway ? '実家から通うのはむずかしい' : '実家から通える';
       case 'rentSingle': return rentOf('single'); case 'rentFamily': return rentOf('family'); case 'rentShare': return Math.round(rentOf('single') * 0.7);
-      case 'repay': { const l = loan('scholar'); return l ? Math.round(l.yearly / 12 * 10) / 10 : 0; }
-      case 'repayYears': { const l = loan('scholar'); return l ? Math.round(l.total / Math.max(1, l.yearly)) : 0; }
-      case 'repayTotal': { const l = loan('scholar'); return l ? Math.round(l.total) : 0; }
+      case 'repay': { const l = (G.loans || []).find((x) => x.type === 'scholar'); return l ? Math.round(l.yearly / 12 * 10) / 10 : 0; }
+      case 'repayYears': { const l = (G.loans || []).find((x) => x.type === 'scholar'); return l ? (l.years || Math.round(l.total / Math.max(1, l.yearly))) : 0; }
+      case 'repayTotal': { const l = (G.loans || []).find((x) => x.type === 'scholar'); return l ? Math.round(l.total) : 0; }
+      case 'scholarBorrowed': return Math.round(G.vars.scholarBorrowed || ((G.loans || []).find((x) => x.type === 'scholar') || {}).total || 0);
       case 'benefitLeft': return G.vars.benefitLeft > 0 ? `あと${Math.round(G.vars.benefitLeft)}万円` : 'もらえる期間は終わった';
       case 'severance': return Math.round(severance());
       case 'pension': return Econ.pensionMonthly(); case 'pension2m': return Math.round(Econ.pensionMonthly() * 2 * 10) / 10;
@@ -106,7 +123,7 @@ const Text = (() => {
       case 'repairCost': return ctx.repairCost || (ctx.repairCost = rint(30, 150));
       case 'houseValue': return Math.round(G.vars.inheritHouseValue || 1500);
       case 'houseTax': return Math.round((G.vars.inheritHouseValue || 1500) * 0.012);
-      case 'borrowTotal': return Math.round(Econ.totalDebt());
+      case 'borrowTotal': return Math.round(G.vars.scholarBorrowed || ((G.loans || []).find((x) => x.type === 'scholar') || {}).total || Econ.totalDebt());
       default: return `{${k}}`;
     }
   }

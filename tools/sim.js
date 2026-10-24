@@ -25,9 +25,9 @@ vm.createContext(ctx);
 const load = (f) => vm.runInContext(fs.readFileSync(path.join(ROOT, 'src/js', f), 'utf8'), ctx, { filename: f });
 for (const f of ['data.gen.js', 'util.js']) load(f);
 vm.runInContext('var Audio2={se(){},bgm(){},loopSe(){return()=>{}},setDuck(){},forLife(){return""}};var Options={get(){return{}}};var asset=(p)=>p;', ctx);
-for (const f of ['state.js', 'cond.js', 'text.js', 'econ.js', 'menu.js', 'effects.js', 'engine.js']) load(f);
+for (const f of ['state.js', 'cond.js', 'text.js', 'econ.js', 'menu.js', 'effects.js', 'family.js', 'engine.js']) load(f);
 // const は vm のグローバルに出ないので、取り出し用の関数を作る
-vm.runInContext('globalThis.__api={get G(){return G},set G(v){G=v},newLife,Engine,Menu,Econ,Cond,people,person,D,STAT_KEYS};', ctx);
+vm.runInContext('globalThis.__api={get G(){return G},set G(v){G=v},newLife,Engine,Menu,Econ,Cond,Fam,people,person,D,STAT_KEYS};', ctx);
 const api = ctx.__api;
 
 const fired = {};

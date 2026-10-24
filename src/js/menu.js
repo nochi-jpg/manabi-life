@@ -24,11 +24,20 @@ const Menu = (() => {
 
   // ---- 偏差値と合格率 ----
   const SUBJ_ALL = { jpn: 1, math: 1, sci: 1, soc: 1, eng: 1 };
+  // 重みのキーの値（教科・技術・才能・ステータス）
+  function wv(k) {
+    if (k.startsWith('skill.')) return G.skill[k.slice(6)] || 0;
+    if (k.startsWith('subj.')) return G.subj[k.slice(5)] ?? 50;
+    if (k === 'academic') return G.stats.academic;
+    if (k in G.talents) return G.talents[k] ?? 50;
+    if (k in G.stats) return G.stats[k];
+    return G.subj[k] ?? 50;
+  }
   function selfHensachi(weights) {
     const w = weights && Object.keys(weights).length ? weights : SUBJ_ALL;
     let s = 0, n = 0;
     for (const [k, x] of Object.entries(w)) {
-      const v = k.startsWith('skill.') ? G.skill[k.slice(6)] || 0 : k === 'academic' ? G.stats.academic : G.subj[k] ?? 50;
+      const v = wv(k);
       s += v * x; n += x;
     }
     return 25 + (n ? s / n : 50) * 0.5;
@@ -81,7 +90,7 @@ const Menu = (() => {
       case 'jobs.midCareer': return jobMenu('mid', filter);
       case 'jobs.civil': return jobMenu('civil', filter);
       case 'jobs.partTimeJobs': return J().partTimeJobs.filter((p) => G.age >= (p.minAge || 16) && (!p.requires || !p.requires.stage || p.requires.stage.includes(G.stage))).map((p) => item(p, { sub: `時給${p.wage}円・週${p.hoursWeek}時間` }));
-      case 'clubs.lessons': return C().lessons.filter((l) => !l.age || (G.age >= l.age[0] && G.age <= l.age[1])).filter((l) => !G.clubs.some((c) => c.id === l.id)).map((l) => item(l, { sub: `年${l.cost}万円` }));
+      case 'clubs.lessons': return C().lessons.filter((l) => !l.age || (G.age >= l.age[0] && G.age <= l.age[1])).filter(lessonHere).filter((l) => !G.clubs.some((c) => c.id === l.id)).map((l) => item(l, { sub: `年${l.cost}万円・${Engine.lessonEffText ? Engine.lessonEffText(l) : ''}` }));
       case 'clubs.adultLessons': return (C().adultLessons || []).filter((l) => !l.age || (G.age >= l.age[0] && G.age <= l.age[1])).filter((l) => !G.clubs.some((c) => c.id === l.id)).map((l) => item(l, { sub: `年${l.cost}万円` }));
       case 'clubs.jhsClubs': return C().jhsClubs.map((l) => item(l, { sub: clubSub(l) }));
       case 'clubs.hsClubs': return [...C().jhsClubs.filter((c) => !C().hsClubsExtra.some((x) => x.label === c.label)), ...C().hsClubsExtra].map((l) => item(l, { sub: clubSub(l) }));
@@ -93,6 +102,8 @@ const Menu = (() => {
       default: console.warn('未対応のメニュー', src); return [];
     }
   }
+  // その地域に教室があるか（都会にしかない習い事もある）
+  function lessonHere(l) { const t = l.tiers || l.tier; if (t && !t.includes(tier())) return false; if (l.climate && !l.climate.includes(pref().climate)) return false; return true; }
   function item(t, o = {}) { return { id: t.id, tmpl: t.id, emoji: t.emoji || '・', label: t.label, name: t.label, sub: o.sub || '', rate: o.rate ?? null, ...o }; }
   const clubSub = (l) => ['', 'ゆるめ', 'ふつう', 'ほぼ毎日'][l.time || 0] + (l.cost ? `・年${l.cost}万円` : '');
 
@@ -301,5 +312,5 @@ const Menu = (() => {
     return Math.round(clamp(p, 0.03, 0.97) * 100);
   }
 
-  return { build, school, dept, job, club, hobby, qual, remember, picked, schoolName, selfHensachi, rateOf, eduLevel, focusLabel, focusOk, FOCUS, isStudent, reportAvg, univCost, inst, prefShort };
+  return { build, wv, lessonHere, school, dept, job, club, hobby, qual, remember, picked, schoolName, selfHensachi, rateOf, eduLevel, focusLabel, focusOk, FOCUS, isStudent, reportAvg, univCost, inst, prefShort };
 })();

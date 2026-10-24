@@ -33,9 +33,11 @@ function rollWealth(p) {
 }
 function wealthIncome(w) { const b = bandOf(w); return Math.round(b.inc[0] + (b.inc[1] - b.inc[0]) * ((w - b.min) / Math.max(1, b.max - b.min))); }
 
+// 親・祖父母の貯金（家の豊かさから）
+function parentAssets(w) { return Math.max(0, Math.round(w < 15 ? normal(30, 40) : w < 35 ? normal(200, 150) : w < 65 ? normal(700, 400) : w < 85 ? normal(2000, 900) : normal(6000, 2500))); }
 let personSeq = 0;
 function newPerson(role, o = {}) {
-  return { id: 'p' + (++personSeq) + '_' + Math.floor(rnd() * 1e6).toString(36), role, name: '', gender: 'M', age: 0, alive: true, relation: rint(55, 80), stage: null, job: null, income: 0, married: false, careLevel: 0, parentIds: [], born: null, ...o };
+  return { id: 'p' + (++personSeq) + '_' + Math.floor(rnd() * 1e6).toString(36), role, name: '', gender: 'M', age: 0, alive: true, relation: rint(55, 80), stage: null, job: null, income: 0, married: false, careLevel: 0, parentIds: [], born: null, health: 90, illness: null, assets: 0, ...o };
 }
 
 function rollPref() {
@@ -50,21 +52,21 @@ function parentJob(targetIncome, gender) {
   return weighted(js, (j) => Math.exp(-Math.abs(mid(j) - targetIncome) / 120));
 }
 
-function newLife({ gender, surname, given, kana, happinessType, mode }) {
+function newLife({ gender, surname, given, happinessType, mode }) {
   const seed = (Math.random() * 2 ** 32) >>> 0;
   RNG.seed(seed);
   personSeq = 0;
   const prefId = rollPref();
   const p = prefOf(prefId);
   const g = {
-    v: 1, seed, mode, happinessType, gender, surname, given, kana: kana || ['', ''],
+    v: 1, seed, mode, happinessType, gender, surname, given, kana: ['', ''],
     birthSurname: surname, motherMaiden: '',
     pref: prefId, birthPref: prefId,
     year: 2010, q: 0, age: 0, alive: true, ended: false,
     stats: { academic: 50, stress: 15, social: 50, health: 85, happiness: 60, jobSatisfaction: 0, physicalLoad: 0, mentalLoad: 0 },
-    talents: { t_academic: talent(), t_comm: talent(), t_art: talent(), t_sport: talent(), t_health: talent(), looks: talent(), familyWealth: rollWealth(p) },
+    talents: { t_academic: talent(), t_comm: talent(), t_art: talent(), t_music: talent(), t_sport: talent(), t_health: talent(), looks: talent(), familyWealth: rollWealth(p) },
     subj: {}, skill: { sport: 0, music: 0, art: 0, it: 0, cooking: 0, language: 0, craft: 0, speech: 0 },
-    flags: {}, vars: { gender, surname, given, birthSurname: surname, mode, happinessType, hobbies: [], plan: 'undecided', target: 'none', pendingExam: 'none' },
+    flags: {}, vars: { gender, surname, given, birthSurname: surname, mode, happinessType, hobbies: [], plan: 'undecided', target: 'none', pendingExam: 'none', lifeLevel: 'normal' }, noticeQ: [],
     counters: {}, once: {}, lastFired: {}, scheduled: [], mods: {},
     stage: 'baby', school: null, employment: 'none', job: null, rank: 0, jobYears: 0, jobStartAge: 0,
     focus: 'focus_hobby', focusHalf: false,
@@ -89,13 +91,13 @@ function newLife({ gender, surname, given, kana, happinessType, mode }) {
   if (withFather) {
     const fj = parentJob(single ? inc : inc * 0.7, 'M');
     const selfF = !!fj.selfEmployOk && chance(0.6);
-    g.people.push(newPerson('father', { name: pick(givenM)[0], gender: 'M', age: dadAge, job: fj.id, jobLabel: fj.label + (selfF ? '（自営）' : ''), jobEmoji: fj.emoji, income: Math.round(single ? inc : inc * 0.7), employment: selfF ? 'self_employed' : 'seishain' }));
+    g.people.push(newPerson('father', { name: pick(givenM)[0], gender: 'M', age: dadAge, job: fj.id, jobLabel: fj.label + (selfF ? '（自営）' : ''), jobEmoji: fj.emoji, income: Math.round(single ? inc : inc * 0.7), employment: selfF ? 'self_employed' : 'seishain', pref: prefId, jobPref: prefId, together: true, jobStart: 23, mul: 1, assets: parentAssets(g.talents.familyWealth) }));
   }
   if (!single || !withFather) {
     const work = single || chance(0.7);
     const mj = work ? parentJob(single ? inc : inc * 0.3, 'F') : null;
     const selfM = !!mj && !!mj.selfEmployOk && chance(0.5);
-    g.people.push(newPerson('mother', { name: pick(givenF)[0], gender: 'F', age: momAge, job: mj ? mj.id : 'homemaker', jobLabel: mj ? (selfM ? mj.label + '（自営）' : single ? mj.label : mj.label + '（パート）') : '専業主婦', jobEmoji: mj ? mj.emoji : '🏠', income: Math.round(single ? inc : inc * 0.3), partTime: !single && !!mj && !selfM, employment: selfM ? 'self_employed' : mj ? (single ? 'seishain' : 'part') : 'homemaker' }));
+    g.people.push(newPerson('mother', { name: pick(givenF)[0], gender: 'F', age: momAge, job: mj ? mj.id : null, jobLabel: mj ? mj.label + (selfM ? '（自営）' : '') : '', jobEmoji: mj ? mj.emoji : '', income: mj ? Math.round(single ? inc : inc * 0.3) : 0, partTime: !single && !!mj && !selfM, employment: selfM ? 'self_employed' : mj ? (single ? 'seishain' : 'part') : 'homemaker', pref: prefId, jobPref: prefId, together: true, jobStart: 23, mul: 1, assets: withFather ? 0 : parentAssets(g.talents.familyWealth) }));
   }
   // きょうだい 0人30%/1人50%/2人以上20%
   const nSib = (() => { const r = rnd(); return r < 0.3 ? 0 : r < 0.8 ? 1 : 2; })();
@@ -103,7 +105,7 @@ function newLife({ gender, surname, given, kana, happinessType, mode }) {
     const older = chance(0.5);
     const sg = chance(0.5) ? 'M' : 'F';
     const nm = pick(sg === 'M' ? givenM : givenF)[0];
-    if (older) g.people.push(newPerson('sibling', { name: nm, gender: sg, age: rint(1, 6), older: true }));
+    if (older) g.people.push(newPerson('sibling', { name: nm, gender: sg, age: rint(1, 6), older: true, pref: prefId, together: true, employment: 'none' }));
     else {
       const inY = rint(1, 6);
       if (momAge + inY <= 45) g.scheduled.push({ event: '__sibling_birth', at: { year: 2010 + inY, q: rint(0, 3) }, data: { name: nm, gender: sg } });
@@ -112,13 +114,16 @@ function newLife({ gender, surname, given, kana, happinessType, mode }) {
   // 祖父母4人（55〜75歳）。同居は地方ほど高確率
   for (let i = 0; i < 4; i++) {
     const gg = i % 2 === 0 ? 'M' : 'F';
-    const gp = newPerson('grandparent', { name: '', gender: gg, age: rint(55, 75), side: i < 2 ? 'father' : 'mother' });
-    if (chance(0.06 + p.rural * 0.15)) gp.livesTogether = true;
+    const gp = newPerson('grandparent', { name: '', gender: gg, age: rint(55, 75), side: i < 2 ? 'father' : 'mother', pref: prefId, together: false, employment: 'retired', income: rint(80, 200), assets: parentAssets(g.talents.familyWealth) * 0.7 });
+    if (i % 2 === 1 && g.people[g.people.length - 1].role === 'grandparent') gp.pref = g.people[g.people.length - 1].pref; // 祖父母の夫婦は同じ県
+    else if (chance(i < 2 ? 0.25 : 0.4)) gp.pref = weighted(D().prefectures.prefectures.filter((x) => x.id !== prefId), (x) => x.population * (Fam.near(x.id, prefId) ? 6 : 1)).id;
+    if (gp.pref === prefId && chance(0.06 + p.rural * 0.15)) { gp.livesTogether = true; gp.together = true; }
     g.people.push(gp);
   }
   // 教科（6歳で本格的に生成。それまでは仮）
   for (const s of D().flags.subjects) g.subj[s] = 50;
   g.flags.lives_with_parents = true;
+  for (const x of g.people) { x.pref = x.pref || prefId; if (x.health == null || x.role === 'grandparent') x.health = clamp(Math.round(92 - Math.max(0, x.age - 50) * 0.9 + normal(0, 5)), 30, 100); }
   // 世の中の始まり
   g.rng = RNG.s;
   return g;
@@ -147,7 +152,7 @@ const roleEmoji = (p) => {
 
 // ---- セーブ（docs/11：四半期ごと・選ぶたびに自動。手動セーブなし） ----
 function save() { if (!G || G.ended) return; G.rng = RNG.s; Store.set('life', G); }
-function loadLife() { const g = Store.get('life'); if (g && g.v === 1 && g.alive) { G = g; RNG.seed(g.rng); personSeq = g.people.length + 10; return true; } return false; }
+function loadLife() { const g = Store.get('life'); if (g && g.v === 1 && g.alive) { G = g; RNG.seed(g.rng); personSeq = g.people.length + 10; Fam.migrate(G); return true; } return false; }
 function deleteLife() { Store.del('life'); G = null; }
 const histories = () => Store.get('history', []);
 function pushHistory(rec) { const h = histories(); h.unshift(rec); Store.set('history', h.slice(0, 60)); }

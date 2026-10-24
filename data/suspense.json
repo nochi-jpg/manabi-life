@@ -87,12 +87,16 @@
     },
     "ev_m_contract_end": {
       "text": "会社の返事は……",
-      "emoji": "📄"
+      "emoji": "📄",
+      "win": "🙂 契約更新！",
+      "lose": "🍂 契約終了……"
     },
     "ev_m_job_review": {
       "text": "転職先の面接中……",
       "emoji": "🔄",
-      "onlyChoice": 1
+      "onlyChoice": 1,
+      "win": "🎉 採用！",
+      "lose": "🍂 不採用……"
     },
     "ev_m_scholarship": {
       "text": "奨学金の審査中……",
@@ -101,43 +105,63 @@
     },
     "ev_r_job_search": {
       "text": "面接中……",
-      "emoji": "🔍"
+      "emoji": "🔍",
+      "win": "🎉 採用！",
+      "lose": "🍂 不採用……"
     },
     "ev_r_headhunt": {
       "text": "面接中……",
-      "emoji": "📩"
+      "emoji": "📩",
+      "win": "🎉 採用！",
+      "lose": "🍂 不採用……"
     },
     "ev_r_first_love": {
       "text": "告白の返事は……",
-      "emoji": "💌"
+      "emoji": "💌",
+      "win": "💕 うまくいった！",
+      "lose": "🍂 片思いのまま……"
     },
     "ev_r_meet": {
       "text": "食事の誘いの返事は……",
-      "emoji": "🍽️"
+      "emoji": "🍽️",
+      "win": "💕 つきあうことに！",
+      "lose": "🍂 縁がなかった……"
     },
     "ev_r_konkatsu": {
       "text": "マッチングの結果は……",
-      "emoji": "🥂"
+      "emoji": "🥂",
+      "win": "💕 いい出会いが！",
+      "lose": "🍂 今回は縁がなかった"
     },
     "ev_r_propose": {
       "text": "プロポーズの返事は……",
-      "emoji": "💍"
+      "emoji": "💍",
+      "win": "💍 OKの返事！",
+      "lose": "💦「もう少し待って」"
     },
     "ev_r_cancer": {
       "text": "治療中……",
-      "emoji": "🎗️"
+      "emoji": "🎗️",
+      "win": "🌸 治療は順調！",
+      "lose": "🍂 きびしい結果……"
     },
     "ev_r_startup": {
       "text": "会社を立ち上げて2年……",
-      "emoji": "🚀"
+      "emoji": "🚀",
+      "win": "🎉 会社が動き出した！",
+      "lose": "🍂 うまくいかなかった……"
     },
     "ev_r_house": {
       "text": "住宅ローンの審査中……",
-      "emoji": "🏦"
+      "emoji": "🏦",
+      "win": "🏠 ローンが通った！",
+      "lose": "🍂 審査に落ちた……"
     },
     "ev_r_invest_property": {
       "text": "ローンの審査中……",
-      "emoji": "🏦"
+      "emoji": "🏦",
+      "win": "🏢 ローンが通った",
+      "lose": "🍂 審査に落ちた……"
     },
     "ev_r_qualify": {
       "text": "資格試験の合格発表……",
@@ -153,7 +177,9 @@
     },
     "ev_r_council": {
       "text": "生徒会選挙の開票中……",
-      "emoji": "🗳️"
+      "emoji": "🗳️",
+      "win": "🎉 当選！",
+      "lose": "🍂 落選……"
     },
     "ev_r_lottery": {
       "text": "宝くじの当せん番号は……",
@@ -162,7 +188,9 @@
     "ev_w_ai_restructure": {
       "text": "社内の面談中……",
       "emoji": "🤖",
-      "onlyChoice": 0
+      "onlyChoice": 0,
+      "win": "🙂 仕事は続けられる",
+      "lose": "🍂 きびしい知らせ……"
     },
     "ev_m_affil_univ": {
       "text": "内部推薦の学部が決まる……",

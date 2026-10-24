@@ -213,6 +213,10 @@
       "glasses": "メガネ"
     },
     "social": {
+      "near_parents": "親の近くに住んでいる（子育て・介護を手伝いあえる）",
+      "separated": "配偶者と別居中",
+      "no_more_children": "これ以上は子どもを持たないと決めた",
+      "long_commute": "となりの県まで遠距離通勤",
       "hodou": "補導歴",
       "arrest": "逮捕歴",
       "conviction": "前科",
@@ -261,6 +265,8 @@
     "mod_juku": "juku"
   },
   "vars": {
+    "careCost": "介護にかかるお金（年・万円）",
+    "lifeLevel": "生活レベル（save/normal/comfy/lux）",
     "plan": [
       "univ",
       "jc",
@@ -370,6 +376,7 @@
     "t_academic",
     "t_comm",
     "t_art",
+    "t_music",
     "t_sport",
     "t_health",
     "looks",
@@ -382,7 +389,8 @@
     "soc",
     "eng",
     "pe",
-    "art"
+    "art",
+    "music"
   ],
   "skills": [
     "sport",
