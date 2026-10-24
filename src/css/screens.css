@@ -5,7 +5,7 @@
 #scr-title .menu{position:absolute;left:50%;top:448px;transform:translateX(-50%);display:flex;flex-direction:column;gap:var(--sp2);width:340px}
 #scr-title .menu button{height:52px;font-size:20px}
 #scr-title .menu small{font-size:13px;opacity:.8}
-#scr-title .note{position:absolute;left:0;right:0;bottom:32px;text-align:center;font-size:13px;color:#8a97b5}
+#scr-title .note{position:absolute;left:0;right:0;bottom:40px;text-align:center;font-size:12px;color:#8a97b5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 16px}
 #scr-title .cred{position:absolute;right:24px;bottom:16px;font-size:12px;color:#a7b2c9}
 #scr-title .ios{position:absolute;left:24px;bottom:16px;height:40px;display:flex;align-items:center;gap:var(--sp1);padding:0 8px 0 16px;border-radius:999px;background:var(--soft2);color:var(--blue);font-size:14px}
 #scr-title .ios button{width:28px;height:28px;padding:0;font-size:14px;box-shadow:none}
@@ -345,7 +345,7 @@
 .rttl{position:absolute;left:0;right:0;top:16px;text-align:center}
 .rttl .a{font-size:28px;font-weight:900;color:var(--blue)}.rttl .b{font-size:15px;color:var(--ink2);margin-top:4px}
 #rme{left:16px;top:96px;width:360px;height:544px;padding:var(--sp2);display:flex;flex-direction:column;align-items:center}
-#rme .pic{width:320px;height:148px;border-radius:16px;background:var(--soft) center/cover no-repeat}
+#rme .pic{width:320px;height:104px;border-radius:16px;background:var(--soft) center/cover no-repeat}
 #rme .end{margin-top:var(--sp2);font-size:22px;font-weight:900}
 #rme .score{font-size:56px;font-weight:900;color:var(--blue);line-height:1.1}#rme .score small{font-size:18px;color:var(--ink2)}
 #rme .stars{font-size:22px;letter-spacing:2px}
@@ -494,3 +494,7 @@
 #rme .hp.bn span{overflow:hidden;text-overflow:ellipsis}#rme .hp.bn b{color:#e08a00}#rme .hp{grid-template-columns:40px 1fr 76px}#rme .hp b{white-space:nowrap}
 #gear{display:inline-block;padding:6px;margin:-6px;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .lbox .l .n small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 息をひきとった画面：長い学歴は小さめの字で2行まで */
+.death .sum div{align-items:center}
+.death .sum .v{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.death .sum .edu .v{font-size:13px;line-height:1.3;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:keep-all;overflow-wrap:anywhere}

@@ -653,7 +653,7 @@
     {
       "id": "ev_m_license_return", "kind": "choice", "emoji": "🚗", "counselor": "family",
       "when": { "age": [75, 100], "season": ["Q1"], "all": ["lic_car"], "none": ["license_returned"], "cooldownYears": 3 },
-      "text": "{age}歳。家族から「運転免許、そろそろ返したら？」と言われた。",
+      "text": "{age}歳。{licenseAdviser}から「運転免許、そろそろ返したら？」と言われた。",
       "choices": [
         { "label": "🪪 免許を返納する", "effects": { "set": ["license_returned"], "clear": ["lic_car", "owns_car"], "stats": { "social": -3 } } },
         { "label": "🚗 まだ運転を続ける", "effects": { "stats": { "happiness": 1 }, "riskMul": { "ev_r_car_accident": 1.5 } } }

@@ -539,14 +539,14 @@
       "weight": { "base": 3, "mul": [["focus_work", 1.5]] },
       "text": "毎日終電で帰る日が続いている。",
       "choices": [
-        { "label": "🗣️ 上司に仕事量を相談する", "roll": { "base": 0.5, "w": { "t_comm": 0.3 } }, "success": { "jobOvertimeDelta": -15, "stats": { "stress": -6 } }, "fail": { "stats": { "stress": 4 } } },
+        { "label": "🗣️ 上司に仕事量を相談する", "when": { "hasBoss": true }, "roll": { "base": 0.5, "w": { "t_comm": 0.3 } }, "success": { "jobOvertimeDelta": -15, "stats": { "stress": -6 } }, "fail": { "stats": { "stress": 4 } } },
         { "label": "💪 がんばって乗り切る", "effects": { "stats": { "stress": 10, "health": -5 }, "promotionBonus": 0.1 } },
         { "label": "🔄 転職を考える", "effects": { "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0] } ] } },
         { "label": "🏢 労働基準監督署に相談する", "when": { "all": ["black_company"] }, "effects": { "jobOvertimeDelta": -20, "stats": { "stress": -4 } } }
       ] },
 
     { "id": "ev_r_harassment", "kind": "choice", "emoji": "😠", "cat": "work",
-      "when": { "employment": ["seishain", "keiyaku", "haken", "part", "civil_servant"], "cooldownYears": 4 },
+      "when": { "employment": ["seishain", "keiyaku", "haken", "part", "civil_servant"], "hasBoss": true, "cooldownYears": 4 },
       "weight": { "base": 1, "mul": [["black_company", 3]] },
       "text": "上司に毎日のように大声でどなられている。",
       "choices": [

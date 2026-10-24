@@ -51,9 +51,11 @@ const Ending = (() => {
     const ha = Math.round(clamp(8 + avg(g.hist.happiness) * 0.92, 0, 100));
     const cr = Math.round(clamp(20 + criterion(g, g.happinessType) * 0.85, 0, 100));
     const bonus = bonusOf(g);
-    const score = Math.round(clamp(ha * W.happinessAvg + cr * W.criterion + bonus.sum, 0, 100));
+    // 合計＝満足感の分＋幸せの基準の分＋ボーナス（画面の3行をたすと、そのまま合計になる）
+    const haPart = Math.round(ha * W.happinessAvg), crPart = Math.round(cr * W.criterion);
+    const score = clamp(haPart + crPart + bonus.sum, 0, 100);
     const rank = D().ending.ranks.find((r) => score >= r.min) || D().ending.ranks[D().ending.ranks.length - 1];
-    return { ha, cr, bonus: bonus.sum, bonusList: bonus.list, score, rank };
+    return { ha, cr, haPart, crPart, bonus: bonus.sum, bonusList: bonus.list, score, rank };
   }
   return { compute, avg };
 })();
@@ -115,7 +117,8 @@ Screens.result = {
         <div class="end">${esc(e.rank.label)}</div>
         <div class="score num">${e.score}<small>点</small></div>
         <div class="stars">${'⭐'.repeat(stars)}<span style="opacity:.25">${'⭐'.repeat(5 - stars)}</span></div>
-        <div class="hp"><span class="ic">💭</span><span><small>幸せの基準</small>${esc(crit.label)}</span><b>${e.cr}点</b></div>
+        <div class="hp"><span class="ic">😊</span><span><small>満足感（人生の平均 ${e.ha}点の6割）</small>毎日の満足感</span><b>${e.haPart}点</b></div>
+        <div class="hp"><span class="ic">💭</span><span><small>幸せの基準（${e.cr}点の4割）</small>${esc(crit.label)}</span><b>${e.crPart}点</b></div>
         ${e.bonus ? `<div class="hp bn"><span class="ic">🎁</span><span><small>ボーナス</small>${esc(e.bonusList.map((x) => x.l.replace(/^\S+\s/, '')).join('・'))}</span><b>＋${e.bonus}点</b></div>` : ''}
         <div class="ep">${esc(ep)}</div>
         <div class="rank">${ranks.map((r) => `<span class="${r.id === e.rank.id ? 'on' : ''}">${({ end_hard: '困難', end_trial: '試行錯誤', end_dramatic: '波乱万丈', end_balance: 'バランス', end_happy: '幸福' })[r.id] || ''}</span>`).join('')}</div>

@@ -5,7 +5,7 @@
 
     {"id": "ev_m_job_hunt_license", "kind": "choice", "emoji": "👔", "cat": "work", "type": "scheduled", "counselor": "self", "when": {"none": ["naitei"]}, "text": "国家試験に合格！資格を生かして働く場所をさがそう。", "fact": {"text": "看護師・美容師・薬剤師などの国家資格は、試験に合格してはじめて、その仕事につくことができます。", "src": "厚生労働省"}, "choices": [{"menu": {"source": "jobs.jobs", "page": 5, "showRate": true, "filter": "eligible"}, "roll": {"rate": "$menuRate"}, "success": {"set": ["naitei"], "var": {"target": "$pick"}, "stats": {"happiness": 8}, "log": "🌸 {target}に採用が決まった！"}, "fail": {"stats": {"stress": 4}, "schedule": [{"event": "ev_r_job_search", "inYears": [0, 0]}], "log": "🍂 不採用。卒業してからもう一度さがす。"}}]},
 
-    {"id": "ev_r_allowance_cut", "kind": "choice", "emoji": "📉", "cat": "money", "when": {"stage": ["univ", "univ_med", "junior_college", "vocational"], "all": ["living_alone"], "none": ["allowance_cut"], "cooldownYears": 4}, "weight": {"base": 0.25, "mul": [["familyWealth<35", 2.5]]}, "text": "親の仕事が急になくなり、仕送りが止まってしまった。", "fact": {"text": "家計が急に苦しくなった学生は、学校の授業料減免や、日本学生支援機構の「家計急変」の奨学金に申し込めます。", "src": "日本学生支援機構"}, "choices": [{"label": "💴 バイトをふやしてがんばる", "effects": {"set": ["allowance_cut"], "focus": "focus_parttime", "stats": {"stress": 8}}}, {"label": "📄 奨学金を借りる", "effects": {"set": ["allowance_cut", "scholarship_loan"], "stats": {"stress": 4}}}, {"label": "⏸️ 1年休学して働く", "showResult": true, "effects": {"set": ["allowance_cut"], "extendStage": 1, "cash": 120, "stats": {"stress": 4}, "log": "⏸️ 1年休学して働き、120万円ためた。"}}]},
+    {"id": "ev_r_allowance_cut", "kind": "choice", "emoji": "📉", "cat": "money", "when": {"stage": ["univ", "univ_med", "junior_college", "vocational"], "all": ["living_alone"], "none": ["allowance_cut"], "person": {"role": "father|mother", "alive": true}, "cooldownYears": 4}, "weight": {"base": 0.25, "mul": [["familyWealth<35", 2.5]]}, "text": "親の仕事が急になくなり、仕送りが止まってしまった。", "fact": {"text": "家計が急に苦しくなった学生は、学校の授業料減免や、日本学生支援機構の「家計急変」の奨学金に申し込めます。", "src": "日本学生支援機構"}, "choices": [{"label": "💴 バイトをふやしてがんばる", "effects": {"set": ["allowance_cut"], "focus": "focus_parttime", "stats": {"stress": 8}}}, {"label": "📄 奨学金を借りる", "effects": {"set": ["allowance_cut", "scholarship_loan"], "stats": {"stress": 4}}}, {"label": "⏸️ 1年休学して働く", "showResult": true, "effects": {"set": ["allowance_cut"], "extendStage": 1, "cash": 120, "stats": {"stress": 4}, "log": "⏸️ 1年休学して働き、120万円ためた。"}}]},
 
     { "id": "ev_m_welfare_end", "kind": "choice", "emoji": "🏛️", "cat": "money", "type": "scheduled", "counselor": "self",
       "text": "{welfareEndReason}ので、生活保護が終わった。これからは自分の収入で暮らしていく。",
@@ -161,7 +161,7 @@
 
     { "id": "ev_r_spouse_return", "kind": "choice", "emoji": "💼", "cat": "family", "type": "scheduled", "counselor": "spouse",
       "when": { "all": ["married"], "spouseEmp": ["homemaker", "none"] },
-      "text": "子どもも少し大きくなった。{spouse}が「そろそろまた働きたい」と言っている。",
+      "text": "{kidsGrown}{spouse}が「そろそろまた働きたい」と言っている。",
       "fact": { "text": "子育てが落ち着いてから働き始める人の多くは、パートなど短い時間の働き方から始めます。", "src": "総務省 労働力調査" },
       "choices": [
         { "label": "🛒 パートで働いてもらう", "showResult": true, "effects": { "spouse": "part" } },
@@ -171,7 +171,7 @@
 
     { "id": "ev_r_return_work", "kind": "choice", "emoji": "💼", "cat": "work", "type": "scheduled", "counselor": "self",
       "when": { "employment": ["homemaker", "none", "unemployed"], "age": [22, 60] },
-      "text": "子どもも少し大きくなった。また働く？",
+      "text": "{kidsGrown}また働く？",
       "choices": [
         { "label": "🔍 仕事をさがす", "effects": { "employment": "unemployed", "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0] } ] } },
         { "label": "🛒 まずはパートで働く", "effects": { "job": { "hire": "j_parttime_general" } } },

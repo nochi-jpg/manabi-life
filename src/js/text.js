@@ -44,8 +44,10 @@ const Text = (() => {
       case 'jhsExamMonth': return ['tokyo', 'kanagawa'].includes(G.pref) ? '2月1日' : ['saitama', 'chiba'].includes(G.pref) ? '1月中旬' : '1月';
       case 'bonusText': { const b = Math.round((G.lastDelta && G.lastDelta.bonus) || 0); return b > 0 ? `ボーナスが出た。${b}万円。` : 'ボーナスはなかった。'; }
       case 'lastGpa': return (G.vars.lastGpa ?? 0).toFixed(2);
-      case 'studentDaily': { const sd = P().studentDaily[G.stage]; return pk(sd || pool().studentDaily); }
-      case 'adultDaily': case 'seniorDaily': return pk(pool()[k]);
+      case 'studentDaily': { const key = ['univ', 'univ_med', 'junior_college', 'vocational', 'grad_master', 'grad_doctor', 'grad_prof'].includes(G.stage) ? 'univ' : ['hs', 'hs_corr', 'hs_night', 'kosen'].includes(G.stage) ? 'hs' : G.stage === 'free_school' ? 'elem' : G.stage; const sd = P().studentDaily[key]; return pk(sd || pool().studentDaily); }
+      // 職場・仕事・同僚の文は、働いている人だけ
+      case 'adultDaily': { const working = !!(G.job && G.job.id && Econ.working()); return pk(pool().adultDaily.filter((t) => working || !/職場|仕事|同僚|会社/.test(t))); }
+      case 'seniorDaily': return pk(pool()[k]);
       case 'tripDest': return pk(pool().tripDest[G.stage] || pool().tripDest.elem);
       case 'kenshinResult': { const bad = G.stats.health < 60 || G.flags.dz_hypertension || G.flags.smoker || G.flags.heavy_drinker; ctx.kenshinBad = bad; return pk(P().kenshinResult[bad ? 'warn' : 'good']); }
       case 'sportsDayResult': return pk(P().sportsDayResult[G.talents.t_sport >= 65 ? 'hi' : G.talents.t_sport < 40 ? 'lo' : 'mid']);
@@ -107,6 +109,8 @@ const Text = (() => {
       case 'schoolYear': return G.school ? G.school.yearIn : 1;
       case 'roninYear': return G.counters.ronin_years || 1;
       case 'reunionSchool': { const pn = Fam.prefName(G.birthPref || G.pref).replace(/[都道府県]$/, ''); const k = G.flags.edu_hs_grad ? pick(['小学校', '中学校', '高校']) : pick(['小学校', '中学校']); return `${pn}の${k}`; } // 同窓会は出身県の学校
+      case 'licenseAdviser': { const fam = people('spouse').some((p) => p.alive) || people('child').some((p) => p.alive); return fam ? '家族' : 'かかりつけのお医者さん'; }
+      case 'kidsGrown': return people('child').some((c) => c.alive && c.age < 18) ? '子どもも少し大きくなった。' : '少し落ち着いてきた。';
       case 'cashNow': return man(Math.max(0, G.cash));
       case 'pocket': return round1(Econ.myPocket()).toFixed(1);
       case 'sendMoney': return ch ? String(ch.sendMoney ?? 7) : '7';

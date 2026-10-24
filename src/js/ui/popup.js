@@ -7,6 +7,15 @@ const Popup = (() => {
   let mini = null; // 最小化中の選択肢（もどるときに呼ぶ関数）
   const PER = 8;
   const COUNSEL = { parents: '👪 家族で話し合い', parents_teacher: '🧑‍🏫 先生と親からの提案', teacher: '🧑‍🏫 先生から', self: '💭 自分で決める', spouse: '💑 パートナーと', family: '👨‍👩‍👧 家族と' };
+  // 相談相手：その人がいないときは「自分で決める」（親がいないときの先生と親 → 先生）
+  function counselorOf(c) {
+    const alive = (r) => people(r).some((p) => p.alive);
+    if (c === 'spouse') return alive('spouse') || alive('partner') ? c : 'self';
+    if (c === 'parents') return alive('father|mother') ? c : 'self';
+    if (c === 'parents_teacher') return alive('father|mother') ? c : 'teacher';
+    if (c === 'family') return alive('spouse') || alive('child') || alive('father|mother') || alive('sibling') ? c : 'self';
+    return c;
+  }
   const rc = (r) => (r >= 70 ? 'hi' : r >= 40 ? 'mid' : 'lo');
   function show(html, cls = 'cbox') {
     const o = ov();
@@ -103,7 +112,7 @@ const Popup = (() => {
           ${btns.replace('class="opts"', 'class="opts one"')}${pagerHtml(page, pages)}${factHtml(view.fact)}</div>`, 'paper');
       } else {
         box = show(`
-          <div class="cs">${COUNSEL[view.counselor] || '💭 どうする？'}</div>${MINI_BTN}
+          <div class="cs">${COUNSEL[counselorOf(view.counselor)] || '💭 どうする？'}</div>${MINI_BTN}
           <div class="top"><div class="who">${view.emoji || '💭'}</div>
             <div><div class="ttl">${esc(view.date)} ・ ${esc(view.ageLabel)}</div><div class="txt">${esc(view.text)}</div></div>${sorter}</div>
           ${prefBar}${btns}${pagerHtml(page, pages)}${factHtml(view.fact)}`);
@@ -349,7 +358,7 @@ const Popup = (() => {
   function death(d, cb) {
     Audio2.setDuck && Audio2.setDuck(true);
     const box = show(`<div class="dv">🕊️</div><h2>${d.year}年 ${d.ss}。<br>${esc(d.name)}は${d.age}歳で、${esc(d.fam)}<br>息をひきとった。</h2><p>死因：${esc(d.cause)}</p>
-      <div class="sum"><div><small>🎓 学歴</small>${esc(d.edu)}</div><div><small>💼 最後の仕事</small>${esc(d.job)}</div><div><small>👪 家族</small>${esc(d.family)}</div><div><small>👶 孫</small>${d.gks}人</div></div>
+      <div class="sum"><div class="edu"><small>🎓 学歴</small><span class="v">${esc(d.edu)}</span></div><div><small>💼 最後の仕事</small><span class="v">${esc(d.job)}</span></div><div><small>👪 家族</small><span class="v">${esc(d.family)}</span></div><div><small>👶 孫</small><span class="v">${d.gks}人</span></div></div>
       <div class="nx"><button class="main" id="dthOk">リザルトへ ▶</button></div>`, 'death');
     ov().classList.add('dark');
     $('#dthOk', box).onclick = () => { ov().classList.remove('dark'); Audio2.setDuck && Audio2.setDuck(false); close(); cb(); };

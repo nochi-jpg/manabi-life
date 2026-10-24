@@ -12,7 +12,7 @@ Screens.title = {
         <button id="tHist">これまでの人生 <small>（${n}人）</small></button>
         <button id="tOpt">オプション</button>
       </div>
-      <div class="note">人生は一度きり。とちゅうから やり直すことは できません（自動でセーブされます）</div>
+      <div class="note">人生は一度きり　途中でやめて最初からやり直すことはできません（自動でセーブされ、ブラウザを開きなおすと再開します）</div>
       <div class="cred">© のち（まなび堂）</div>
       ${Platform.showIOSHint() ? '<div class="ios">📲 共有 → ホーム画面に追加 で全画面で遊べます <button id="iosX">✕</button></div>' : ''}`;
     $('#tStart').onclick = () => (has ? App.show('main') : App.show('start'));
