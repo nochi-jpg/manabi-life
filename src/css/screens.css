@@ -492,3 +492,4 @@
 @keyframes mvIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 #rme .hp.bn span{overflow:hidden;text-overflow:ellipsis}#rme .hp.bn b{color:#e08a00}#rme .hp{grid-template-columns:40px 1fr 76px}#rme .hp b{white-space:nowrap}
 #gear{display:inline-block;padding:6px;margin:-6px;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.lbox .l .n small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

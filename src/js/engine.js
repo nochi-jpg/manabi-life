@@ -449,7 +449,16 @@ const Engine = (() => {
   }
   // 習い事の1行ぶん（ステータスの変化のめやすつき）
   const EFF_L = { health: '健康', social: '人間関係', happiness: '満足感', stress: 'ストレス', 'skill.sport': '運動', 'skill.music': '演奏', 'skill.art': '絵', 'skill.it': 'IT', 'skill.language': '語学', 'skill.cooking': '料理', 'subj.jpn': '国語', 'subj.math': '算数', 'subj.eng': '英語', 'subj.pe': '体育', 'subj.art': '図工', 'subj.music': '音楽', 'subj.sci': '理科', subjAll: '全教科' };
-  function lessonEff(d) { const L = []; for (const [k, v] of Object.entries(d.yearly || {})) { const t = `${EFF_L[k] || k}${v > 0 ? '↑' : '↓'}`; if (!L.includes(t)) L.push(t); } return L.slice(0, 3).join(' '); }
+  // 習い事の効果の表示（1年あたり）：塾・予備校は「5教科の伸び+◯%」、ほかは「運動+4・健康+2」のように数字で。時間をとる習い事は勉強の伸びが少しへる
+  function lessonEff(d) {
+    const L = [];
+    if (d.study) L.push(`5教科の伸び+${Math.round((d.study - 1) * 100)}%`);
+    const lab = (k) => (G.age >= 12 && k === 'subj.math' ? '数学' : G.age >= 12 && k === 'subj.art' ? '美術' : EFF_L[k] || k);
+    for (const [k, v] of Object.entries(d.yearly || {})) L.push(`${lab(k)}${v > 0 ? '+' : '−'}${Math.abs(v)}`);
+    const t = d.study ? 0 : d.time || 0;
+    if (t >= 2 && G.age < 19) L.push(`勉強−${Math.round(t * D().clubs.rules.studyPenaltyPerTime * 100)}%`);
+    return L.slice(0, 4).join('・');
+  }
   function lessonItem(c) { const d = Menu.club(c.id); return { id: c.id, emoji: d.emoji, label: d.label, years: G.year - (c.since || G.year) + 1, cost: d.cost, eff: lessonEff(d) }; }
   // 家計で決まる、習い事にかけられる1年の金額（万円）
   // 世帯年収の15%まで（家のくらしで決まる下限あり）。年収600万円なら年90万円
@@ -802,9 +811,11 @@ const Engine = (() => {
     const baseG = { elem: 3, free_school: 2, jhs: 4, hs: 5, hs_corr: 3, hs_night: 3, kosen: 5, ronin: 6 }[st];
     if (baseG) {
       const q = (G.school && G.school.quality) || 1;
-      const juku = G.flags.juku || G.clubs.some((c) => c.id === 'ls_juken_juku') ? 1.3 : 1;
+      // 塾・予備校（study）：通っているあいだだけ、5教科の伸びが上がる（いちばん効くもの1つ）。勉強なので、勉強時間はへらない
+      const studyMul = Math.max(1, ...G.clubs.map((c) => (Menu.club(c.id) || {}).study || 1));
+      Effects.setFlag('juku', studyMul > 1);
       const fam = 0.9 + G.talents.familyWealth / 500;
-      const time = G.clubs.reduce((a, c) => a + ((Menu.club(c.id) || {}).time || 0), 0) * D().clubs.rules.studyPenaltyPerTime;
+      const time = G.clubs.reduce((a, c) => { const d = Menu.club(c.id) || {}; return a + (d.study ? 0 : d.time || 0); }, 0) * D().clubs.rules.studyPenaltyPerTime;
       const ks = ['jpn', 'math', 'sci', 'soc', 'eng', 'pe', 'art', 'music'];
       const sorted = ks.slice(0, 5).sort((a, b) => G.subj[b] - G.subj[a]);
       const like = Cond.likeMain();
@@ -813,7 +824,7 @@ const Engine = (() => {
       for (const k of ks) {
         const t = talentOfSubj(k);
         if (G.subj[k] == null) G.subj[k] = Math.round(clamp(t + normal(0, 10), 1, 99));
-        let env = q * juku * fam * (1 - time);
+        let env = q * fam * (1 - time) * (['jpn', 'math', 'sci', 'soc', 'eng'].includes(k) ? studyMul : 1);
         const f = G.focus;
         if (f === 'focus_study' && !['pe', 'art', 'music'].includes(k)) env *= 1.4;
         if (f === 'focus_strength') env *= sorted.slice(0, 2).includes(k) ? 1.7 : 0.9;
@@ -919,7 +930,7 @@ const Engine = (() => {
     const key = st === 'vocational' ? 'voc' : st === 'univ_med' || ['nurse', 'med', 'dent', 'pharm'].includes(G.vars.major) ? 'med' : G.vars.major === 'edu' ? 'edu' : d && d.track === 'rikei' ? 'rikei' : 'bunkei';
     const pool = shuffle(COURSES[key]).slice(0, 6).concat(shuffle(COURSES.common).slice(0, 2));
     const f = G.focus;
-    const base = 75.5 + (G.stats.academic - 50) * 0.55 + (f === 'focus_study' ? 8 : f === 'focus_parttime' ? -6 : f === 'focus_friends' || f === 'focus_love' ? -3 : 0) - (G.stats.stress > 70 ? 6 : 0);
+    const base = 76.5 + (G.stats.academic - 50) * 0.55 + (f === 'focus_study' ? 8 : f === 'focus_parttime' ? -6 : f === 'focus_friends' || f === 'focus_love' ? -3 : 0) - (G.stats.stress > 70 ? 6 : 0);
     const GR = (sc) => (sc >= 90 ? ['S', 4] : sc >= 80 ? ['A', 3] : sc >= 70 ? ['B', 2] : sc >= 60 ? ['C', 1] : ['D', 0]);
     const rows = pool.map((nm) => { const sc = Math.round(clamp(base + normal(0, 9), 20, 100)); const [g, gp] = GR(sc); return { l: nm, sc, v: g, gp }; });
     const gpa = Math.round((rows.reduce((a, x) => a + x.gp, 0) / rows.length) * 100) / 100;

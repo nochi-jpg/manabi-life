@@ -202,7 +202,7 @@ const Popup = (() => {
         <div class="q">${esc(view.text)}<small>${esc(view.note)}</small></div>
         <div class="ls">${vis.map((x) => `<div class="l"><span class="e">${x.emoji}</span><span class="n">${esc(x.label)}<small>${x.years}年目 ・ 年${x.cost}万円 ・ ${esc(x.eff)}</small></span>
           ${x.lock ? `<span class="lock">${esc(x.lock)}</span><button class="q2 on" disabled>やめる</button>` : `<button data-k="${x.id}" data-v="1" class="${keep[x.id] ? 'on' : ''}">続ける</button><button data-k="${x.id}" data-v="0" class="q2 ${keep[x.id] ? '' : 'on'}">やめる</button>`}</div>`).join('')}</div>${pagerHtml(lpage, lpages, 'lp')}
-        <div class="sum"><span>💡</span><span>続けると：<b>年${cost}万円</b>（${G.age < 16 ? '家計から' : '所持金から'}）${view.cap ? `　家計で出せるめやす：年${view.cap}万円まで${Engine.jukuOk() ? '（中学受験の塾は別わく）' : ''}` : ''}</span></div>
+        <div class="sum"><span>💡</span><span>続けると：<b>年${cost}万円</b>（${G.age < 16 ? '家計から' : '所持金から'}）${view.cap ? `　家計で出せるめやす：年${view.cap}万円まで${Engine.jukuOk() ? '（塾・予備校は別わく）' : ''}` : ''}</span></div>
         <div class="lbtns"><button id="lAdd" ${n >= 4 ? 'disabled' : ''}>＋ 習い事を増やす（${n}/4）</button><button class="ok main" id="lOk">これで決める ▶</button></div>`, 'lbox');
       bindMini(box, render);
       bindPager(box, 'lp', () => lpage, (v) => { lpage = v; render(); });
