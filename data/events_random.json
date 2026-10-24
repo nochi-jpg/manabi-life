@@ -54,7 +54,7 @@
       ] },
 
     { "id": "ev_r_new_lesson", "kind": "choice", "emoji": "🎒", "cat": "lesson",
-      "when": { "age": [6, 14], "cooldownYears": 2 },
+      "when": { "age": [6, 14], "cooldownYears": 2, "lessonsLess": 4 },
       "weight": { "base": 2 },
       "text": "友だちに「いっしょに習わない？」と誘われた。",
       "choices": [
@@ -1152,7 +1152,7 @@
         { "label": "🏠 家で付き添い、できるかぎり支える", "when": { "selfWorking": false }, "effects": { "stats": { "stress": 5 }, "person": { "relation": "spouse", "delta": 10 } } }
       ] }
     ,{ "id": "ev_r_adult_lesson", "kind": "choice", "emoji": "🎒", "cat": "lesson",
-      "when": { "age": [22, 85], "cooldownYears": 4 },
+      "when": { "age": [22, 85], "cooldownYears": 4, "lessonsLess": 4 },
       "weight": { "base": 0.56, "mul": [["focus_hobby", 2], ["focus_health", 1.5], ["focus_qualify", 1.5], ["retired_flag", 2], ["stress>=70", 1.3]] },
       "text": "{someone}に誘われて、大人向けの習い事の体験に行ってみた。",
       "choices": [

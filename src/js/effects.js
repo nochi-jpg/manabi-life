@@ -327,6 +327,7 @@ const Clubs = {
   join(id) {
     const c = Menu.club(id); if (!c) return;
     if (G.clubs.some((x) => x.id === id)) return;
+    if (Engine.isLesson(id) && G.clubs.filter((x) => Engine.isLesson(x.id)).length >= 4) return; // 習い事は4つまで
     // 合計 time ≤ 4（docs clubs.json）
     let total = G.clubs.reduce((a, x) => a + ((Menu.club(x.id) || {}).time || 0), 0);
     while (G.clubs.length && total + (c.time || 0) > D().clubs.rules.maxTime) { const r = G.clubs.shift(); total -= (Menu.club(r.id) || {}).time || 0; }

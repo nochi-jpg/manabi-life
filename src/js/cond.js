@@ -142,6 +142,7 @@ function testKey(k, v, ctx) {
     case 'cooldownYears': { const last = G.lastFired[ev.id]; return last == null || G.year - last >= v; }
     case 'yearsLeft': return !!G.school && schoolYearsLeft() === v;
     case 'yearInStage': return !!G.school && (Array.isArray(v) ? inRange(G.school.yearIn, v) : G.school.yearIn === v);
+    case 'lessonsLess': return G.clubs.filter((c) => Engine.isLesson(c.id)).length < v; // 習い事の数が v 個より少ない（4つまで）
     case 'noLesson': return !G.clubs.some((c) => c.id === v);
     case 'jobYears': return !!G.job && (Array.isArray(v) ? v.includes(G.jobYears) : G.jobYears === v);
     case 'after': return true; // 並び順だけ（engine で後ろに回す）

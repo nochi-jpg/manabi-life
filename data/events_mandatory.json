@@ -95,7 +95,7 @@
       "when": { "age": [10, 10], "season": ["Q1"], "stage": ["elem"], "region": ["A", "B"], "none": ["edu_elem_private"], "once": true },
       "text": "小学4年生。クラスで中学受験の塾に通い始める子が増えてきた。",
       "choices": [
-        { "label": "📝 中学受験の塾に通う（3年で約250万）", "when": { "jukuOk": true }, "effects": { "club": { "join": "ls_juken_juku" }, "set": ["juken_track"], "stats": { "stress": 5 } } },
+        { "label": "📝 中学受験の塾に通う（3年で約250万）", "when": { "jukuOk": true, "lessonsLess": 4 }, "effects": { "club": { "join": "ls_juken_juku" }, "set": ["juken_track"], "stats": { "stress": 5 } } },
         { "label": "📘 公立中高一貫校の適性検査だけ受ける", "effects": { "set": ["juken_track"], "var": { "ikkanOnly": true } } },
         { "label": "🏫 地元の公立中学に行く", "effects": { "stats": { "stress": -2, "happiness": 2 } } }
       ]
@@ -324,7 +324,7 @@
       "fact": { "text": "大学受験の予備校・塾の費用は、高校生で年50〜100万円くらい。高3から通う人がいちばん多い。", "src": "文部科学省 子供の学習費調査" },
       "choices": [
         { "label": "🙂 今は通わない（自分で勉強する）", "effects": {} },
-        { "label": "🏫 予備校に通う（年60万円・塾のわく）", "when": { "jukuOk": true }, "effects": { "club": { "join": "ls_yobiko" }, "stats": { "stress": 3 }, "log": "🏫 大学受験の予備校に通い始めた" } },
+        { "label": "🏫 予備校に通う（年60万円・塾のわく）", "when": { "jukuOk": true, "lessonsLess": 4 }, "effects": { "club": { "join": "ls_yobiko" }, "stats": { "stress": 3 }, "log": "🏫 大学受験の予備校に通い始めた" } },
         { "label": "💸 家計が苦しく、予備校には通えない", "when": { "jukuOk": false }, "effects": { "stats": { "stress": 2 } } }
       ]
     },
