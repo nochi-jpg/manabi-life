@@ -177,7 +177,12 @@
       "community_role": "地域の役員",
       "pension_early": "年金を繰り上げ受給",
       "pension_late": "年金を繰り下げ受給",
-      "license_returned": "免許返納"
+      "license_returned": "免許返納",
+      "renting": "賃貸に住んでいる",
+      "company_housing": "社宅・寮",
+      "owns_rental": "貸している部屋を持っている",
+      "rental_vacant": "貸している部屋が空室",
+      "akiya": "空き家を持っている"
     },
     "health": {
       "smoker": "喫煙者",
@@ -307,7 +312,18 @@
     "motherMaiden": "母の旧姓（親の離婚で使う）",
     "partnerSurname": "恋人・配偶者の苗字",
     "spouseSurname": "夫婦の苗字",
-    "surnameChanged": "結婚で苗字を変えたか（エンジンが surname≠birthSurname で自動判定）"
+    "surnameChanged": "結婚で苗字を変えたか（エンジンが surname≠birthSurname で自動判定）",
+    "mortgageType": [
+      "variable",
+      "fixed"
+    ],
+    "mortgageBorrower": [
+      "self",
+      "spouse",
+      "both"
+    ],
+    "inheritedHouse": "親の家を相続した",
+    "workAway": "勤め先が実家から通えない"
   },
   "personOps": [
     "add",

@@ -95,6 +95,15 @@
       "text": "奨学金を{repayYears}年かけて、ついに返し終わった。返した合計は{repayTotal}万円（借りたのは{borrowTotal}万円）。",
       "effects": { "clear": ["scholarship_loan_repaying"], "stats": { "happiness": 6, "stress": -4 } } },
 
+    { "id": "ev_f_danshin", "kind": "flow", "emoji": "🛡️", "cat": "money",
+      "when": { "all": ["widowed", "mortgage"], "var": { "mortgageBorrower": ["spouse"] }, "once": true },
+      "text": "住宅ローンは亡くなった{spouse}の名前で借りていた。団体信用生命保険で、残りのローン{loanLeft}万円がなくなった。",
+      "effects": { "clear": ["mortgage"], "loanClose": "mortgage" } },
+    { "id": "ev_f_mortgage_done", "kind": "flow", "emoji": "🎉", "cat": "money",
+      "when": { "all": ["mortgage"], "loanFinished": "mortgage" },
+      "text": "住宅ローンを返し終わった！ 家は完全に自分たちのものになった。",
+      "effects": { "clear": ["mortgage"], "stats": { "happiness": 8, "stress": -6 } } },
+
     { "id": "ev_f_pet_death", "kind": "flow", "emoji": "🌈", "cat": "life", "type": "scheduled",
       "when": { "all": ["pet"] },
       "text": "長い間いっしょだったペットが、虹の橋をわたった。",

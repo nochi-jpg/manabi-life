@@ -456,6 +456,18 @@
       "effects": { "job": { "hire": "$target" }, "clear": ["naitei"], "scholarRepayStartIfLoan": true, "log": "🏢 {job}として就職" }
     },
     {
+      "id": "ev_m_housing", "kind": "choice", "emoji": "🏠", "counselor": "self",
+      "when": { "season": ["Q1"], "jobYears": [0, 0], "employment": ["seishain", "civil_servant", "keiyaku", "haken", "part", "freelance"], "stage": ["none"], "none": ["owns_house"], "once": true },
+      "text": "社会人になった。どこに住む？（{pref}の家賃のめやす：ひとり用 月{rentSingle}万円）",
+      "choices": [
+        { "label": "🏠 実家から通う（家に月3万円入れる）", "when": { "person": { "role": "father|mother", "alive": true }, "var": { "workAway": [false] } }, "effects": { "set": ["lives_with_parents"], "clear": ["living_alone", "renting"], "rentMonthly": 3, "stats": { "happiness": 1 } } },
+        { "label": "🔑 部屋を借りてひとり暮らし（月{rentSingle}万円・最初に家賃の4か月分）", "effects": { "set": ["living_alone", "renting"], "clear": ["lives_with_parents"], "rentMonthly": "$rentSingle", "cash": "-$moveInCost", "stats": { "happiness": 4, "social": -2 } } },
+        { "label": "🏢 会社の寮・社宅に入る（相場の3割くらい）", "when": { "companyHousing": true }, "effects": { "set": ["company_housing", "renting"], "clear": ["lives_with_parents"], "rentMonthly": "$rentCompany", "stats": { "social": 2 } } },
+        { "label": "🏘️ シェアハウスに住む（月{rentShare}万円）", "when": { "region": ["A"] }, "effects": { "set": ["living_alone", "renting"], "clear": ["lives_with_parents"], "rentMonthly": "$rentShare", "stats": { "social": 3 } } }
+      ],
+      "note": "workAway＝勤め先が実家から通えないとき true（転勤・上京など）"
+    },
+    {
       "id": "ev_m_scholar_repay", "kind": "flow", "emoji": "📄",
       "when": { "season": ["Q2"], "all": ["scholarship_loan"], "none": ["scholarship_loan_repaying"], "stage": ["none"], "once": true },
       "text": "奨学金の返済が始まった。毎月{repay}万円、{repayYears}年間。",

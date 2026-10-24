@@ -664,7 +664,9 @@
       "weight": { "base": 2, "mul": [["married", 2], ["child:any", 1.8]] },
       "text": "マイホームを買う？（{housePrice}万円・頭金{downPayment}万円）",
       "choices": [
-        { "label": "🏠 35年ローンで買う", "when": { "money": { "cash": [">=", "$downPayment"] } }, "showRate": true, "roll": { "rate": "$loanApproval" }, "success": { "set": ["owns_house", "mortgage"], "cash": "-$downPayment", "loan": { "type": "mortgage", "amount": "$loanAmount", "years": 35, "rate": 0.01 }, "stats": { "happiness": 8 } }, "fail": { "log": "🏦 ローンの審査に通らなかった" } },
+        { "label": "🏠 新築を変動金利で買う（今は約0.6%・上がるかも）", "when": { "money": { "cash": [">=", "$downPayment"] } }, "showRate": true, "roll": { "rate": "$loanApproval" }, "success": { "set": ["owns_house", "mortgage"], "clear": ["renting"], "rentMonthly": 0, "cash": "-$downPayment-$acquisitionTax", "var": { "mortgageType": "variable" }, "loan": { "type": "mortgage", "amount": "$loanAmount", "years": 35, "rate": 0.006 }, "stats": { "happiness": 8 } }, "fail": { "log": "🏦 ローンの審査に通らなかった" } },
+        { "label": "🔒 新築を固定金利で買う（約1.9%・ずっと同じ）", "when": { "money": { "cash": [">=", "$downPayment"] } }, "showRate": true, "roll": { "rate": "$loanApproval" }, "success": { "set": ["owns_house", "mortgage"], "clear": ["renting"], "rentMonthly": 0, "cash": "-$downPayment-$acquisitionTax", "var": { "mortgageType": "fixed" }, "loan": { "type": "mortgage", "amount": "$loanAmount", "years": 35, "rate": 0.019 }, "stats": { "happiness": 8 } }, "fail": { "log": "🏦 ローンの審査に通らなかった" } },
+        { "label": "🏚️ 中古を買ってリフォーム（新築の約6割）", "when": { "money": { "cash": [">=", "$downPaymentUsed"] } }, "showRate": true, "roll": { "rate": "$loanApprovalUsed" }, "success": { "set": ["owns_house", "mortgage"], "clear": ["renting"], "rentMonthly": 0, "cash": "-$downPaymentUsed", "var": { "mortgageType": "fixed" }, "loan": { "type": "mortgage", "amount": "$loanAmountUsed", "years": 30, "rate": 0.019 }, "stats": { "happiness": 6 } }, "fail": { "log": "🏦 ローンの審査に通らなかった" } },
         { "label": "🏢 賃貸のまま暮らす", "effects": {} },
         { "label": "🏡 実家を二世帯住宅にする", "when": { "person": { "role": "father|mother", "alive": true } }, "effects": { "set": ["owns_house", "lives_with_parents"], "cash": -300, "personRelation": { "mother": 5 } } }
       ] },
@@ -1072,6 +1074,70 @@
         { "label": "🏢 会社に通い続ける", "effects": { "stats": { "social": 1 } } }
       ],
       "note": "在宅中は背景がリビングになる。転職・退職で remote_work は外れる" },
+
+    { "id": "ev_r_housing_family", "kind": "choice", "emoji": "🏡", "cat": "money", "type": "scheduled",
+      "when": { "all": ["married"], "marriedYears": [0, 0], "none": ["owns_house"], "once": "perMarriage" },
+      "text": "結婚して、2人でどこに住む？（ファミリー向けの家賃：月{rentFamily}万円）",
+      "choices": [
+        { "label": "🔑 2人で部屋を借りる（月{rentFamily}万円）", "effects": { "set": ["renting"], "clear": ["lives_with_parents", "living_alone"], "rentMonthly": "$rentFamily", "cash": "-$moveInCostFamily" } },
+        { "label": "👵 どちらかの実家で同居する", "when": { "person": { "role": "father|mother", "alive": true } }, "effects": { "set": ["lives_with_parents"], "clear": ["renting", "living_alone"], "rentMonthly": 0, "stats": { "stress": 3 }, "person": { "relation": "spouse", "delta": -3 } } },
+        { "label": "🏠 思い切って家を買う", "effects": { "schedule": [ { "event": "ev_r_house", "inYears": [0, 0] } ] } }
+      ] },
+
+    { "id": "ev_r_rate_rise", "kind": "choice", "emoji": "📈", "cat": "money",
+      "when": { "year": [2030, 2100], "all": ["mortgage"], "var": { "mortgageType": ["variable"] }, "cooldownYears": 6 },
+      "weight": { "base": 1.5 },
+      "text": "世の中の金利が上がり、変動金利の住宅ローンの返済が月{rateUp}万円増えることになった。",
+      "choices": [
+        { "label": "🔒 固定金利に借りかえる（手数料30万円）", "effects": { "cash": -30, "var": { "mortgageType": "fixed" }, "loanRate": 0.022 } },
+        { "label": "💴 貯金でくり上げ返済する（200万円）", "when": { "money": { "cash": [">=", 200] } }, "effects": { "cash": -200, "loanPrepay": 200 } },
+        { "label": "😐 そのまま返し続ける", "effects": { "loanRateUp": 0.005, "stats": { "stress": 3 } } }
+      ] },
+
+    { "id": "ev_r_invest_property", "kind": "choice", "emoji": "🏢", "cat": "money",
+      "when": { "age": [28, 65], "none": ["owns_rental", "blacklisted", "bankruptcy"], "employment": ["seishain", "civil_servant", "executive"], "money": { "cash": [">=", 200] }, "cooldownYears": 5 },
+      "weight": { "base": 1, "mul": [["focus_invest", 2.5], ["income>=600", 1.5]] },
+      "text": "不動産会社から「投資用のマンションを買って貸せば、家賃でローンが返せますよ」とすすめられた。（{pref}の部屋：{unitPrice}万円・家賃 月{unitRent}万円）",
+      "choices": [
+        { "label": "🏢 ローンを組んで買う（頭金200万円）", "showRate": true, "roll": { "rate": "$loanApproval" }, "success": { "set": ["owns_rental"], "cash": -200, "loan": { "type": "investment", "amount": "$unitLoan", "years": 30, "rate": 0.025 }, "rentIncomeMonthly": "$unitRent", "log": "🏢 投資用の部屋を買い、貸し始めた" }, "fail": { "log": "🏦 ローンの審査に通らなかった" } },
+        { "label": "📚 話を聞いて、もう少し勉強する", "effects": { "focus": "focus_invest" } },
+        { "label": "🙅 ことわる", "effects": {} }
+      ] },
+
+    { "id": "ev_r_vacancy", "kind": "choice", "emoji": "🚪", "cat": "money",
+      "when": { "all": ["owns_rental"], "none": ["rental_vacant"] },
+      "risk": "rentalVacancy",
+      "text": "貸していた部屋の人が出ていき、空き部屋になった。家賃が入らないのに、ローンは毎月{loanMonthly}万円かかる。",
+      "choices": [
+        { "label": "💸 家賃を下げて、すぐに次の人を探す", "effects": { "set": ["rental_vacant"], "rentIncomeMul": 0.85, "vacantMonths": 2 } },
+        { "label": "🛠️ リフォームして、家賃はそのまま（50万円）", "effects": { "set": ["rental_vacant"], "cash": -50, "vacantMonths": 4 } },
+        { "label": "🏷️ 売ってしまう", "effects": { "schedule": [ { "event": "ev_r_sell_rental", "inYears": [0, 0] } ] } }
+      ] },
+
+    { "id": "ev_r_rental_repair", "kind": "flow", "emoji": "🔧", "cat": "money",
+      "when": { "all": ["owns_rental"], "cooldownYears": 3 },
+      "risk": "rentalRepair",
+      "text": "🔧 貸している部屋の給湯器がこわれ、修理に{repairCost}万円かかった。",
+      "effects": { "cash": "-$repairCost" } },
+
+    { "id": "ev_r_sell_rental", "kind": "choice", "emoji": "🏷️", "cat": "money",
+      "when": { "all": ["owns_rental"], "cooldownYears": 5 },
+      "weight": { "base": 0.8, "mul": [["age>=60", 2]] },
+      "text": "持っている部屋を売る？（いまの値段：{rentalValue}万円、ローンの残り：{rentalLoanLeft}万円）",
+      "choices": [
+        { "label": "🏷️ 売る", "effects": { "clear": ["owns_rental", "rental_vacant"], "cash": "$rentalValue-$rentalLoanLeft", "rentIncomeMonthly": 0, "loanClose": "investment" } },
+        { "label": "🏢 持ち続ける", "effects": {} }
+      ] },
+
+    { "id": "ev_r_inherit_house", "kind": "choice", "emoji": "🏚️", "cat": "money", "type": "scheduled",
+      "when": { "age": [30, 105], "var": { "inheritedHouse": [true] } },
+      "text": "親が住んでいた家を相続した。（評価額 {houseValue}万円・固定資産税 年{houseTax}万円）",
+      "choices": [
+        { "label": "🏠 自分たちが住む", "effects": { "set": ["owns_house"], "clear": ["renting"], "rentMonthly": 0, "move": { "to": "parentHome" } } },
+        { "label": "🔑 人に貸す", "effects": { "set": ["owns_rental"], "rentIncomeMonthly": "$inheritRent", "cash": -80, "log": "🔑 リフォームして貸し出した" } },
+        { "label": "🏷️ 売る", "effects": { "cash": "$houseValue" } },
+        { "label": "🏚️ とりあえずそのままにする（空き家）", "effects": { "set": ["akiya"], "cashYearly": "-$houseTax", "log": "🏚️ 空き家のまま。税金と管理の手間がかかり続ける" } }
+      ] },
 
     { "id": "ev_r_spouse_illness", "kind": "choice", "emoji": "🏥", "cat": "family",
       "when": { "all": ["married"], "person": { "role": "spouse", "alive": true, "age": [45, 110] }, "cooldownYears": 5 },

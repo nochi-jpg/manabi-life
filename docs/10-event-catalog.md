@@ -2,7 +2,7 @@
 
 > このファイルは `node tools/catalog.js` で `data/events_*.json` から生成しています。直接編集せず、JSONを直してから再生成してください。
 
-## 必須イベント（条件を満たすと必ず起こる）（65件）
+## 必須イベント（条件を満たすと必ず起こる）（66件）
 
 | | ID | 時期 | 条件 | 文章 | 選択肢 |
 |---|---|---|---|---|---|
@@ -57,6 +57,7 @@
 | ⚖️ | `ev_m_shihou` | 夏 | 在籍:grad_prof/none / 除外:lic_lawyer | 司法試験（合格率 約40%・受験は5回まで） | ✍️ 受験する<br>🏳️ 受験をやめて就職する |
 | 🎓 | `ev_m_graduation` | 冬 | 在籍:univ/univ_med/junior_college/vocational/kosen/grad_master/grad_doctor/grad_prof / 最終学年-0 | {school}を卒業した。 |  |
 | 🏢 | `ev_m_first_job` | 春 | 在籍:none / 必要:naitei | 社会人1年目。{job}として働き始めた。初任給は{income}万円。 |  |
+| 🏠 | `ev_m_housing` | 春 | 在籍:none / 除外:owns_house / 雇用:seishain/civil_servant/keiyaku/haken/part/freelance / 勤続0/0年 | 社会人になった。どこに住む？（{pref}の家賃のめやす：ひとり用 月{rentSingle}万円） | 🏠 実家から通う（家に月3万円入れる）<br>🔑 部屋を借りてひとり暮らし（月{rentSingle}万円・最初に家賃の4か月分）<br>🏢 会社の寮・社宅に入る（相場の3割くらい）<br>🏘️ シェアハウスに住む（月{rentShare}万円） |
 | 📄 | `ev_m_scholar_repay` | 夏 | 在籍:none / 必要:scholarship_loan / 除外:scholarship_loan_repaying | 奨学金の返済が始まった。毎月{repay}万円、{repayYears}年間。 |  |
 | 🔄 | `ev_m_job_review` | 22〜59歳 春 | 雇用:seishain/keiyaku/civil_servant/freelance/self_employed / 勤続5/10/15/20/25/30年 | 今の仕事について{jobYears}年。給料{income}万円、満足感{jobSat}。このままでいい？ | 🙂 今の仕事を続ける<br>［候補リスト:jobs.midCareer］<br>📖 資格をとって仕事を変える<br>🚀 独立・起業する<br>🧺 仕事をゆるめる（パート・アルバイトに）<br>😌 一度やめて休む |
 | 📈 | `ev_m_promotion` | 春 | 雇用:seishain/civil_servant/part | 📈 {jobLabel}として{newTitle}になった！ |  |
@@ -72,7 +73,7 @@
 | 🚗 | `ev_m_license_return` | 75〜100歳 春 | 必要:lic_car / 除外:license_returned | {age}歳。家族から「運転免許、そろそろ返したら？」と言われた。 | 🪪 免許を返納する<br>🚗 まだ運転を続ける |
 | 🕊️ | `ev_m_death` |  |  | {year}年{month}月。{name}は{age}歳で人生を終えた。{deathCause} |  |
 
-## ランダム選択肢イベント（112件）
+## ランダム選択肢イベント（119件）
 
 | | ID | 時期 | 条件 | 文章 | 選択肢 |
 |---|---|---|---|---|---|
@@ -144,7 +145,7 @@
 | 🏮 | `ev_r_family_business` | 18〜50歳 | 人物:father｜mother | 親から「そろそろ家の仕事を継いでくれないか」と言われた。 | 🏮 継ぐ<br>🙇 自分の道を進むと伝える |
 | 🗼 | `ev_r_tokyo_offer` | 18〜35歳 | 除外:moved_to_tokyo | 東京の会社から声がかかった。給料は今の{tokyoRatio}倍くらい。でも家賃も高い。 | 🗼 上京する<br>🏡 地元に残る |
 | 🏡 | `ev_r_u_turn` | 27〜60歳 | 必要:moved_to_tokyo / 除外:u_turn | ふるさとに帰ろうか考えている。 | 🏡 地元に戻る（Uターン）<br>🗼 今の場所で暮らす |
-| 🏠 | `ev_r_house` | 28〜55歳 | 除外:owns_house | マイホームを買う？（{housePrice}万円・頭金{downPayment}万円） | 🏠 35年ローンで買う<br>🏢 賃貸のまま暮らす<br>🏡 実家を二世帯住宅にする |
+| 🏠 | `ev_r_house` | 28〜55歳 | 除外:owns_house | マイホームを買う？（{housePrice}万円・頭金{downPayment}万円） | 🏠 新築を変動金利で買う（今は約0.6%・上がるかも）<br>🔒 新築を固定金利で買う（約1.9%・ずっと同じ）<br>🏚️ 中古を買ってリフォーム（新築の約6割）<br>🏢 賃貸のまま暮らす<br>🏡 実家を二世帯住宅にする |
 | 📈 | `ev_r_nisa` | 18〜75歳 | 除外:nisa | 同僚から「NISAで積み立て投資してる？」と聞かれた。 | 📈 毎月3万円の積み立てを始める<br>📈📈 毎月10万円を積み立てる<br>🏦 貯金のほうが安心 |
 | 💹 | `ev_r_stock_tip` | 20〜80歳 |  | 「この株・コインは絶対上がる」という話を聞いた。 | 💹 50万円分買う<br>🙅 「絶対」という話は信じない |
 | 📉 | `ev_r_market_crash` |  | どれか:nisa,stock_trader,crypto | 世界的な株の暴落！持っている投資が{crashPct}%値下がりした。 | 😱 こわいので全部売る<br>🧘 そのまま持ち続ける<br>🛒 安くなったので買い増す |
@@ -187,9 +188,16 @@
 | ✈️ | `ev_r_child_abroad` |  | 子どもあり | {child}が「1年間、留学したい」と言っている。（約200万円） | ✈️ 行かせる<br>🏅 奨学金の留学プログラムをいっしょに探す<br>🙇 今は無理だと伝える |
 | 📄 | `ev_r_scholar_trouble` |  | 必要:scholarship_loan_repaying | 所持金がマイナスで、奨学金の返済（月{repay}万円）がきびしい。 | 📮 返還猶予を申請する（返すのを待ってもらう）<br>➗ 減額返還を申請する（月の返済を半分に・期間はのびる）<br>🙈 そのまま払わない |
 | 🏠 | `ev_r_remote_work` |  | 除外:remote_work / 雇用:seishain/keiyaku/haken/freelance | 会社で、家で働く「在宅勤務（リモートワーク）」ができるようになった。 | 🏠 在宅中心にする<br>🏢 会社に通い続ける |
+| 🏡 | `ev_r_housing_family` |  | 必要:married / 除外:owns_house | 結婚して、2人でどこに住む？（ファミリー向けの家賃：月{rentFamily}万円） | 🔑 2人で部屋を借りる（月{rentFamily}万円）<br>👵 どちらかの実家で同居する<br>🏠 思い切って家を買う |
+| 📈 | `ev_r_rate_rise` |  | 必要:mortgage | 世の中の金利が上がり、変動金利の住宅ローンの返済が月{rateUp}万円増えることになった。 | 🔒 固定金利に借りかえる（手数料30万円）<br>💴 貯金でくり上げ返済する（200万円）<br>😐 そのまま返し続ける |
+| 🏢 | `ev_r_invest_property` | 28〜65歳 | 除外:owns_rental,blacklisted,bankruptcy / 雇用:seishain/civil_servant/executive | 不動産会社から「投資用のマンションを買って貸せば、家賃でローンが返せますよ」とすすめられた。（{pref}の部屋：{unitPrice}万円・家賃 月{unitRent}万円） | 🏢 ローンを組んで買う（頭金200万円）<br>📚 話を聞いて、もう少し勉強する<br>🙅 ことわる |
+| 🚪 | `ev_r_vacancy` | 確率:rentalVacancy | 必要:owns_rental / 除外:rental_vacant | 貸していた部屋の人が出ていき、空き部屋になった。家賃が入らないのに、ローンは毎月{loanMonthly}万円かかる。 | 💸 家賃を下げて、すぐに次の人を探す<br>🛠️ リフォームして、家賃はそのまま（50万円）<br>🏷️ 売ってしまう |
+| 🔧 | `ev_r_rental_repair` | 確率:rentalRepair | 必要:owns_rental | 🔧 貸している部屋の給湯器がこわれ、修理に{repairCost}万円かかった。 |  |
+| 🏷️ | `ev_r_sell_rental` |  | 必要:owns_rental | 持っている部屋を売る？（いまの値段：{rentalValue}万円、ローンの残り：{rentalLoanLeft}万円） | 🏷️ 売る<br>🏢 持ち続ける |
+| 🏚️ | `ev_r_inherit_house` | 30〜105歳 |  | 親が住んでいた家を相続した。（評価額 {houseValue}万円・固定資産税 年{houseTax}万円） | 🏠 自分たちが住む<br>🔑 人に貸す<br>🏷️ 売る<br>🏚️ とりあえずそのままにする（空き家） |
 | 🏥 | `ev_r_spouse_illness` |  | 必要:married / 人物:spouse | {spouse}が病気で入院した。 | 🏥 仕事を調整して付き添う<br>💼 仕事を続け、できる範囲で支える |
 
-## 流れるだけイベント（65件）
+## 流れるだけイベント（67件）
 
 | | ID | 時期 | 条件 | 文章 | 選択肢 |
 |---|---|---|---|---|---|
@@ -210,6 +218,8 @@
 | 🟥 | `ev_f_cash_negative` | 16〜105歳 |  | 所持金がマイナスになった。足りない分は、カードローンで借りていることになる。借りたお金には毎年15%の利息がつき、放っておくとどんどん増えていく。 |  |
 | 🟩 | `ev_f_cash_recover` |  | 必要:debt_card | やっと所持金がプラスにもどった。借金を返し終えた。 |  |
 | 🎉 | `ev_f_scholar_done` |  | 必要:scholarship_loan_repaying | 奨学金を{repayYears}年かけて、ついに返し終わった。返した合計は{repayTotal}万円（借りたのは{borrowTotal}万円）。 |  |
+| 🛡️ | `ev_f_danshin` |  | 必要:widowed,mortgage | 住宅ローンは亡くなった{spouse}の名前で借りていた。団体信用生命保険で、残りのローン{loanLeft}万円がなくなった。 |  |
+| 🎉 | `ev_f_mortgage_done` |  | 必要:mortgage | 住宅ローンを返し終わった！ 家は完全に自分たちのものになった。 |  |
 | 🌈 | `ev_f_pet_death` |  | 必要:pet | 長い間いっしょだったペットが、虹の橋をわたった。 |  |
 | 🛬 | `ev_f_return_japan` |  | 必要:lives_abroad,transfer_abroad | 海外赴任を終えて日本に帰ってきた。 |  |
 | 🌤️ | `ev_f_recover_depression` |  | 必要:dz_depression | 少しずつ、朝起きるのがつらくなくなってきた。回復に向かっている。 |  |

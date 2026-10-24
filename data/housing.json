@@ -1,0 +1,35 @@
+{
+  "_comment": "住まい（実家・賃貸・社宅・持ち家）と不動産投資。家賃・ローン・家賃収入は毎季節の所持金の出入りに入る。金額は万円。",
+  "rent": {
+    "_comment": "月の家賃のめやす（地域 tier × 部屋の広さ）。東京都だけ別。",
+    "single": { "tokyo": 9, "A": 6.5, "B": 5, "C": 4 },
+    "family": { "tokyo": 17, "A": 11, "B": 8, "C": 6.5 },
+    "renewalFee": "2年ごとに家賃1か月分（首都圏のみ）",
+    "moveInCost": "家賃の4〜5か月分（敷金・礼金・仲介料など）"
+  },
+  "companyHousing": { "rentMul": 0.3, "jobs": "大企業・公務員・自衛隊・警察など。社宅・寮があれば家賃は相場の3割ほど" },
+  "buy": {
+    "price": { "_comment": "新築マンション・一戸建てのめやす（万円）", "tokyo": 7000, "A": 4800, "B": 3500, "C": 2800, "used": 0.6 },
+    "downPaymentMin": 0.1,
+    "mortgage": {
+      "years": 35,
+      "types": { "variable": { "label": "変動金利", "rate": 0.006, "risk": "金利が上がると返済額が増える" }, "fixed": { "label": "固定金利（35年）", "rate": 0.019 } },
+      "screening": { "maxIncomeMul": 7, "maxRepayRatio": 0.35, "blockFlags": ["blacklisted", "bankruptcy"], "minJobYears": 1, "formsOk": ["seishain", "civil_servant"], "formsHard": ["keiyaku", "haken", "part", "freelance"] },
+      "danshin": "団体信用生命保険：ローンを借りた人が亡くなると残りのローンはなくなる（配偶者の生活が守られる）",
+      "prepay": "まとまったお金でくり上げ返済できる"
+    },
+    "maintenance": { "condoFeeMonthly": 3, "houseRepairEvery": 15, "houseRepairCost": 200 },
+    "valueDecay": 0.02
+  },
+  "investment": {
+    "_comment": "投資用の部屋を買って貸す（不動産投資）",
+    "unitPrice": { "tokyo": 3000, "A": 2200, "B": 1500, "C": 900 },
+    "rentIncome": { "tokyo": 10, "A": 7.5, "B": 5.5, "C": 4 },
+    "loanRate": 0.025, "loanYears": 30,
+    "costs": { "managementMonthly": 1.5, "fixedAssetTaxYearly": 10 },
+    "vacancyChancePerYear": { "tokyo": 0.05, "A": 0.08, "B": 0.15, "C": 0.25 },
+    "repairChancePerYear": 0.08, "repairCost": [30, 150],
+    "priceTrend": { "tokyo": 0.005, "A": -0.005, "B": -0.015, "C": -0.025 },
+    "note": "家賃収入でローンを返す仕組み。空室になるとローンだけ残る。地方ほど空室と値下がりのリスクが高い"
+  }
+}
