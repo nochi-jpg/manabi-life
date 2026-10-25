@@ -17,7 +17,7 @@
     "beauty": "美容業界", "service": "サービス業", "animal": "ペット業界", "agri": "農林水産業"
   },
   "tracks": [
-    { "id": "t_corp", "jobs": ["j_sales", "j_office", "j_accounting", "j_securities", "j_trading", "j_global", "j_maker_tech", "j_construction_mgr", "j_realestate"],
+    { "id": "t_corp", "jobs": ["j_paralegal", "j_sales", "j_office", "j_accounting", "j_securities", "j_trading", "j_global", "j_maker_tech", "j_construction_mgr", "j_realestate"],
       "steps": [ { "t": "一般社員" }, { "t": "主任", "y": 3, "p": 0.35, "inc": 0.05 }, { "t": "係長", "y": 7, "p": 0.25, "inc": 0.08, "ment": 5 }, { "t": "課長", "y": 12, "p": 0.18, "inc": 0.15, "ment": 10, "mgr": true }, { "t": "部長", "y": 18, "p": 0.1, "inc": 0.15, "ment": 10, "mgr": true }, { "t": "本部長", "y": 24, "p": 0.05, "inc": 0.15, "ment": 8, "mgr": true }, { "t": "取締役", "y": 28, "p": 0.02, "inc": 0.4, "ment": 10, "mgr": true } ] },
     { "id": "t_it", "jobs": ["j_it_engineer", "j_data_scientist"],
       "steps": [ { "t": "エンジニア" }, { "t": "シニアエンジニア", "y": 3, "p": 0.35, "inc": 0.08 }, { "t": "チームリーダー", "y": 6, "p": 0.25, "inc": 0.08, "ment": 5 }, { "t": "プロジェクトマネージャー", "y": 9, "p": 0.2, "inc": 0.12, "ment": 10, "mgr": true }, { "t": "部長", "y": 15, "p": 0.1, "inc": 0.15, "ment": 8, "mgr": true }, { "t": "CTO（技術の責任者）", "y": 20, "p": 0.03, "inc": 0.3, "ment": 10, "mgr": true } ] },
@@ -86,6 +86,10 @@
       "steps": [ { "t": "アナリスト" }, { "t": "コンサルタント", "y": 2, "p": 0.6, "inc": 0.25 }, { "t": "マネージャー", "y": 5, "p": 0.4, "inc": 0.3, "ment": 8, "mgr": true }, { "t": "プリンシパル", "y": 9, "p": 0.2, "inc": 0.3, "ment": 8, "mgr": true }, { "t": "パートナー", "y": 13, "p": 0.07, "inc": 0.6, "ment": 8, "mgr": true } ] },
     { "id": "t_ibank", "jobs": ["j_ibanker"],
       "steps": [ { "t": "アナリスト" }, { "t": "アソシエイト", "y": 3, "p": 0.6, "inc": 0.3 }, { "t": "ヴァイスプレジデント", "y": 6, "p": 0.4, "inc": 0.3, "ment": 8, "mgr": true }, { "t": "ディレクター", "y": 10, "p": 0.2, "inc": 0.3, "ment": 8, "mgr": true }, { "t": "マネージングディレクター", "y": 14, "p": 0.07, "inc": 0.6, "ment": 10, "mgr": true } ] },
+    { "id": "t_prosecutor", "jobs": ["j_prosecutor"],
+      "steps": [ { "t": "検事" }, { "t": "主任検事", "y": 8, "p": 0.5, "inc": 0.15 }, { "t": "部長検事", "y": 15, "p": 0.2, "inc": 0.2, "ment": 8, "mgr": true }, { "t": "検事正", "y": 24, "p": 0.06, "inc": 0.25, "ment": 8, "mgr": true } ] },
+    { "id": "t_judge", "jobs": ["j_judge"],
+      "steps": [ { "t": "判事補" }, { "t": "判事", "y": 10, "p": 0.9, "inc": 0.25 }, { "t": "部総括判事", "y": 20, "p": 0.25, "inc": 0.2, "ment": 6, "mgr": true }, { "t": "裁判所長", "y": 28, "p": 0.06, "inc": 0.2, "ment": 6, "mgr": true } ] },
     { "id": "t_cpa", "jobs": ["j_cpa", "j_tax", "j_scrivener", "j_sharoushi"],
       "steps": [ { "t": "スタッフ" }, { "t": "シニア", "y": 3, "p": 0.5, "inc": 0.15 }, { "t": "マネージャー", "y": 7, "p": 0.3, "inc": 0.2, "ment": 8, "mgr": true }, { "t": "パートナー", "y": 14, "p": 0.08, "inc": 0.5, "ment": 8, "mgr": true } ] },
     { "id": "t_press", "jobs": ["j_journalist"],

@@ -524,13 +524,16 @@
         { "label": "🏳️ あきらめて別の仕事を探す", "effects": { "var": { "pendingExam": "none", "plan": "work" } } }
       ]
     },
+    {"id": "ev_m_yobi", "kind": "choice", "emoji": "📚", "counselor": "self", "when": {"season": ["Q2"], "stage": ["univ", "none"], "var": {"major": ["law"]}, "age": [20, 34], "none": ["lic_lawyer", "yobi_pass", "yobi_quit", "arrest"], "counter": {"yobiTries": ["<", 5]}}, "text": "司法試験予備試験。合格すれば、法科大学院に行かなくても司法試験を受けられる。（合格率 約4%）", "choices": [{"label": "✍️ 受験する", "showRate": true, "roll": {"base": 0.02, "w": {"academic": 0.15}}, "success": {"set": ["yobi_pass"], "stats": {"happiness": 10}, "log": "🎉 予備試験に合格！来年、司法試験を受けられる"}, "fail": {"counter": {"yobiTries": 1}, "stats": {"stress": 6}, "log": "🍂 予備試験は不合格。とてもむずかしい試験だ"}}, {"label": "🙅 予備試験は受けない", "effects": {"set": ["yobi_quit"]}}]},
+    {"id": "ev_m_shihou_yobi", "kind": "choice", "emoji": "⚖️", "counselor": "self", "when": {"season": ["Q2"], "stage": ["univ", "none"], "all": ["yobi_pass"], "none": ["lic_lawyer", "arrest"], "counter": {"examTries": ["<", 5]}}, "text": "司法試験（予備試験ルート・合格率 約90%）", "choices": [{"label": "✍️ 受験する", "showRate": true, "roll": {"base": 0.85, "w": {"academic": 0.3}}, "success": {"set": ["lic_lawyer", "shihou_new"], "log": "⚖️ 司法試験に合格！このあと約1年の司法修習へ"}, "fail": {"counter": {"examTries": 1}, "stats": {"stress": 8}}}, {"label": "🏳️ 受験をやめる", "effects": {"counter": {"examTries": 5}}}]},
+    {"id": "ev_m_shuushuu", "kind": "choice", "emoji": "🧑‍⚖️", "counselor": "self", "when": {"season": ["Q1"], "stage": ["none"], "all": ["shihou_new"], "none": ["naitei"]}, "text": "約1年の司法修習を終え、最後の試験（二回試験）にも合格した。法律家として、どの道に進む？", "choices": [{"label": "⚖️ 弁護士になる（法律事務所に入る）", "effects": {"job": {"hire": "j_lawyer"}, "clear": ["shihou_new"], "log": "⚖️ 弁護士として働き始めた"}}, {"label": "🔍 検察官（検事）をめざす", "showRate": true, "roll": {"base": 0.3, "w": {"academic": 0.4, "t_comm": 0.2}}, "success": {"job": {"hire": "j_prosecutor"}, "clear": ["shihou_new"], "log": "🔍 検察官（検事）に採用された"}, "fail": {"job": {"hire": "j_lawyer"}, "clear": ["shihou_new"], "log": "🍂 検事には採用されず、弁護士として働くことにした"}}, {"label": "🧑‍⚖️ 裁判官をめざす", "showRate": true, "roll": {"base": 0.2, "w": {"academic": 0.6}}, "success": {"job": {"hire": "j_judge"}, "clear": ["shihou_new"], "log": "🧑‍⚖️ 裁判官（判事補）に採用された"}, "fail": {"job": {"hire": "j_lawyer"}, "clear": ["shihou_new"], "log": "🍂 裁判官には採用されず、弁護士として働くことにした"}}]},
     {
       "id": "ev_m_shihou", "kind": "choice", "emoji": "⚖️", "counselor": "self",
       "when": { "season": ["Q2"], "stage": ["grad_prof", "none"], "var": { "major": ["gr_law"] }, "none": ["lic_lawyer"], "counter": { "examTries": ["<", 5] } },
       "text": "司法試験（合格率 約40%・受験は5回まで）",
       "choices": [
-        { "label": "✍️ 受験する", "showRate": true, "roll": { "base": 0.35, "w": { "academic": 0.8 } }, "success": { "set": ["lic_lawyer"], "log": "⚖️ 司法試験に合格！" }, "fail": { "counter": { "examTries": 1 }, "stats": { "stress": 8 } } },
-        { "label": "🏳️ 受験をやめて就職する", "effects": { "var": { "plan": "work" } } }
+        { "label": "✍️ 受験する", "showRate": true, "roll": { "base": 0.35, "w": { "academic": 0.8 } }, "success": { "set": ["lic_lawyer", "shihou_new"], "log": "⚖️ 司法試験に合格！このあと約1年の司法修習へ" }, "fail": { "counter": { "examTries": 1 }, "stats": { "stress": 8 } } },
+        { "label": "🏳️ 受験をやめて就職する", "effects": { "var": { "plan": "work" }, "counter": { "examTries": 5 } } }
       ]
     },
     {

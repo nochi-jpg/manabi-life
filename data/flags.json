@@ -64,6 +64,7 @@
     "like_none"
   ],
   "counters": {
+    "yobiTries": "予備試験を受けた回数",
     "job_changes": "転職回数",
     "partners_past": "過去の恋人の数",
     "ronin_years": "浪人年数",
@@ -100,6 +101,9 @@
       "juku": "塾に通っている",
       "juken_track": "中学受験コース",
       "teacher_course": "教職課程を履修中",
+      "shihou_new": "司法試験に合格して、司法修習中",
+      "yobi_pass": "司法試験予備試験に合格",
+      "yobi_quit": "予備試験はもう受けない",
       "scholarship_loan": "貸与型奨学金",
       "scholarship_grant": "給付型奨学金",
       "scholarship_loan_repaying": "奨学金を返済中",

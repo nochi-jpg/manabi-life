@@ -133,7 +133,7 @@ function effectBlocks(node, prefix, out = []) {
 }
 
 // ---------- イベントのチェック ----------
-const licenseOwner = { lic_doctor: 'ev_m_kokushi_doctor', lic_dentist: 'ev_m_kokushi_dentist', lic_pharmacist: 'ev_m_kokushi_pharm', lic_lawyer: 'ev_m_shihou', lic_nurse: 'ev_m_kokushi_nurse' };
+const licenseOwner = { lic_doctor: 'ev_m_kokushi_doctor', lic_dentist: 'ev_m_kokushi_dentist', lic_pharmacist: 'ev_m_kokushi_pharm', lic_lawyer: ['ev_m_shihou', 'ev_m_shihou_yobi'], lic_nurse: 'ev_m_kokushi_nurse' };
 
 for (const e of allEvents) {
   const w = e.when || {};
@@ -184,7 +184,7 @@ for (const e of allEvents) {
     if (ef.person && ef.person.kill && !isDyn(ef.person.kill) && !hasRoleAlive(new RegExp(ef.person.kill))) err(where, 'I-5違反：生存条件なしで人物を死亡させている');
     if (ef.person && ef.person.kill === '$who' && persons.length === 0 && !w.child) err(where, 'I-5違反：$who の対象条件がない');
     // I-11 資格は決められたイベントだけで付く
-    for (const [lic, owner2] of Object.entries(licenseOwner)) if (sets.has(lic) && e.id !== owner2) err(where, `I-11違反：${lic} は ${owner2} 以外で付けられない`);
+    for (const [lic, owner2] of Object.entries(licenseOwner)) if (sets.has(lic) && ![].concat(owner2).includes(e.id)) err(where, `I-11違反：${lic} は ${owner2} 以外で付けられない`);
     // I-8 学歴
     if (sets.has('edu_master_grad') && !all.has('edu_univ_grad')) err(where, 'I-8違反：大卒条件なしで修士');
     // 逮捕は14歳以上
