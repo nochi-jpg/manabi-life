@@ -89,6 +89,8 @@ function personMatch(p, c) {
   if (c.healthMax != null && (p.health ?? 80) > c.healthMax) return false;
   if (c.ill && !p.illness) return false;
   if (c.notInFacility && p.inFacility) return false;
+  // 面会・お見舞いに来られる人：入院中・施設・要介護3以上・小さい子だけ・仲が悪い（関係30未満）の人は来ない
+  if (c.canVisit && (p.hosp || p.inFacility || (p.careLevel || 0) >= 3 || p.age < 5 || (p.relation ?? 60) < 30)) return false;
   if (c.widowed && people('father|mother').filter((x) => x !== p).length) return false;
   if (c.married != null && !!p.married !== c.married) return false;
   return true;

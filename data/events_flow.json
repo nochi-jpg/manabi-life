@@ -238,7 +238,7 @@
       "when": { "pensionStartsNow": true },
       "text": "年金の受け取りが始まった。2か月ごとに{pension2m}万円が振り込まれる。" },
     { "id": "ev_f_grandchild_play", "kind": "flow", "emoji": "🧸", "cat": "family",
-      "when": { "age": [55, 100], "person": { "role": "grandchild", "alive": true }, "cooldownYears": 2 }, "weight": { "base": 2 },
+      "when": { "age": [55, 100], "none": ["in_facility"], "person": { "role": "grandchild", "alive": true, "canVisit": true }, "cooldownYears": 2 }, "weight": { "base": 2 },
       "text": "孫の{grandchildName}が遊びに来た。あっという間に1日が過ぎた。", "effects": { "stats": { "happiness": 5, "stress": -3 } } },
     { "id": "ev_f_old_friend", "kind": "flow", "emoji": "🕯️", "cat": "life",
       "when": { "age": [70, 105], "cooldownYears": 4 }, "weight": { "base": 1.5 },
@@ -262,11 +262,11 @@
 
     {"id": "ev_f_facility_daily", "kind": "flow", "emoji": "🏡", "cat": "daily", "place": ["facility"], "when": {}, "weight": {"base": 2}, "text": "{facilityDaily}"},
 
-    {"id": "ev_f_facility_visit", "kind": "flow", "emoji": "💐", "cat": "family", "place": ["facility"], "when": {"person": {"role": "child|spouse|grandchild", "alive": true}}, "weight": {"base": 1.2}, "text": "{whoName}が施設に面会に来てくれた。{facilityVisitText}", "effects": {"stats": {"happiness": 4, "stress": -3}}},
+    {"id": "ev_f_facility_visit", "kind": "flow", "emoji": "💐", "cat": "family", "place": ["facility"], "when": {"person": {"role": "child|spouse|grandchild|sibling", "alive": true, "canVisit": true}}, "weight": {"base": 1.2}, "text": "{whoName}が施設に面会に来てくれた。{facilityVisitText}", "effects": {"stats": {"happiness": 4, "stress": -3}}},
 
     {"id": "ev_f_hospital_daily", "kind": "flow", "emoji": "🏥", "cat": "daily", "place": ["hospital"], "when": {}, "weight": {"base": 2}, "text": "{hospitalDaily}"},
 
-    {"id": "ev_f_hospital_visit", "kind": "flow", "emoji": "💐", "cat": "family", "place": ["hospital"], "when": {"person": {"role": "spouse|child|father|mother|partner", "alive": true}}, "weight": {"base": 1.2}, "text": "{whoName}がお見舞いに来てくれた。{hospitalVisitText}", "effects": {"stats": {"happiness": 3, "stress": -3}}},
+    {"id": "ev_f_hospital_visit", "kind": "flow", "emoji": "💐", "cat": "family", "place": ["hospital"], "when": {"person": {"role": "spouse|child|father|mother|partner|sibling|grandchild", "alive": true, "canVisit": true}}, "weight": {"base": 1.2}, "text": "{whoName}がお見舞いに来てくれた。{hospitalVisitText}", "effects": {"stats": {"happiness": 3, "stress": -3}}},
 
     {"id": "ev_f_sequela_pain", "kind": "flow", "emoji": "🩹", "cat": "health", "when": {"all": ["sequela"], "cooldownYears": 2}, "weight": {"base": 1.5}, "text": "{sequelaPain}", "effects": {"stats": {"stress": 2, "happiness": -1}}},
 

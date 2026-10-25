@@ -127,7 +127,7 @@ const Text = (() => {
       case 'facilityDaily': return pk(pool().facilityDaily);
       case 'hospitalDaily': { const L = pool().hospitalDaily.slice(); if ((G.vars.hosp || {}).room === 'ward') L.push('同じ病室の人と、少しずつ話すようになった。'); else L.push('個室なので、夜も静かに休めた。'); return pk(L); }
       case 'facilityVisitText': return pick(['いっしょに中庭を散歩した。', '近況を聞いて、たくさん笑った。', 'おみやげのお菓子を、職員さんにも配った。']);
-      case 'hospitalVisitText': return pick(['着がえとお菓子を持ってきてくれた。', '「早く元気になってね」と言ってくれた。', '仕事のことは心配しないで、と言ってくれた。']);
+      case 'hospitalVisitText': return pick(['着がえとお菓子を持ってきてくれた。', '「早く元気になってね」と言ってくれた。', '好きな本を持ってきてくれた。'].concat(G.vars.hospPrevEmp ? ['「仕事のことは心配しないで」と言ってくれた。'] : []));
       case 'facilityEventName': return pick([['お花見会', '春の遠足'], ['夏祭り', 'すいか割り大会'], ['敬老会', '運動会'], ['クリスマス会', '書き初め大会']][G.q]); // 季節に合わせる
       case 'houseRentOut': return Math.max(4, Math.round((G.vars.houseValue || 1500) * 0.045 / 12));
       case 'houseStayWho': { const h = Fam.household(); const sp = h.find((p) => p.role === 'spouse'); return sp ? sp.name : h.length ? roleLabel(h[0]) : '家族'; }
