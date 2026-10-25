@@ -30,7 +30,7 @@
 .opts2{position:absolute;left:160px;right:160px;top:216px;display:grid;grid-template-columns:1fr 1fr;gap:var(--sp4)}
 .pick.mode{height:296px;grid-template-columns:1fr;grid-template-rows:auto auto 1fr;justify-items:center;align-content:start;row-gap:var(--sp2);padding:var(--sp4);text-align:center}
 .pick.mode .i{font-size:72px}.pick.mode .l{font-size:30px;color:var(--blue)}
-.pick.mode .d{font-size:17px;line-height:1.6;color:var(--ink2);font-weight:700}
+.pick.mode .d{font-size:17px;line-height:1.6;color:var(--ink2);font-weight:700;white-space:pre-line}
 #nm{left:190px;top:168px;width:900px;height:360px;padding:var(--sp4) var(--sp4)}
 #nm .row{display:grid;grid-template-columns:80px 1fr 64px;align-items:center;column-gap:var(--sp2);margin-bottom:var(--sp3)}
 #nm .k{font-size:18px;color:var(--ink2)}

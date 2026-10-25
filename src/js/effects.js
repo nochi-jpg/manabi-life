@@ -463,6 +463,8 @@ const Kids = {
     if (!G.flags.wants_children || G.flags.pregnant || G.flags.gave_up_children) return null;
     const age = this.momAge();
     if (age >= 47) { this.giveUp('age', null); Fam.notice('🕊️', '年齢のこともあり、子どもはあきらめることにした。', 'family'); return null; }
+    // おだやかモード：妊娠を望んだら、その年のうちに必ず妊娠する（不妊治療は起きない）
+    if (G.mode === 'gentle') return 'ev_m_pregnant';
     const p = G.flags.fertility_tx ? curve(this.TX, age) : curve(this.NATURAL, age) * (G.vars.infertile ? 0.15 : 1);
     if (chance(p)) return 'ev_m_pregnant';
     G.vars.tryYears = (G.vars.tryYears || 0) + 1;

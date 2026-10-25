@@ -4,12 +4,13 @@
   "modes": {
     "real": {
       "label": "🌏 現実的モード",
-      "desc": "日本の統計どおり。病気・事故・別れ・犯罪など、つらいできごとも起こります"
+      "desc": "日本の統計通り、病気や別れ、\n事故などのイベントもおこります。"
     },
     "gentle": {
       "label": "🌷 おだやかモード",
-      "desc": "がん・離婚・逮捕・家族との死別などのつらいできごとは起こらず、天寿をまっとうします",
+      "desc": "不幸なイベントが起こりづらく、\n天寿を全うします。",
       "excludeEvents": [
+        "ev_m_fertility_ask", "ev_m_fertility_continue", "ev_r_fertility_work", "ev_f_fertility_daily",
         "ev_r_shoplift_invite",
         "ev_r_night_out",
         "ev_r_yami_baito",
