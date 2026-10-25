@@ -84,7 +84,7 @@ const Menu = (() => {
       case 'schools.postByPlan': return postMenu(filter);
       case 'schools.vocational': return vocMenu();
       case 'schools.graduate': return gradMenu();
-      case 'schools.abroad': return S().postSecondary.abroad.filter((a) => !a.age || (G.age >= a.age[0] && G.age <= a.age[1])).map((a) => item(a, { sub: `約${a.cost}万円` }));
+      case 'schools.abroad': return S().postSecondary.abroad.filter((a) => a.id !== 'ab_wh' && (!a.age || (G.age >= a.age[0] && G.age <= a.age[1]))) // ワーキングホリデーは学校の留学ではないので出さない.map((a) => item(a, { sub: `約${a.cost}万円` }));
       case 'schools.affiliatedDepts': return affilMenu();
       case 'jobs.jobs': return jobMenu('new', filter);
       case 'jobs.midCareer': return jobMenu('mid', filter);

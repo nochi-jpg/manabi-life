@@ -332,8 +332,7 @@
           { "label": "🔁 浪人してもう1年がんばる（3年まで）", "when": { "counter": { "ronin_years": ["<", 3] } }, "effects": { "var": { "plan": "univ" }, "nextStage": "ronin", "schedule": [ { "event": "ev_m_ronin_yobiko", "inYears": [0, 0] } ], "stats": { "stress": 8 } } },
           { "label": "🏫 合格できそうな学校の二次募集を受ける", "menu": { "source": "schools.postByPlan", "page": 5, "showRate": true, "filter": "lowerTier" }, "roll": { "rate": "$menuRate" }, "success": { "var": { "target": "$pick" }, "set": ["naitei_school"] }, "fail": { "var": { "plan": "work", "target": "j_parttime_general" } } },
           { "label": "🛠️ 専門学校に行く（ほぼ全員合格）", "effects": { "var": { "plan": "voc" }, "menuNext": "schools.vocational" } },
-          { "label": "💼 就職する", "effects": { "var": { "plan": "work", "target": "j_parttime_general" }, "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0], "season": "Q1" } ] } },
-          { "label": "🧳 ワーキングホリデーに行く", "when": { "age": [18, 30] }, "effects": { "var": { "plan": "abroad", "target": "ab_wh" } } }
+          { "label": "💼 就職する", "effects": { "var": { "plan": "work", "target": "j_parttime_general" }, "schedule": [ { "event": "ev_r_job_search", "inYears": [0, 0], "season": "Q1" } ] } }
         ]
       }
     },
