@@ -45,6 +45,7 @@ const Detail = (() => {
     const chips = [];
     const exp = Menu.expectedFlags();
     (j.requires || []).forEach((f) => chips.push(G.flags[f] ? `<span class="chip ok">✓ ${esc(licName(f))}</span>` : exp.has(f) ? `<span class="chip ok">🎓 ${esc(licName(f))}（取得見込み）</span>` : `<span class="chip ng">✗ ${esc(licName(f))}</span>`));
+    if (j.requiresAny) { const have = j.requiresAny.filter((f) => G.flags[f]); chips.push(have.length ? `<span class="chip ok">✓ ${esc(licName(have[0]))}</span>` : `<span class="chip ng">✗ ${esc(j.requiresAny.slice(0, 2).map(licName).join('か'))}が必要</span>`); }
     chips.push(`<span class="chip ok">✓ ${eduLabel[j.eduMin || 0]}</span>`);
     if (j.shiftWork) chips.push('<span class="chip">🌙 夜勤・交代制</span>');
     chips.push(`<span class="chip">⏰ 残業 月${j.overtime || 10}時間</span>`);
@@ -69,7 +70,7 @@ const Detail = (() => {
       <div class="sec"><h4>📊 この仕事を1年続けたときのステータスの変化（めやす）</h4>${effHtml(jobEffects(j))}</div>`;
     frame(`💼 ${G.age < 23 ? '就職活動' : '仕事さがし'} ・ ${calYear()}年${MONTH[G.q]}月`, left, right, ok, back, 'この職場を受ける');
   }
-  function licName(f) { const q = D().events_random.qualifications.find((x) => x.flag === f); if (q) return q.label.replace(/（.*）/, ''); return ({ lic_car: '普通免許', lic_large: '大型免許', lic_nurse: '看護師免許', lic_doctor: '医師免許', lic_dentist: '歯科医師免許', lic_pharmacist: '薬剤師免許', lic_lawyer: '弁護士資格', lic_pt: '理学療法士', lic_teacher_elem: '小学校教員免許', lic_teacher_sec: '中高教員免許', lic_nursery: '保育士', lic_beauty: '美容師免許', lic_cpa: '公認会計士', lic_tax: '税理士', lic_architect: '建築士', lic_electric: '電気工事士' })[f] || f; }
+  function licName(f) { const q = D().events_random.qualifications.find((x) => x.flag === f); if (q) return q.label.replace(/（.*）/, ''); const EN = { toeic_600: 'TOEIC 600点', toeic_800: 'TOEIC 800点', toeic_900: 'TOEIC 900点', eiken_p1: '英検準1級', eiken_1: '英検1級', eiken_2: '英検2級', edu_abroad_degree: '海外の大学の卒業', edu_abroad_univ: '海外の大学' }; if (EN[f]) return EN[f]; return ({ lic_car: '普通免許', lic_large: '大型免許', lic_nurse: '看護師免許', lic_doctor: '医師免許', lic_dentist: '歯科医師免許', lic_pharmacist: '薬剤師免許', lic_lawyer: '弁護士資格', lic_pt: '理学療法士', lic_teacher_elem: '小学校教員免許', lic_teacher_sec: '中高教員免許', lic_nursery: '保育士', lic_beauty: '美容師免許', lic_cpa: '公認会計士', lic_tax: '税理士', lic_architect: '建築士', lic_electric: '電気工事士' })[f] || f; }
 
   function school(item, ok, back) {
     const t = Menu.school(item.tmpl) || {};

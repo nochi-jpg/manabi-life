@@ -154,12 +154,21 @@
       "id": "bg_konbini",
       "file": "assets/bg/konbini.jpg",
       "label": "コンビニ（アルバイト・パート）"
+    },
+    {
+      "id": "bg_care",
+      "file": "assets/bg/care.jpg",
+      "label": "介護施設"
     }
   ],
   "priority": [
     {
-      "if": "入院中・自分が要介護（施設）",
+      "if": "入院中",
       "bg": "bg_hospital"
+    },
+    {
+      "if": "自分が介護施設に入っている（in_facility）",
+      "bg": "bg_care"
     },
     {
       "if": "海外にいる（留学中・lives_abroad）",
@@ -259,7 +268,8 @@
     "j_mechanic": "bg_worksite",
     "j_parttime_general": "bg_konbini",
     "j_illustrator": "bg_home",
-    "j_youtuber": "bg_home"
+    "j_youtuber": "bg_home",
+    "j_care": "bg_care"
   },
   "sportByClub": {
     "_comment": "プロスポーツ選手は、中高大で入っていた運動部が屋内競技なら屋内競技場、それ以外は屋外競技場",

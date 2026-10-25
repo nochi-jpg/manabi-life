@@ -114,6 +114,14 @@ const Effects = (() => {
         case 'blacklistYears': G.vars.blackUntil = Math.max(G.vars.blackUntil || 0, G.year + num(v, ctx)); break;
         case 'lifeLevel': G.vars.lifeLevel = v; G.vars.autoSave = false; break;
         case 'openUi': G.vars.openUi = v; break;
+        // ---- 入院・介護施設 ----
+        case 'famHospital': { const p = v === 'spouse' ? person('spouse') : ctx.who; if (p) Fam.hospitalize(p, '病気', true); break; }
+        case 'hospitalize': if (!G.vars.hosp && G.alive && chance(v.p ?? 1)) Life.hospitalize(v); break;
+        case 'hospRoom': if (G.vars.hosp) G.vars.hosp.room = v; break;
+        case 'hospRehab': if (G.vars.hosp) G.vars.hosp.rehab = true; break;
+        case 'discharge': Life.discharge(v === 'sequela', logs); break;
+        case 'enterFacility': Life.enterFacility(logs); break;
+        case 'rentOutHouse': if (G.flags.owns_house) { const r = Text.dynValue('houseRentOut', ctx); G.vars.rentIncomeMonthly = (G.vars.rentIncomeMonthly || 0) + r; G.vars.houseRentedOut = true; G.vars.rentMonthly = 0; setFlag('renting', false); logs.push(`🏢 家を月${r}万円で人に貸した（管理会社に頼んで、毎月家賃が入る）。`); } break;
         case 'sellCar': if (G.flags.owns_car) { const val = Math.round(G.vars.carValue ?? 30); G.cash += val; setFlag('owns_car', false); G.vars.carValue = 0; logs.push(`🚗 車を${man(val)}万円で売った。`); } break;
         case 'sellRental': if (G.flags.owns_rental) { const l = (G.loans || []).find((x) => x.type === 'investment' && x.left > 0); const val = G.vars.rentalValue || 0; G.cash += val - (l ? l.left : 0); if (l) l.left = 0; setFlag('owns_rental', false); G.vars.rentalValue = 0; G.vars.rentIncomeMonthly = 0; logs.push(`🏢 貸している部屋を${man(val)}万円で売った${l ? '（投資のローンを返した）' : ''}。`); } break;
         // 手元の現金で、利息の高い借金から返す（生活費として3か月分はのこす）
@@ -175,6 +183,8 @@ const Effects = (() => {
         default: if (!Effects.warned[k]) { Effects.warned[k] = 1; console.warn('未対応の効果', k); }
       }
     }
+    // 債務整理・自己破産で奨学金がなくなったら、「返済中」のしるしも消す（月0万円の返済が残らないように）
+    if ((ef.debt || ef.debtSettle || ef.bankrupt) && G.flags.scholarship_loan_repaying && !(G.loans || []).some((l) => l.type === 'scholar' && l.left > 0.5)) delete G.flags.scholarship_loan_repaying;
   }
   const annuity = (P, r, n) => (r > 0 ? (P * r) / (1 - Math.pow(1 + r, -n)) : P / Math.max(1, n));
   return { apply, stat, setFlag, num, resolve, annuity, warned: {} };
@@ -426,6 +436,55 @@ const People = {
 
 // ===== 住まい・投資など =====
 const Life = {
+  // 入院（docs：患者調査2023の平均在院日数・高額療養費・差額ベッド代・食事代）
+  //   days：入院日数のめやす、aft：後遺症が残る確率、surgery：手術給付金の対象
+  HOSP: { cancer: [15, 0.12, 'がんの手術', true], cancer_chemo: [10, 0.08, 'がんの抗がん剤治療', false], cancer_care: [20, 0.05, 'がんの治療', false], heart: [18, 0.15, '心臓の手術', true], stroke: [69, 0.5, '脳卒中の治療とリハビリ', false], traffic: [35, 0.15, '交通事故のけが', true] },
+  hospitalize(v) {
+    const [d0, aft, label, surgery] = this.HOSP[v.cause] || [14, 0.1, '病気の治療', false];
+    const days = Math.max(5, Math.round(d0 * (0.7 + rnd() * 0.6)));
+    G.vars.hosp = { cause: v.cause, label, days, aft: v.aft ?? aft, room: 'ward', left: days >= 60 ? 1 : 0, rehab: false, surgery };
+    Effects.stat('stress', 8); // 入院の不安
+    G.vars.hospYear = G.year;
+    if (Econ.working()) { G.vars.hospPrevEmp = G.employment; G.employment = 'leave'; } // 仕事は休職（給料の約3分の2の傷病手当金）
+    // この季節の残りのイベントのうち、病院では起きないものは消して、入院のイベントを先頭に
+    G.queue = (G.queue || []).filter((x) => (x.id === 'ev_m_death' ? true : x.id === '__lessons' ? false : !Engine.placeBlocked(Engine.ev(x.id), x)));
+    G.queue.unshift({ id: 'ev_m_hospital_in', ctx: {}, sched: true }, { id: 'ev_f_hospital_daily', ctx: {}, sched: true });
+    if (G.vars.hosp.left <= 0) G.queue.push({ id: 'ev_m_discharge', ctx: {}, sched: true });
+  },
+  // 入院費：高額療養費の上限×月数＋食事代＋個室代 − 医療保険・がん保険の給付金
+  hospBill(h) {
+    const inc = Econ.annualIncome();
+    const cap = G.age >= 70 ? 5.8 : inc >= 770 ? 17 : inc > 0 && inc < 370 ? 5.8 : 9;
+    const med = cap * Math.max(1, Math.ceil(h.days / 30));
+    const food = h.days * 0.165, room = h.room === 'private' ? h.days * 0.8 : 0;
+    let ins = 0;
+    if (G.flags.life_insurance) ins += h.days * 0.5 + (h.surgery ? 10 : 0);
+    if (G.flags.cancer_insurance && /cancer/.test(h.cause)) ins += h.days * 1 + (G.vars.cancerLumpPaid ? 0 : 50);
+    return { total: Math.round(med + food + room), ins: Math.round(ins), med: Math.round(med), food: Math.round(food), room: Math.round(room) };
+  },
+  discharge(seq, logs) {
+    const h = G.vars.hosp; if (!h) return;
+    const b = this.hospBill(h);
+    G.cash -= b.total; G.cash += b.ins; G.received.insurance = (G.received.insurance || 0) + b.ins;
+    if (G.flags.cancer_insurance && /cancer/.test(h.cause)) G.vars.cancerLumpPaid = true;
+    if (G.vars.hospPrevEmp && G.employment === 'leave') G.employment = G.vars.hospPrevEmp;
+    G.vars.hospPrevEmp = null;
+    if (seq) { Effects.setFlag('sequela', true); G.vars.sequelaType = h.cause; Effects.stat('health', -8); Effects.stat('stress', 6); }
+    G.vars.lastHosp = { ...h, bill: b };
+    G.vars.hosp = null;
+  },
+  // 自分が介護施設に入る：車は手放す・免許は返す・家は「売る／貸す／家族が住む」を選ぶ
+  enterFacility(logs) {
+    Effects.setFlag('in_facility', true); G.vars.facilityYear = G.year;
+    if (G.clubs.length) { G.clubs = []; logs.push('🎒 習い事は、施設に入るのでやめた。'); }
+    if (G.flags.owns_car) { const val = Math.round(G.vars.carValue ?? 20); G.cash += val; Effects.setFlag('owns_car', false); G.vars.carValue = 0; logs.push(`🚗 もう運転しないので、車を${man(val)}万円で売った。`); }
+    if (G.flags.lic_car && !G.flags.license_returned) { Effects.setFlag('license_returned', true); Effects.setFlag('lic_car', false); }
+    const home = Fam.household().length > 0;
+    if (G.flags.owns_house && !G.flags.lives_with_parents) Engine.schedule('ev_m_facility_house', 0, null, {});
+    else if (!home && G.vars.rentMonthly) { G.vars.rentMonthly = 0; Effects.setFlag('renting', false); logs.push('🏠 借りていた部屋は解約した。'); }
+    if (G.focus && !['focus_health', 'focus_rest', 'focus_hobby', 'focus_family'].includes(G.focus)) Engine.setFocus('focus_health', true);
+    logs.push(`🏢 介護施設に入った。これからは施設で暮らす（費用は月${round1(Econ.facilityFee() / 12)}万円・年金に合わせて選んだ）。`);
+  },
   move(to, ctx, o = {}) {
     if (!to) return;
     let id = to;

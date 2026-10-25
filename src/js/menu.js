@@ -157,10 +157,15 @@ const Menu = (() => {
     for (const t of ps.universityTiers) {
       if (plan === 'abroad' ? t.where !== 'abroad' : t.where === 'abroad') continue;
       if (t.tierOnly && !t.tierOnly.includes(tier()) && t.where === 'home') continue;
+      // 県内の大学数（pref.univCount）で、地元にある大学の種類と学部の数が変わる（東京145校・島根2校など）
+      const uc = pref().univCount ?? 10;
+      const homeNeed = { u_national: 0, u_public: 3, u_private_mid: 12, u_private_easy: 3, u_edu: 6 }[t.id];
+      if (t.where !== 'city' && t.where !== 'abroad' && homeNeed != null && uc < homeNeed) continue;
       if (t.requires && t.requires['subj.eng'] && (G.subj.eng || 0) < t.requires['subj.eng'] - 15) continue;
       const depts = t.fixedDept ? [dept(t.fixedDept)] : ps.departments.filter(trackOk).filter((d) => !d.skillCheck || t.fixedDept);
       // 学部は2〜3つずつ（成績に近いものから）
-      const ranked = depts.map((d) => ({ d, k: seeded(G.seed + t.id + d.id) })).sort((a, b) => a.k - b.k).slice(0, t.fixedDept ? 1 : 3).map((x) => x.d);
+      const ucN = pref().univCount ?? 10; const nDept = t.fixedDept ? 1 : t.where === 'city' || t.where === 'abroad' ? 3 : ucN >= 100 ? 5 : ucN >= 25 ? 3 : ucN >= 8 ? 2 : 1;
+      const ranked = depts.map((d) => ({ d, k: seeded(G.seed + t.id + d.id) })).sort((a, b) => a.k - b.k).slice(0, nDept).map((x) => x.d);
       for (const d of ranked) {
         const s = inst(t, 0, d.id);
         const h = s.h + (d.hensachiBonus || 0);
@@ -180,8 +185,12 @@ const Menu = (() => {
     return out.sort((a, b) => Math.abs(a.h - me - 2) - Math.abs(b.h - me - 2));
   }
   const pick2 = (arr, salt) => arr[Math.floor(seeded(G.seed + salt) * arr.length)];
+  // 地方（C）にあるのは、看護・介護・保育・調理・美容・自動車整備・医療事務・公務員など、地元で働く人をそだてる学校が中心
+  const VOC_LOCAL = ['vo_nurse', 'vo_care', 'vo_nursery', 'vo_cook', 'vo_beauty', 'vo_auto', 'vo_medoffice', 'vo_civil', 'vo_arch'];
+  const VOC_MID = VOC_LOCAL.concat(['vo_pt', 'vo_it', 'vo_patissier', 'vo_design', 'vo_animal']);
   function vocMenu() {
-    return S().postSecondary.vocational.map((t) => { const s = inst(t, 0); return { ...s, emoji: t.emoji, label: schoolName(t), name: schoolName(t), sub: `${t.years}年・年${t.cost}万円`, rate: clamp(rateOf(selfHensachi() - s.h + 6), 80, 97), years: t.years, cost: t.cost, stage: 'vocational', dept: t.id }; });
+    const T = tier();
+    return S().postSecondary.vocational.filter((t) => T === 'A' || (T === 'B' ? VOC_MID : VOC_LOCAL).includes(t.id)).map((t) => { const s = inst(t, 0); return { ...s, emoji: t.emoji, label: schoolName(t), name: schoolName(t), sub: `${t.years}年・年${t.cost}万円`, rate: clamp(rateOf(selfHensachi() - s.h + 6), 80, 97), years: t.years, cost: t.cost, stage: 'vocational', dept: t.id }; });
   }
   function gradMenu() {
     return S().postSecondary.graduate.filter((g) => (g.requires || []).every((f) => G.flags[f] || (f === 'edu_univ_grad' && G.stage === 'univ')) && (!g.minAge || G.age >= g.minAge)).map((g) => {
@@ -222,7 +231,10 @@ const Menu = (() => {
     let d = hs - (j.hensachi || 40);
     d += (G.talents.t_comm - 50) / 10 + (G.stats.social - 50) / 10; // 面接（±5）
     for (const [f, b] of Object.entries(j.bonusFlags || {})) if (G.flags[f]) d += b;
-    if (G.flags.toeic_900) d += 3; else if (G.flags.toeic_800) d += 2; else if (G.flags.toeic_600) d += 0.5;
+    // 地方は会社の数が少なく、事務・企画などの仕事は少ない枠の取りあいになる
+    if (!LOCAL_JOBS.includes(j.id) && j.cat !== 'civil') d -= tier() === 'C' ? 4 : tier() === 'B' ? 2 : 0;
+    // TOEICの点数は、英語を使う仕事（外資・商社・航空・ホテル・通訳など）でだけ有利
+    if (engJob(j)) d += G.flags.toeic_900 ? 7 : G.flags.toeic_800 ? 5 : G.flags.toeic_600 ? 2.5 : 0;
     const sc = G.school && picked(G.vars.schoolPick || '');
     if (sc && sc.tmpl) { const t = school(sc.tmpl); if (t && t.jobRank) d += (t.jobRank - 3) * 2; }
     if (G.vars.major) { const dp = dept(G.vars.major); if (dp && (dp.opens || []).some((o) => (j.tags || []).includes(o) || j.cat === o)) d += 3; }
@@ -243,6 +255,8 @@ const Menu = (() => {
     return out;
   }
   const licLabel = (f) => (D().flags.flags.license || {})[f] || f;
+  const engJob = (j) => ((j.weights || {}).eng || 0) >= 1 || (j.tags || []).some((t) => t === 'global' || t === 'airline');
+  const hasToeic = () => !!(G.flags.toeic_600 || G.flags.toeic_800 || G.flags.toeic_900);
   function jobOk(j, mode) {
     if (j.viaEventOnly) return false;
     if (j.id === 'j_parttime_general') return mode !== 'civil';
@@ -252,6 +266,7 @@ const Menu = (() => {
     if ((j.eduMin || 0) > eduLevel()) return false;
     const exp = expectedFlags();
     if ((j.requires || []).some((f) => !G.flags[f] && !exp.has(f))) return false;
+    if (j.requiresAny && !j.requiresAny.some((f) => G.flags[f])) return false; // 英語の資格など、どれか1つが必要
     if ((j.excludes || []).some((f) => G.flags[f])) return false;
     if (j.minAge && G.age < j.minAge) return false;
     if (j.maxAge && G.age > j.maxAge) return false;
@@ -264,8 +279,15 @@ const Menu = (() => {
     if (ai && ai.risk >= 0.7 && calYear() >= (ai.wave || 2035) + 5 && mode !== 'mid') return false;
     return true;
   }
+  // どこにでもある仕事（地方でも求人がある）
+  const LOCAL_JOBS = ['j_care', 'j_nurse', 'j_nursery', 'j_teacher_elem', 'j_teacher_sec', 'j_civil_local', 'j_police', 'j_firefighter', 'j_sdf', 'j_farmer', 'j_fisher', 'j_factory', 'j_carpenter', 'j_electrician', 'j_truck', 'j_delivery', 'j_taxi', 'j_office', 'j_sales', 'j_sales_shop', 'j_store_manager', 'j_cook', 'j_family_business', 'j_parttime_general', 'j_pharmacist', 'j_doctor', 'j_dentist', 'j_pt', 'j_beautician', 'j_mechanic', 'j_hotel', 'j_juku', 'j_construction_mgr', 'j_bank', 'j_cleaning', 'j_welfare', 'j_accounting', 'j_realestate'];
+  // 地方の求人：その年に募集がある仕事だけ（大都市圏はぜんぶ、地方中核は7割、地方は4割）。仕事の種類が少ないぶん、決まった枠を取りあう
+  function jobHere(j) {
+    const T = tier(); if (T === 'A' || LOCAL_JOBS.includes(j.id) || j.cat === 'civil') return true;
+    return seeded(G.seed + j.id + G.pref + calYear()) < (T === 'B' ? 0.7 : 0.4);
+  }
   function jobMenu(mode) {
-    const list = J().jobs.filter((j) => jobOk(j, mode));
+    const list = J().jobs.filter((j) => jobOk(j, mode) && jobHere(j));
     const exp = expectedFlags();
     const out = list.map((j) => {
       const ai = D().ai_impact.jobs[j.id];
@@ -281,6 +303,7 @@ const Menu = (() => {
       if (s < 3 && tm && (tm.opens || []).some((x) => (j.tags || []).includes(x) || j.cat === x || j.id.includes(x))) s += 3;
       if (o.expect) s += 6; // 資格取得見込みの仕事はいちばん上に
       return s; };
+    for (const o of out) { const jj = job(o.id); if (jj && engJob(jj) && hasToeic()) o.sub += '・🔤 TOEICが生きる'; }
     for (const o of out) { const f = fit(o); if (f >= 3 && !o.expect) o.sub += '・👍 学んだことが生きる'; else if (f >= 2) o.sub += '・💚 好きなことに合う'; }
     return out.sort((a, b) => fit(b) + b.rate / 40 - (fit(a) + a.rate / 40)).slice(0, 25);
   }

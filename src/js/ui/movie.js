@@ -1,7 +1,7 @@
 'use strict';
 // ===== 人生ふり返りムービー（息をひきとった → ここ → リザルト） =====
 // 白い背景に、左は大事なできごと（10行くらい）がふんわり浮かぶ。右は、その時の顔グラと場面の背景がじんわり変わる。
-// クリックで次の行へ早送り。最後に「リザルトへ ▶」。BGMはリザルトと同じ曲を先に流す（地続き）。
+// タップ（クリック）で次の行へ早送り。最後に「リザルトへ ▶」。BGMはリザルトと同じ曲を先に流す（地続き）。
 const LifeMovie = (() => {
   const STEP_MS = 2300; // 1行ごとの間
   const MAX = 11; // 左に出す行の数のめやす
@@ -85,7 +85,7 @@ const LifeMovie = (() => {
     ov.className = 'ov on movie';
     ov.innerHTML = `<div class="mv"><div class="mvl"><div class="mvh">${esc(G.surname)} ${esc(G.given)}の人生</div><div class="mvlist">${L.map((x, i) => `<div class="mvr" data-i="${i}"><span class="ag num">${x.age}歳</span><span class="tx">${esc(x.text)}</span></div>`).join('')}</div></div>
       <div class="mvp"><div class="lay a"><img class="bgi" alt=""><img class="fc" alt=""></div><div class="lay b"><img class="bgi" alt=""><img class="fc" alt=""></div></div>
-      <div class="mvtap">クリックで早送り</div><button class="main mvgo" id="mvGo">リザルトへ ▶</button></div>`;
+      <div class="mvtap">タップ（クリック）で早送り</div><button class="main mvgo" id="mvGo">リザルトへ ▶</button></div>`;
     let i = -1, t = 0, front = 'a', ended = false;
     const lay = (k) => $('.lay.' + k, ov);
     const setPic = (x) => {

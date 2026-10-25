@@ -68,6 +68,8 @@ const Main = (() => {
     Audio2.bgm(Audio2.forLife(G));
   }
   function roleHtml() {
+    if (G.vars.hosp) return `<span class="r1">🏥 入院中｜${esc(G.vars.hosp.label)}</span><span class="r2"><b>${G.age}歳</b>${G.vars.hospPrevEmp ? '<span class="form">休職中</span>' : ''}</span>`;
+    if (G.flags.in_facility) return `<span class="r1">🏢 介護施設で暮らしている</span><span class="r2"><b>${G.age}歳</b></span>`;
     if (G.job && G.job.id && Econ.working()) {
       const j = Menu.job(G.job.id) || {};
       const ind = D().ranks.industry[j.cat] || j.label;
@@ -108,6 +110,8 @@ const Main = (() => {
   function bgOf() {
     const V = D().visuals;
     const B = (id) => V.backgrounds.find((b) => b.id === id) || V.backgrounds[0];
+    if (G.vars.hosp) return B('bg_hospital');
+    if (G.flags.in_facility) return B('bg_care');
     if (G.flags.lives_abroad || G.stage === 'abroad_study') return B('bg_abroad');
     if (G.school && G.vars.schoolAway && Menu.picked(G.school.pick) && Menu.picked(G.school.pick).where === 'abroad') return B('bg_abroad');
     if (G.school && V.byStage[G.stage]) return B(V.byStage[G.stage]);
@@ -135,7 +139,9 @@ const Main = (() => {
     const LIC = D().flags.flags.license;
     const lic = Object.keys(LIC).filter((f) => G.flags[f]).map((f) => `📜 ${esc(licLabel(f))}`);
     const HE = ['dz_diabetes', 'dz_hypertension', 'dz_depression', 'dz_cancer_lung', 'dz_cancer_stomach', 'dz_cancer_colon', 'dz_cancer_breast', 'dz_heart', 'dz_stroke_after', 'dz_dementia', 'dz_allergy', 'dz_asthma', 'injury_sports', 'injury_traffic'];
-    const ill = HE.filter((f) => G.flags[f]).map((f) => `🏥 ${esc(D().flags.flags.health[f] || f)}`);
+    const ill = HE.filter((f) => G.flags[f] && !(f === 'dz_stroke_after' && G.flags.sequela)).map((f) => `🏥 ${esc(D().flags.flags.health[f] || f)}`);
+    if (G.flags.sequela) ill.unshift(`🩹 後遺症（${esc(Text.dynValue ? ({ cancer: '疲れやすさ', cancer_chemo: 'しびれ', cancer_care: '疲れやすさ', heart: '息切れ', stroke: 'まひ', traffic: '足の痛み' })[G.vars.sequelaType] || '体の不調' : '')}）`);
+    if (G.vars.hosp) ill.unshift(`🏥 入院中（${esc(G.vars.hosp.label)}）`);
     const other = [];
     if (G.vars.phone) other.push(G.vars.phoneNoRule ? '📱 スマホ' : '📱 スマホ（ルールあり）');
     if (G.flags.owns_car) other.push('🚗 車'); if (G.flags.pet) other.push('🐶 ペット'); if (G.flags.exercise_habit) other.push('🏃 運動習慣');

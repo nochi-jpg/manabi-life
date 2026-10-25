@@ -27,7 +27,8 @@ function familyLine(p) {
   // なんとしても1行に：長い職業名ほど字を小さく（それでも入らなければ…で切る）
   const len = String(what).replace(/<[^>]+>/g, '').replace(/\p{Extended_Pictographic}/gu, '').length;
   const fs = len <= 9 ? '' : len <= 12 ? 'f14' : len <= 15 ? 'f12' : 'f11';
-  return `<div class="kv"><span class="k">${roleEmoji(p)} ${p.role === 'grandparent' ? (p.side === 'mother' ? '母方の' : '父方の') : ''}${roleLabel(p)}（${p.age}）</span><span class="one ${fs}">${what}</span></div>`;
+  const kl = `${p.role === 'grandparent' ? (p.side === 'mother' ? '母方の' : '父方の') : ''}${roleLabel(p)}（${p.age}）`;
+  return `<div class="kv"><span class="k ${kl.length >= 8 ? 'long' : ''}">${roleEmoji(p)} ${kl}</span><span class="one ${fs}">${what}</span></div>`;
 }
 Screens.birth = {
   enter(el) {

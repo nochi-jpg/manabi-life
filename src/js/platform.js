@@ -53,7 +53,8 @@ const Platform = (() => {
     // ダブルタップ拡大・ピンチを止める
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     let last = 0;
-    document.addEventListener('touchend', (e) => { const n = Date.now(); if (n - last < 300 && e.target.tagName !== 'INPUT') e.preventDefault(); last = n; }, { passive: false });
+    // すばやく続けてタップしたとき：ダブルタップの拡大は止めるが、タップ（クリック）は自分で起こす（早送り・連打が効くように）
+    document.addEventListener('touchend', (e) => { const n = Date.now(); if (n - last < 300 && e.target.tagName !== 'INPUT') { e.preventDefault(); const t = e.target.closest ? e.target : e.target.parentElement; if (t && t.click) t.click(); } last = n; }, { passive: false });
     autoOnFirstTap();
   }
   const portrait = () => isMobile && window.innerHeight > window.innerWidth;

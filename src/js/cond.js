@@ -144,6 +144,8 @@ function testKey(k, v, ctx) {
     case 'yearInStage': return !!G.school && (Array.isArray(v) ? inRange(G.school.yearIn, v) : G.school.yearIn === v);
     case 'hasBoss': { const st = Econ.steps(); const top = st.length > 0 && (G.rank || 0) >= st.length - 1; return (!top && G.employment !== 'executive' && G.employment !== 'self_employed') === !!v; } // 上の役職（上司）がいる
     case 'noGrandchild': return !people('grandchild').some((p) => p.alive) === !!v;
+    case 'noHospStay': return (G.vars.hospYear !== G.year) === !!v; // 今年の入院は退院のときに精算ずみ
+    case 'familyAtHome': return (Fam.household().length > 0) === !!v; // いっしょに住んでいる家族がいる
     case 'lessonsLess': return G.clubs.filter((c) => Engine.isLesson(c.id)).length < v; // 習い事の数が v 個より少ない（4つまで）
     case 'noLesson': return !G.clubs.some((c) => c.id === v);
     case 'jobYears': return !!G.job && (Array.isArray(v) ? v.includes(G.jobYears) : G.jobYears === v);
@@ -200,7 +202,8 @@ function testKey(k, v, ctx) {
     case 'counterIncreasedThisYear': return (G.counterYear || {})[v] === G.year;
     case 'year': return inRange(calYear(), v);
     case 'date': { const [y, m] = v.split('-').map(Number); return calYear() === y && MONTH[G.q] === m; }
-    case 'repayFinished': return (G.loans || []).filter((l) => l.type === 'scholar').every((l) => l.left <= 0) && !!G.flags.scholarship_loan_repaying && (G.loans || []).some((l) => l.type === 'scholar');
+    case 'repayFinished': return !!G.flags.scholarship_loan_repaying && !(G.loans || []).some((l) => l.type === 'scholar' && l.left > 0.5); // 奨学金の残りがない（返し終えた・整理した）
+    case 'scholarLeft': return (G.loans || []).some((l) => l.type === 'scholar' && l.left > 0.5 && (l.yearly || 0) > 0) === !!v;
     case 'loanFinished': { const l = (G.loans || []).find((x) => x.type === v); return !!l && l.left <= 0; }
     case 'likeTalentGap': { const m = { like_outdoor: 't_sport', like_book: 't_academic', like_draw: 't_art', like_math: 't_academic', like_game: 't_academic' }[likeMain()]; return !!m && G.talents[m] < 40; }
     case 'schoolTripYear': return !!G.school && schoolYearsLeft() === 1 && ['elem', 'jhs', 'hs'].includes(G.stage) && (G.stage === 'hs' ? G.q === 2 : G.q === 0);

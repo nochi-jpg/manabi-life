@@ -102,6 +102,8 @@ const Fam = (() => {
   }
   // 「東京都・賃貸（妻・長男と3人）」
   function livingLabel() {
+    if (G.vars.hosp) return `入院中（${G.vars.hosp.room === 'private' ? '個室' : '大部屋'}）`;
+    if (G.flags.in_facility) return `${pref().name}・介護施設`;
     const hh = household();
     const kind = G.flags.lives_dorm ? '寮' : G.flags.company_housing ? '社宅' : G.flags.owns_house ? '持ち家' : hh.some((p) => p.role === 'father' || p.role === 'mother') && !G.vars.parentsMovedIn ? '実家' : G.flags.welfare ? '公営住宅' : G.age < 18 ? '実家' : '賃貸';
     if (!hh.length) return `${pref().name}・${kind}（ひとり暮らし）`;
@@ -188,7 +190,7 @@ const Fam = (() => {
       if (!il[1] && chance(0.55)) { p.illness = null; p.health = clamp(p.health + 10, 0, 100); }
     } else if (p.age >= 25 && chance(curve({ 25: 0.01, 45: 0.03, 60: 0.06, 75: 0.12, 90: 0.2 }, p.age))) {
       const il = pick(ILL); p.illness = il[0]; p.health = clamp(p.health - il[2], 5, 100);
-      if (['father', 'mother', 'spouse', 'child', 'sibling'].includes(p.role) && (p.role !== 'child' || p.age >= 18)) notice('🏥', `${callName(p)}が${il[0]}で入院した。`, 'family', null, p);
+      if (['father', 'mother', 'spouse', 'child', 'sibling'].includes(p.role) && (p.role !== 'child' || p.age >= 18)) hospitalize(p, il[0]);
     }
     // 仕事・年金・貯金
     if (isWorking(p)) {
@@ -320,8 +322,23 @@ const Fam = (() => {
   const familyCanHelp = () => G.people.some((p) => p.alive && ['father', 'mother', 'spouse', 'sibling'].includes(p.role) && (p.assets || 0) > 80);
 
   // 人物の「いまの様子」
+  // 家族の入院・退院（入院は1季節、脳卒中などは2季節くらい）
+  function hospitalize(p, what, silent) {
+    if (!p || !p.alive || p.hosp) return;
+    p.hosp = { what, at: G.year * 4 + G.q, len: /脳卒中/.test(what) ? 2 : 1 };
+    if (!silent) notice('🏥', `${callName(p)}が${what}で入院した。`, 'family', null, p);
+  }
+  function seasonTick() {
+    const now = G.year * 4 + G.q;
+    for (const p of G.people) {
+      if (!p.hosp) continue;
+      if (!p.alive) { p.hosp = null; continue; }
+      if (now - p.hosp.at >= p.hosp.len) { notice('🌤️', `${callName(p)}が退院した。${p.illness && p.illness !== p.hosp.what ? '' : p.illness ? 'これからは通院して治療を続ける。' : '元気になった。'}`, 'family', null, p); p.hosp = null; }
+    }
+  }
   function statusLabel(p) {
     if (!p.alive) return `🕊️ ${p.diedYear || ''}年に亡くなった`;
+    if (p.hosp) return `🏥 入院中（${p.hosp.what}）`;
     if (p.careLevel >= 1) return `🤲 要介護${p.careLevel}${p.inFacility ? '（施設）' : ''}`;
     if (p.employment === 'student' || (p.age >= 6 && p.age < 18 && ['child', 'sibling', 'grandchild'].includes(p.role))) return `🎒 ${kidStage(p)}`;
     if (p.age < 6) return p.age < 3 ? '👶 赤ちゃん' : '🧸 保育園・幼稚園';
@@ -334,5 +351,5 @@ const Fam = (() => {
   }
   function kidStage(p) { const a = p.age; if (p.stage === 'work_start' || p.stage === 'work') return '社会人'; return a < 3 ? '赤ちゃん' : a < 6 ? '保育園・幼稚園' : a < 12 ? '小学生' : a < 15 ? '中学生' : a < 18 ? '高校生' : a < 22 ? '大学生など' : '社会人'; }
 
-  return { hops, near, prefName, fill, migrate, assignJob, jobIncome, callName, household, spouseHome, householdIncome, householdAssets, livingLabel, roleShort, sync, moved, jobCheck, quitPerson, moveToWho, whoMoveIn, yearOf, childAdultYear, notice, divorce, separate, reunite, supportYear, supportYearly, bailout, familyCanHelp, statusLabel, kidStage, isWorking, pensionOf };
+  return { hospitalize, seasonTick, hops, near, prefName, fill, migrate, assignJob, jobIncome, callName, household, spouseHome, householdIncome, householdAssets, livingLabel, roleShort, sync, moved, jobCheck, quitPerson, moveToWho, whoMoveIn, yearOf, childAdultYear, notice, divorce, separate, reunite, supportYear, supportYearly, bailout, familyCanHelp, statusLabel, kidStage, isWorking, pensionOf };
 })();

@@ -394,15 +394,15 @@
       "risk": "traffic_injury", "riskMul": [["owns_car", 2], ["age>=75", 2], ["heavy_drinker", 1.5]],
       "text": "運転中、交差点で事故を起こしてしまった。",
       "choices": [
-        { "label": "📞 すぐに警察と保険会社に連絡", "roll": { "base": 0.75 }, "success": { "stats": { "stress": 8 }, "cash": -5, "set": ["injury_traffic"], "log": "💥 けがは軽く、保険で対応できた" }, "fail": { "stats": { "health": -15, "stress": 12 }, "cash": -20, "counter": { "hospital_count": 1 }, "set": ["injury_traffic"], "log": "🏥 入院が必要なけがをした" } }
+        { "label": "📞 すぐに警察と保険会社に連絡", "roll": { "base": 0.92 }, "success": { "stats": { "stress": 8 }, "cash": -5, "set": ["injury_traffic"], "log": "💥 けがは軽く、保険で対応できた" }, "fail": { "stats": { "health": -15, "stress": 12 }, "cash": -10, "counter": { "hospital_count": 1 }, "set": ["injury_traffic"], "hospitalize": { "cause": "traffic", "p": 1 }, "log": "🏥 入院が必要なけがをした" } }
       ] },
 
     { "id": "ev_r_traffic_victim", "kind": "flow", "emoji": "🚑", "cat": "risk",
       "when": { "none": ["owns_car"] },
       "risk": "traffic_injury",
-      "roll": { "base": 0.85 },
+      "roll": { "base": 0.92 },
       "success": { "text": "🚲 自転車で転んで、車とぶつかりそうになった。打ぼくですんだ。", "effects": { "stats": { "health": -3 } } },
-      "fail": { "text": "🚑 歩いていて車にはねられ、骨折して入院した。", "effects": { "stats": { "health": -15, "stress": 8 }, "set": ["injury_traffic"], "counter": { "hospital_count": 1 }, "insurancePayout": 30 } } },
+      "fail": { "text": "🚑 歩いていて車にはねられ、骨折した。", "effects": { "stats": { "health": -15, "stress": 8 }, "set": ["injury_traffic"], "counter": { "hospital_count": 1 }, "insurancePayout": 30, "hospitalize": { "cause": "traffic", "p": 1 } } } },
 
     { "id": "ev_r_drunk_drive", "kind": "choice", "emoji": "🍻", "cat": "risk",
       "when": { "age": [20, 80], "all": ["owns_car", "drinker"], "cooldownYears": 3 },
@@ -487,9 +487,9 @@
       "setStageBy": { "kenshin_habit": [1, 2], "default": [2, 4] },
       "text": "検査の結果、{cancerName}（ステージ{cancerStage}）と診断された。",
       "choices": [
-        { "label": "🏥 手術を受ける", "when": { "var": { "cancerStage": [1, 2, 3] } }, "showRate": true, "roll": { "byStage": { "1": 0.95, "2": 0.85, "3": 0.6 } }, "success": { "set": ["cancer_survivor"], "cash": -30, "stats": { "health": -15 }, "log": "🎗️ 手術は成功し、がんを克服した" }, "fail": { "setCancerFlag": true, "cash": -30, "stats": { "health": -25 } } },
-        { "label": "💊 抗がん剤・放射線治療", "showRate": true, "roll": { "byStage": { "1": 0.85, "2": 0.7, "3": 0.45, "4": 0.2 } }, "success": { "set": ["cancer_survivor"], "cash": -40, "stats": { "health": -20 } }, "fail": { "setCancerFlag": true, "cash": -40, "stats": { "health": -30 } } },
-        { "label": "🕊️ 緩和ケアで、痛みをおさえて過ごす", "effects": { "setCancerFlag": true, "stats": { "happiness": 3, "stress": -5 }, "deathRiskMul": 4 } },
+        { "label": "🏥 手術を受ける", "when": { "var": { "cancerStage": [1, 2, 3] } }, "showRate": true, "roll": { "byStage": { "1": 0.95, "2": 0.85, "3": 0.6 } }, "success": { "set": ["cancer_survivor"], "cash": -10, "stats": { "health": -15 }, "hospitalize": { "cause": "cancer", "p": 1 }, "log": "🎗️ 手術は成功し、がんを克服した" }, "fail": { "setCancerFlag": true, "cash": -10, "stats": { "health": -25 }, "hospitalize": { "cause": "cancer", "p": 1 } } },
+        { "label": "💊 抗がん剤・放射線治療", "showRate": true, "roll": { "byStage": { "1": 0.85, "2": 0.7, "3": 0.45, "4": 0.2 } }, "success": { "set": ["cancer_survivor"], "cash": -25, "stats": { "health": -20 }, "hospitalize": { "cause": "cancer_chemo", "p": 0.4 } }, "fail": { "setCancerFlag": true, "cash": -25, "stats": { "health": -30 }, "hospitalize": { "cause": "cancer_chemo", "p": 0.4 } } },
+        { "label": "🕊️ 緩和ケアで、痛みをおさえて過ごす", "effects": { "setCancerFlag": true, "stats": { "happiness": 3, "stress": -5 }, "deathRiskMul": 4, "hospitalize": { "cause": "cancer_care", "p": 0.3 } } },
         { "label": "🌿 高額な民間療法にたよる（200万）", "effects": { "cash": -200, "setCancerFlag": true, "stats": { "health": -20 }, "deathRiskMul": 5, "log": "🌿 効果は確認されていない治療だった" } }
       ],
       "note": "高額療養費制度で医療費の自己負担には上限がある（収入により月約9万円前後）。がん保険加入者は一時金が入る" },
@@ -514,14 +514,14 @@
       "when": { "age": [40, 105] },
       "risk": "stroke", "riskMul": [["dz_hypertension", 2.5], ["smoker", 1.5], ["dz_diabetes", 2]],
       "roll": { "base": 0.6 },
-      "success": { "text": "🧠 脳卒中で倒れたが、すぐに治療を受けて回復した。", "effects": { "stats": { "health": -15 }, "counter": { "hospital_count": 1 }, "cash": -20 } },
-      "fail": { "text": "🧠 脳卒中で倒れ、体に後遺症が残った。", "effects": { "set": ["dz_stroke_after"], "stats": { "health": -30, "happiness": -10 }, "selfCare": 2, "job": { "riskQuit": 0.6 } } } },
+      "success": { "text": "🧠 脳卒中で倒れたが、すぐに治療を受けた。", "effects": { "stats": { "health": -15 }, "counter": { "hospital_count": 1 }, "hospitalize": { "cause": "stroke", "p": 1, "aft": 0.15 } } },
+      "fail": { "text": "🧠 脳卒中で倒れ、体に後遺症が残った。", "effects": { "set": ["dz_stroke_after"], "stats": { "health": -30, "happiness": -10 }, "selfCare": 2, "job": { "riskQuit": 0.6 }, "hospitalize": { "cause": "stroke", "p": 1, "aft": 1 } } } },
 
     { "id": "ev_r_heart", "kind": "flow", "emoji": "❤️‍🩹", "cat": "health",
       "when": { "age": [40, 105], "none": ["dz_heart"] },
       "risk": "heart", "riskMul": [["smoker", 2], ["dz_diabetes", 2], ["dz_hypertension", 1.5], ["exercise_habit", 0.7]],
       "text": "❤️‍🩹 胸が苦しくなり救急搬送。心臓の病気が見つかり、手術を受けた。",
-      "effects": { "set": ["dz_heart"], "stats": { "health": -20 }, "counter": { "hospital_count": 1 }, "cash": -25 } },
+      "effects": { "set": ["dz_heart"], "stats": { "health": -20 }, "counter": { "hospital_count": 1 }, "hospitalize": { "cause": "heart", "p": 1 } } },
 
     { "id": "ev_r_depression", "kind": "choice", "emoji": "🌧️", "cat": "health",
       "when": { "age": [15, 90], "none": ["dz_depression"], "stat": { "stress": [">=", 75] } },
@@ -698,7 +698,7 @@
       "note": "1等7億円の当選確率は2000万分の1。期待値は購入額の約45%。小学生に『期待値』を体感させる" },
 
     { "id": "ev_r_debt_crisis", "kind": "choice", "emoji": "💳", "cat": "money",
-      "when": { "age": [20, 90], "consumerDebt": [">=", 1], "cooldownYears": 3 },
+      "when": { "age": [20, 90], "consumerDebt": [">=", 1], "none": ["welfare"], "cooldownYears": 3 },
       "text": "1年ずっと赤字が続いて、借金（{debtNoHouse}万円）が返せなくなってきた。",
       "choices": [
         { "label": "📉 投資を売って返す", "when": { "assets": [">=", 30] }, "showResult": true, "effects": { "sellAssetsForDebt": true, "stats": { "stress": -6 } } },
@@ -762,7 +762,7 @@
       "text": "体が思うように動かなくなり、介護が必要になった。",
       "choices": [
         { "label": "🏠 家で介護サービスを使う", "effects": { "selfCare": 2, "cashYearly": -36 } },
-        { "label": "🏢 介護施設に入る", "effects": { "selfCare": 3, "cashYearly": -180, "move": { "to": "facility" } } },
+        { "label": "🏢 介護施設に入る（年金に合わせて 月8〜18万円）", "effects": { "selfCare": 3, "enterFacility": true } },
         { "label": "👨‍👩‍👧 子どもの家で暮らす", "when": { "child": { "alive": true, "age": [30, 80] } }, "effects": { "selfCare": 2, "childBurden": true } }
       ] },
 
@@ -788,8 +788,8 @@
       ] },
 
     { "id": "ev_r_eiken", "kind": "choice", "emoji": "🔤", "cat": "school",
-      "when": { "age": [10, 22], "cooldownYears": 1, "notMax": "eiken_1" },
-      "weight": { "base": 2, "mul": [["subj.eng>=60", 1.5], ["club:ls_english", 2]] },
+      "when": { "age": [10, 39], "cooldownYears": 1, "notMax": "eiken_1" },
+      "weight": { "base": 2, "mul": [["subj.eng>=60", 1.5], ["club:ls_english", 2], ["age>=23", 0.2], ["age>=30", 0.4]] },
       "text": "英検を受けてみる？",
       "choices": [
         { "label": "🔤 {nextEikenLevel}を受ける", "showRate": true, "roll": { "eiken": true, "w": { "eng": 1 } }, "success": { "set": ["$nextEikenFlag"], "stats": { "happiness": 3 } }, "fail": { "stats": { "happiness": -1 } } },
@@ -797,8 +797,8 @@
       ] },
 
     { "id": "ev_r_toeic", "kind": "choice", "emoji": "📝", "cat": "work",
-      "when": { "age": [18, 60], "notMax": "toeic_900", "cooldownYears": 2 },
-      "weight": { "base": 1.2, "mul": [["jobCat:global", 2.5], ["stage:univ", 1.5]] },
+      "when": { "age": [18, 39], "notMax": "toeic_900", "cooldownYears": 2 },
+      "weight": { "base": 1.2, "mul": [["jobCat:global", 2.5], ["stage:univ", 1.5], ["age>=30", 0.35]] },
       "text": "TOEICを受ける？（受験料 約8千円）",
       "choices": [
         { "label": "📝 受ける", "cash": -0.8, "roll": { "toeic": true, "w": { "eng": 1 } }, "success": { "set": ["$toeicFlag"] }, "fail": {} },
@@ -985,7 +985,7 @@
       ] },
 
     { "id": "ev_r_hospital_bill", "kind": "choice", "emoji": "🧾", "cat": "health",
-      "when": { "age": [16, 105], "counterIncreasedThisYear": "hospital_count" },
+      "when": { "age": [16, 105], "counterIncreasedThisYear": "hospital_count" , "noHospStay": true },
       "weight": { "base": 10 },
       "text": "退院のとき、請求書を見てびっくり。医療費は全部で{billTotal}万円。でも健康保険で3割に、さらに「高額療養費制度」で上限があり、払うのは{billPay}万円になった。",
       "choices": [
@@ -1059,7 +1059,7 @@
       ] },
 
     { "id": "ev_r_scholar_trouble", "kind": "choice", "emoji": "📄", "cat": "money",
-      "when": { "all": ["scholarship_loan_repaying"], "liquid": ["<", 0], "cooldownYears": 2 },
+      "when": { "all": ["scholarship_loan_repaying"], "none": ["welfare"], "scholarLeft": true, "liquid": ["<", 0], "cooldownYears": 2 },
       "weight": { "base": 6 },
       "text": "所持金がマイナスで、奨学金の返済（月{repay}万円）がきびしい。",
       "choices": [
@@ -1147,9 +1147,9 @@
       "weight": { "base": 1, "mul": [["spouseAge>=65", 2]] },
       "text": "{spouse}が病気で入院した。",
       "choices": [
-        { "label": "🏥 仕事を調整して付き添う", "when": { "selfWorking": true }, "effects": { "stats": { "stress": 6 }, "person": { "relation": "spouse", "delta": 10 }, "jobHoursMul": 0.85 } },
-        { "label": "💼 仕事を続け、できる範囲で支える", "when": { "selfWorking": true }, "effects": { "stats": { "stress": 4 } } },
-        { "label": "🏠 家で付き添い、できるかぎり支える", "when": { "selfWorking": false }, "effects": { "stats": { "stress": 5 }, "person": { "relation": "spouse", "delta": 10 } } }
+        { "label": "🏥 仕事を調整して付き添う", "when": { "selfWorking": true }, "effects": { "famHospital": "spouse", "stats": { "stress": 6 }, "person": { "relation": "spouse", "delta": 10 }, "jobHoursMul": 0.85 } },
+        { "label": "💼 仕事を続け、できる範囲で支える", "when": { "selfWorking": true }, "effects": { "famHospital": "spouse", "stats": { "stress": 4 } } },
+        { "label": "🏠 家で付き添い、できるかぎり支える", "when": { "selfWorking": false }, "effects": { "famHospital": "spouse", "stats": { "stress": 5 }, "person": { "relation": "spouse", "delta": 10 } } }
       ] }
     ,{ "id": "ev_r_adult_lesson", "kind": "choice", "emoji": "🎒", "cat": "lesson",
       "when": { "age": [22, 85], "cooldownYears": 4, "lessonsLess": 4 },
@@ -1158,6 +1158,22 @@
       "choices": [
         { "menu": { "source": "clubs.adultLessons", "page": 5, "filter": "age" }, "effects": { "club": { "join": "$pick" }, "stats": { "happiness": 2 } } },
         { "label": "🙂 今はいいかな", "effects": {} }
-      ] }
+      ] },
+
+    {"id": "ev_m_hospital_in", "kind": "choice", "emoji": "🏥", "cat": "health", "type": "scheduled", "counselor": "self", "when": {}, "text": "{hospCause}で入院することになった（およそ{hospDays}日間）。病室はどうする？{hospInsNote}", "fact": {"text": "入院の平均日数は、胃がん約15日・心臓の病気約18日・骨折約35日・脳卒中約69日（2023年）。医療費は高額療養費制度で月9万円くらいまで。個室などの差額ベッド代と食事代（1食約550円）は別にかかる。", "src": "厚生労働省 患者調査（2023）・中央社会保険医療協議会"}, "choices": [{"label": "🛏️ 大部屋（4〜6人・差額ベッド代なし）", "effects": {"hospRoom": "ward", "log": "🛏️ 大部屋に入院した"}}, {"label": "🚪 個室（1日約8,000円・静かに休める）", "effects": {"hospRoom": "private", "stats": {"stress": -6}, "log": "🚪 個室に入院した"}}]},
+
+    {"id": "ev_r_hospital_rehab", "kind": "choice", "emoji": "🦵", "cat": "health", "place": ["hospital"], "when": {}, "weight": {"base": 3}, "text": "リハビリの先生に「早めに体を動かすと、回復が早くなりますよ」と言われた。", "choices": [{"label": "💪 つらくても、リハビリをがんばる", "effects": {"hospRehab": true, "stats": {"stress": 5, "health": 3}, "log": "💪 リハビリをがんばった"}}, {"label": "😌 無理をせず、ゆっくり休む", "effects": {"stats": {"stress": -5}}}]},
+
+    {"id": "ev_r_hospital_time", "kind": "choice", "emoji": "📱", "cat": "health", "place": ["hospital"], "when": {}, "weight": {"base": 2}, "text": "入院生活は時間がたっぷりある。何をして過ごす？", "choices": [{"label": "📺 動画や本で、のんびり過ごす", "effects": {"stats": {"happiness": 3, "stress": -4}}}, {"label": "📖 勉強や資格の本を読む", "effects": {"stats": {"academic": 2, "stress": 2}, "log": "📖 入院中に勉強した"}}, {"label": "✉️ 家族や友だちに、手紙やメッセージを書く", "effects": {"stats": {"social": 4, "happiness": 2}}}]},
+
+    {"id": "ev_r_facility_event", "kind": "choice", "emoji": "🎐", "cat": "life", "place": ["facility"], "when": {"cooldownYears": 2}, "weight": {"base": 2}, "text": "施設で{facilityEventName}がある。参加する？", "choices": [{"label": "🎉 参加する", "effects": {"stats": {"happiness": 5, "social": 4, "stress": -2}}}, {"label": "🛏️ 部屋で静かに過ごす", "effects": {"stats": {"stress": -3, "social": -1}}}]},
+
+    {"id": "ev_r_facility_rehab", "kind": "choice", "emoji": "🦯", "cat": "health", "place": ["facility"], "when": {"cooldownYears": 3}, "weight": {"base": 1.5}, "text": "施設の理学療法士さんに、リハビリの回数をふやしてみないかと言われた。", "choices": [{"label": "💪 ふやす", "effects": {"stats": {"health": 4, "stress": 3}}}, {"label": "🙂 今のままでいい", "effects": {"stats": {"stress": -2}}}]},
+
+    {"id": "ev_m_facility_house", "kind": "choice", "emoji": "🏠", "cat": "money", "type": "scheduled", "counselor": "self", "when": {"all": ["owns_house"]}, "text": "介護施設に入ることになった。持っている家（いまの値段 約{houseValueNow}万円・ローン残り{mortgageLeft}万円）はどうする？", "fact": {"text": "施設に入ったあとの家は「売る」「貸す」「家族が住みつづける」などの方法がある。空き家のままだと、税金や手入れの費用がかかりつづける。", "src": "国土交通省 空き家対策"}, "choices": [{"label": "💴 家を手放す（売る）", "effects": {"sellHouse": true, "rentMonthly": 0, "clear": ["renting"], "payDebtsFromCash": true, "log": "💴 家を売った"}}, {"label": "🏢 人に貸す（家賃収入 月{houseRentOut}万円）", "effects": {"rentOutHouse": true, "log": "🏢 家を人に貸すことにした"}}, {"label": "🏠 {houseStayWho}がそのまま住む", "when": {"familyAtHome": true}, "effects": {"log": "🏠 家族がそのまま家に住むことにした"}}]},
+
+    {"id": "ev_r_sequela_work", "kind": "choice", "emoji": "🩹", "cat": "work", "when": {"all": ["sequela"], "employment": ["seishain", "keiyaku", "haken", "part", "civil_servant", "self_employed", "executive"], "stat": {"physicalLoad": [">=", 85]}, "cooldownYears": 3}, "weight": {"base": 3}, "text": "後遺症で、いまの仕事の体の負担がかなりきつい……。", "choices": [{"label": "😣 がまんして、このまま続ける", "effects": {"stats": {"stress": 8, "health": -3}}}, {"label": "🗂️ 体の負担が少ない仕事にかえてもらう", "roll": {"base": 0.6}, "showRate": true, "success": {"jobLoadDelta": {"physical": -40}, "stats": {"stress": -4}, "log": "🗂️ 体の負担が少ない仕事にかえてもらえた"}, "fail": {"stats": {"stress": 4}, "log": "😞 「今は人が足りなくて……」と言われてしまった"}}, {"label": "🚪 思い切って仕事をやめる", "effects": {"job": {"quit": "self"}, "stats": {"stress": -6}}}]},
+
+    {"id": "ev_r_sequela_rehab", "kind": "choice", "emoji": "🦯", "cat": "health", "when": {"all": ["sequela"], "cooldownYears": 3}, "weight": {"base": 2}, "text": "後遺症のリハビリに、病院へ通っている。", "choices": [{"label": "💪 通院を続ける（年5万円くらい）", "roll": {"base": 0.25}, "showRate": true, "success": {"cash": -5, "clear": ["sequela"], "stats": {"happiness": 8}, "log": "🌈 後遺症がほとんど気にならないくらいまで回復した"}, "fail": {"cash": -5, "stats": {"health": 2}, "log": "🦯 少しずつ、できることがふえてきた"}}, {"label": "🙂 今の生活に慣れることにする", "effects": {"stats": {"stress": -2}}}]}
   ]
 }

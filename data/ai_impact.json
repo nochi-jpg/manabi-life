@@ -44,6 +44,7 @@
     "j_architect": { "risk": 0.35, "wave": 2038, "src": ["nri2015"] },
     "j_maker_tech": { "risk": 0.35, "wave": 2038, "src": ["nri2015"] },
     "j_global": { "risk": 0.3, "wave": 2037, "src": ["wef2025"] },
+    "j_interpreter": { "risk": 0.55, "wave": 2032, "src": ["jcast2025"] },
     "j_game_creator": { "risk": 0.3, "wave": 2036, "src": ["nri2015", "jcast2025"] },
     "j_youtuber": { "risk": 0.3, "wave": 2036, "src": ["jcast2025"] },
     "j_cook": { "risk": 0.3, "wave": 2042, "src": ["nri2015"] },

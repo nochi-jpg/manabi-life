@@ -105,7 +105,7 @@
       "steps": [ { "t": "アルバイト" }, { "t": "バイトリーダー", "y": 2, "p": 0.3, "inc": 0.05, "ment": 3 } ] }
   ],
   "noRank": {
-    "jobs": ["j_illustrator", "j_musician", "j_youtuber", "j_entertainer", "j_farmer", "j_fisher", "j_ceo", "j_family_business"],
-    "reason": "フリーランス・自営業・経営者。昇進のかわりに『ヒット』『規模の拡大』などのイベントで収入が変わる"
+    "jobs": ["j_illustrator", "j_musician", "j_youtuber", "j_entertainer", "j_farmer", "j_fisher", "j_ceo", "j_family_business", "j_interpreter"],
+    "reason": "フリーランス・自営業・経営者（通訳・翻訳はフリーランスが多い）。昇進のかわりに『ヒット』『規模の拡大』などのイベントで収入が変わる"
   }
 }

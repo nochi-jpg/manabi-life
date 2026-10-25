@@ -35,6 +35,21 @@ const Engine = (() => {
     G.scheduled.push({ event: id, at: { year: y, q }, data });
   }
 
+  // ---------- いる場所（入院中・介護施設）で起きるイベントをしぼる ----------
+  const placeNow = () => (G.vars.hosp ? 'hospital' : G.flags.in_facility ? 'facility' : null);
+  // 介護施設でも起きる選択肢イベント（お金・健康・終活など）
+  const FAC_OK = new Set(['ev_r_ending_note', 'ev_f_old_friend', 'ev_f_100', 'ev_m_asset_sell', 'ev_r_debt_crisis', 'ev_r_welfare', 'ev_r_sell_rental', 'ev_r_vacancy', 'ev_r_rate_rise', 'ev_r_market_crash', 'ev_r_inherit_house', 'ev_m_focus_adult', 'ev_m_facility_house']);
+  function placeBlocked(e, item) {
+    if (!e) return true;
+    const pl = placeNow();
+    if (e.place) return !pl || !e.place.includes(pl); // 施設・病院だけのイベント
+    if (!pl || (item && item.sched) || e.id === 'ev_m_death') return false;
+    if (e.kind === 'flow' && ['world', 'family', 'money'].includes(e.cat)) return false; // 世の中・家族・お金のお知らせ
+    if (e.kind === 'flow' && e.cat === 'health' && e.risk) return false; // 病気の進行
+    if (pl === 'hospital') return !(e._src === 'm' && e.when && (e.when.once || (e.when.age && e.when.age[1] - e.when.age[0] <= 1))); // 入院中は、学校の入学など一度きりのものだけ
+    if (FAC_OK.has(e.id)) return false;
+    return !(e.cat === 'health' && e.id !== 'ev_r_care_self'); // 施設では健康のことだけ
+  }
   // ---------- 1季節の候補を集める ----------
   function buildQueue() {
     index();
@@ -54,7 +69,7 @@ const Engine = (() => {
       if (!Cond.test(w, { ev: e, ...ctx })) continue;
       Q.push({ id: e.id, ctx: packCtx(ctx), sched: true });
     }
-    if (!activeQ()) return finishQueue(Q);
+    if (!activeQ()) return endQueue(Q);
     // 2. 必須イベント・世の中のできごと
     const afters = [];
     const FAM = (D().events_family || { events: [] }).events;
@@ -64,7 +79,7 @@ const Engine = (() => {
         if (src === 'events_family' && (e0.weight || e0.kind !== 'choice')) continue;
         const e = ev(e0.id);
         if (e.type === 'scheduled' || (e.when && e.when.engine) || e.risk) continue;
-        if (gentleOut(e.id) || has(e.id)) continue;
+        if (gentleOut(e.id) || has(e.id) || placeBlocked(e)) continue;
         if (!onceYearOk(e)) continue;
         const ctx = { ev: e };
         if (!Cond.test(e.when, ctx)) continue;
@@ -73,13 +88,13 @@ const Engine = (() => {
     }
     Q.push(...afters);
     // 習い事を続ける？（要望3：春に。学年が上がる・入学・就職のとき）
-    if ((G.q === 0 || G.vars.lessonForce) && G.clubs.some((c) => isLesson(c.id))) Q.push({ id: '__lessons', ctx: {} });
+    if ((G.q === 0 || G.vars.lessonForce) && !placeNow() && G.clubs.some((c) => isLesson(c.id))) Q.push({ id: '__lessons', ctx: {} });
     // 3. リスク（病気・事故・失業など）
     let riskChoice = false;
     for (const src of ['events_random', 'events_flow', 'events_world', 'events_family']) {
       for (const e0 of L(src)) {
         const e = ev(e0.id);
-        if (!e.risk || e.type === 'scheduled' || e.risk === 'death_byPerson' || gentleOut(e.id) || has(e.id)) continue;
+        if (!e.risk || e.type === 'scheduled' || e.risk === 'death_byPerson' || gentleOut(e.id) || has(e.id) || placeBlocked(e)) continue;
         if (e.id === 'ev_r_care_self' && G.vars.selfCare) continue; // 介護が必要になるのは1回
         if (e.kind === 'choice' && riskChoice) continue;
         const ctx = { ev: e };
@@ -93,7 +108,7 @@ const Engine = (() => {
     //  ・収入がなく所持金もない → 生活保護の相談
     //  ・3か月赤字だった → 「生活水準や趣味を見直してみようか……」
     if (G.age >= 18 && !Menu.isStudent() && !hasChoiceQ(Q)) {
-      const tryAdd = (id) => { const e = ev(id); const ctx = { ev: e }; if (e && !gentleOut(id) && onceYearOk(e) && Cond.test(e.when, ctx)) { add(id, ctx); return true; } return false; };
+      const tryAdd = (id) => { const e = ev(id); const ctx = { ev: e }; if (e && !gentleOut(id) && !placeBlocked(e) && onceYearOk(e) && Cond.test(e.when, ctx)) { add(id, ctx); return true; } return false; };
       const hasAssets = G.assets >= 1 || (G.flags.owns_house && !G.flags.lives_with_parents) || G.flags.owns_rental || G.flags.owns_car;
       const defQ = G.vars.defQ || 0;
       const yearOut = Econ.expenses().total;
@@ -104,7 +119,7 @@ const Engine = (() => {
       if (!done && defQ >= 1 && defQ < 4 && G.cash < yearOut * 2 && Econ.lifeLevel() !== 'save' && !G.flags.welfare) tryAdd('ev_m_budget_review'); // 貯金が2年分あれば、少しの赤字は気にしない
     }
     // プロポーズ：付き合って2年以上たったら、毎年40%（45歳からは12%）で「する」か「される」が来る（ランダムを待たない）
-    if (G.q === 1 && G.age >= 22 && G.flags.has_partner && !G.flags.married && !hasChoiceQ(Q) && chance(G.age < 45 ? 0.4 : 0.12)) {
+    if (G.q === 1 && G.age >= 22 && !placeNow() && G.flags.has_partner && !G.flags.married && !hasChoiceQ(Q) && chance(G.age < 45 ? 0.4 : 0.12)) {
       const id = chance(0.5) ? 'ev_r_propose' : 'ev_r_proposed';
       const e = ev(id); const ctx = { ev: e }; const w = { ...e.when, person: { ...e.when.person, years: 2 } };
       if (e && !gentleOut(id) && onceYearOk(e) && Cond.test(w, ctx)) add(id, ctx);
@@ -113,7 +128,7 @@ const Engine = (() => {
     for (const src of ['events_flow', 'events_random', 'events_family']) {
       for (const e0 of L(src)) {
         const e = ev(e0.id);
-        if (e.kind !== 'flow' || e.weight || e.risk || e.type === 'scheduled' || gentleOut(e.id) || has(e.id)) continue;
+        if (e.kind !== 'flow' || e.weight || e.risk || e.type === 'scheduled' || gentleOut(e.id) || has(e.id) || placeBlocked(e)) continue;
         if (!onceYearOk(e)) continue;
         const ctx = { ev: e };
         if (!Cond.test(e.when, ctx)) continue;
@@ -125,10 +140,10 @@ const Engine = (() => {
     const hasChoice = () => Q.some((x) => (ev(x.id) || {}).kind === 'choice');
     if (!hasChoice() && (G.randomChoicesYear || 0) < 2) {
       const hit = [];
-      const k = G.age < 6 ? 0.005 : G.age >= 30 ? 0.0049 : 0.006;
+      const k = G.age < 6 ? 0.005 : G.age >= 30 ? 0.0046 : 0.006;
       for (const e0 of [...D().events_random.events, ...FAM]) {
         const e = ev(e0.id);
-        if (e.kind !== 'choice' || !e.weight || e.type === 'scheduled' || e.risk || gentleOut(e.id)) continue;
+        if (e.kind !== 'choice' || !e.weight || e.type === 'scheduled' || e.risk || gentleOut(e.id) || placeBlocked(e)) continue;
         if (!onceYearOk(e)) continue;
         const ctx = { ev: e };
         if (!Cond.test(e.when, ctx)) continue;
@@ -147,14 +162,14 @@ const Engine = (() => {
         const cand = [];
         for (const e0 of [...D().events_flow.events, ...FAM.filter((x) => x.kind === 'flow')]) {
           const e = ev(e0.id);
-          if (!e.weight || e.risk || e.type === 'scheduled' || has(e.id) || gentleOut(e.id) || !onceYearOk(e)) continue;
+          if (!e.weight || e.risk || e.type === 'scheduled' || has(e.id) || gentleOut(e.id) || placeBlocked(e) || !onceYearOk(e)) continue;
           const ctx = { ev: e };
           if (!Cond.test(e.when, ctx)) continue;
           cand.push({ e, ctx, w: Cond.weightOf(e.weight) * (e.cat === 'daily' ? 0.6 : 1) });
         }
         for (const e0 of D().events_random.events) { // 判定つきの流れ（コンテスト・ヒットなど）
           const e = ev(e0.id);
-          if (e.kind !== 'flow' || !e.weight || e.risk || has(e.id) || !onceYearOk(e)) continue;
+          if (e.kind !== 'flow' || !e.weight || e.risk || has(e.id) || placeBlocked(e) || !onceYearOk(e)) continue;
           const ctx = { ev: e };
           if (!Cond.test(e.when, ctx)) continue;
           cand.push({ e, ctx, w: Cond.weightOf(e.weight) * 0.5 });
@@ -163,7 +178,17 @@ const Engine = (() => {
         if (c) add(c.e.id, c.ctx);
       }
     }
-    return finishQueue(Q);
+    return endQueue(Q);
+  }
+  // 季節の最後：入院が長い（脳卒中など）ときは、入院の日常を入れて、次の季節の終わりに退院
+  function endQueue(Q) {
+    finishQueue(Q);
+    const h = G.vars.hosp;
+    if (h) {
+      if (!G.queue.some((x) => x.id === 'ev_f_hospital_daily')) G.queue.unshift({ id: 'ev_f_hospital_daily', ctx: {}, sched: true });
+      h.left = Math.max(0, (h.left || 0) - 1);
+      if (h.left === 0 && !G.queue.some((x) => x.id === 'ev_m_discharge')) G.queue.push({ id: 'ev_m_discharge', ctx: {}, sched: true });
+    }
   }
   function hasChoiceQ(Q) { return Q.some((x) => (ev(x.id) || {}).kind === 'choice'); }
   function finishQueue(Q) {
@@ -567,6 +592,8 @@ const Engine = (() => {
     if (G.pendingDeath) { G.pendingDeath = false; G.queue = [{ id: 'ev_m_death', ctx: {} }]; save(); return; }
     if (G.q === 3) yearlyGrowth();
     if (!G.alive) return;
+    Fam.seasonTick();
+    if (G.flags.sequela) Effects.stat('stress', 0.8); // 後遺症：少しずつストレスがたまる（1年で約+3）
     buildQueue();
     save();
   }
@@ -752,6 +779,7 @@ const Engine = (() => {
     s.physicalLoad = clamp(pl + ot * 0.3 + ld.physical, 0, 100);
     s.mentalLoad = clamp(ml + ot * 0.4 + (st.ment || 0) * (G.rank || 0) * 0.5 + ld.mental + (G.flags.black_company ? 15 : 0), 0, 100);
     if (G.job.hoursMul) { s.physicalLoad *= G.job.hoursMul; s.mentalLoad *= G.job.hoursMul; }
+    if (G.flags.sequela) s.physicalLoad = clamp(s.physicalLoad * 1.5 + 35, 0, 100); // 後遺症：体の負担がすぐ上限に
     // 適性（才能×仕事の重み）＋好きなこと＋給料－負荷
     let apt = 0, n = 0;
     for (const [k, w] of Object.entries(j.weights || {})) { const t = k === 'pe' ? G.talents.t_sport : Menu.wv(k); apt += t * w; n += w; }
@@ -986,5 +1014,5 @@ const Engine = (() => {
     }
     return false;
   }
-  return { prefMenu, prefCounts, PREF_SRC, univReport, lessonEffText: (d) => lessonEff(d), begin, next, choose, chooseMenuNext, chooseLessons, addLesson, lessonCandidates, lessonCap, jukuOk, poorHome, isLesson, snap, diff, schedule, setFocus, onLike, initSubjects, die, rollP, ev, buildQueue, advance, checkDeath, ageLabel, acad };
+  return { placeNow, placeBlocked, ev, prefMenu, prefCounts, PREF_SRC, univReport, lessonEffText: (d) => lessonEff(d), begin, next, choose, chooseMenuNext, chooseLessons, addLesson, lessonCandidates, lessonCap, jukuOk, poorHome, isLesson, snap, diff, schedule, setFocus, onLike, initSubjects, die, rollP, ev, buildQueue, advance, checkDeath, ageLabel, acad };
 })();

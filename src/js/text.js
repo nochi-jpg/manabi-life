@@ -114,6 +114,23 @@ const Text = (() => {
       case 'partJob': { const j = G.job && G.job.part && Menu.job(G.job.part); return j ? j.label : 'アルバイト'; }
       case 'partMonthly': { const j = G.job && G.job.part && Menu.job(G.job.part); return j ? round1((j.wage * j.hoursWeek * 50 / 10000) / 12 * (G.focus === 'focus_parttime' ? 2 : 1)).toFixed(1) : '0'; }
       case 'carValueNow': return man(G.vars.carValue ?? 30);
+      // ---- 入院・介護施設 ----
+      case 'hospCause': return (G.vars.hosp || G.vars.lastHosp || {}).label || '病気の治療';
+      case 'hospDays': return (G.vars.hosp || G.vars.lastHosp || {}).days || 14;
+      case 'hospOkRate': { const h = G.vars.hosp; return h ? Math.round(100 * (1 - h.aft * (h.rehab ? 0.6 : 1))) : 100; }
+      case 'hospBill': { const h = G.vars.lastHosp || G.vars.hosp; if (!h) return 0; const b = h.bill || Life.hospBill(h); return man(b.total); }
+      case 'hospInsText': { const h = G.vars.lastHosp || G.vars.hosp; if (!h) return ''; const b = h.bill || Life.hospBill(h); return b.ins > 0 ? `・保険の給付金 ${man(b.ins)}万円が入った` : '・保険には入っていなかった'; }
+      case 'hospInsNote': return G.flags.life_insurance || G.flags.cancer_insurance ? '（医療保険から、入院1日あたり5,000円が出る）' : '（医療保険に入っていないので、入院費は全部自分で払う）';
+      case 'hospOkText': return ({ cancer: 'がんの手術をのりこえた。', cancer_chemo: '治療をやりとげた。', cancer_care: '体調が少し落ち着いた。', heart: '心臓の手術をのりこえた。', stroke: 'リハビリをがんばり、ほとんど元どおりに動けるようになった。', traffic: 'けがはすっかり治った。' })[(G.vars.lastHosp || {}).cause] || '元気になった。';
+      case 'sequelaName': return ({ cancer: '手術のあとの体の疲れやすさ', cancer_chemo: '手足のしびれ', cancer_care: '体の疲れやすさ', heart: '息切れ', stroke: '手足のまひ', traffic: '足の痛み' })[(G.vars.lastHosp || G.vars.hosp || {}).cause] || '体の不調';
+      case 'sequelaPain': return pick({ stroke: ['手足のまひで、ボタンをとめるのに時間がかかる。', 'リハビリのおかげで、少しずつ歩けるきょりがのびてきた。'], traffic: ['雨の日は、けがをした足が痛む。', '長く歩くと、足が重くなる。'], heart: ['階段をのぼると、すぐに息が切れる。', '無理をしないように、毎日少しずつ散歩している。'] }[G.vars.sequelaType] || ['後遺症で、前のようには体が動かない日がある。', '疲れやすくなったので、早めに休むようにしている。']);
+      case 'facilityDaily': return pk(pool().facilityDaily);
+      case 'hospitalDaily': { const L = pool().hospitalDaily.slice(); if ((G.vars.hosp || {}).room === 'ward') L.push('同じ病室の人と、少しずつ話すようになった。'); else L.push('個室なので、夜も静かに休めた。'); return pk(L); }
+      case 'facilityVisitText': return pick(['いっしょに中庭を散歩した。', '近況を聞いて、たくさん笑った。', 'おみやげのお菓子を、職員さんにも配った。']);
+      case 'hospitalVisitText': return pick(['着がえとお菓子を持ってきてくれた。', '「早く元気になってね」と言ってくれた。', '仕事のことは心配しないで、と言ってくれた。']);
+      case 'facilityEventName': return pick([['お花見会', '春の遠足'], ['夏祭り', 'すいか割り大会'], ['敬老会', '運動会'], ['クリスマス会', '書き初め大会']][G.q]); // 季節に合わせる
+      case 'houseRentOut': return Math.max(4, Math.round((G.vars.houseValue || 1500) * 0.045 / 12));
+      case 'houseStayWho': { const h = Fam.household(); const sp = h.find((p) => p.role === 'spouse'); return sp ? sp.name : h.length ? roleLabel(h[0]) : '家族'; }
       case 'cashNow': return man(Math.max(0, G.cash));
       case 'pocket': return round1(Econ.myPocket()).toFixed(1);
       case 'sendMoney': return ch ? String(ch.sendMoney ?? 7) : '7';
@@ -219,6 +236,8 @@ const Text = (() => {
       case 'offerJob': return G.job ? G.job.id : 'j_sales';
       case 'sameCompanyLowAi': return 'j_office';
       case 'loanAmountRental': return D().housing.investment.unitPrice[Econ.tierKey()] - 200;
+      case 'hospOkRate': { const h = G.vars.hosp; return h ? Math.round(100 * (1 - h.aft * (h.rehab ? 0.6 : 1))) : 100; }
+      case 'houseRentOut': return Math.max(4, Math.round((G.vars.houseValue || 1500) * 0.045 / 12));
       default:
         if (k.startsWith('targetOrDefault:')) { const t = G.vars.target; return t && t !== 'none' ? t : k.split(':')[1]; }
         console.warn('未対応の値', k); return 0;

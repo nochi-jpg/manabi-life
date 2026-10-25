@@ -287,7 +287,7 @@
       ] },
 
     { "id": "ev_f_child_visit", "kind": "flow", "emoji": "🎍", "cat": "family",
-      "when": { "child": { "age": [20, 70], "alive": true, "together": false } },
+      "when": { "season": ["Q4"], "none": ["in_facility"], "child": { "age": [20, 70], "alive": true, "together": false } },
       "weight": { "base": 1.5 },
       "text": "お正月に{child}が帰ってきた。久しぶりに家がにぎやかになった。",
       "effects": { "stats": { "happiness": 3 }, "personRelation": { "child": 2 } } },

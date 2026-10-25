@@ -110,17 +110,20 @@ const Econ = (() => {
   // 親の年収（自分がおこづかいをもらうとき）
   function parentsIncome() { const ps = people('father|mother').filter((p) => p.alive); const v = ps.reduce((a, p) => a + (p.income || 0), 0); return v || [300, 450, 600, 800, 1100][Math.min(4, Math.floor(G.talents.familyWealth / 20))]; }
   function myPocket() { const st = G.stage === 'elem' ? 'elem' : G.stage === 'jhs' ? 'jhs' : G.stage === 'hs' ? 'hs' : Menu.isStudent() && G.age >= 18 ? 'univ' : null; return st ? Math.max(0.1, pocketMoney(st, parentsIncome())) : 0; }
+  // 介護施設の費用（年）：年金が少ない人は特別養護老人ホーム（月8万円くらい〜）、多い人は有料老人ホーム（月18万円くらいまで）
+  function facilityFee() { return Math.round(clamp(pensionAnnual() * 0.75, 96, 216)); }
   // ---- 生活費（年・万円） ----
   function livingCost() {
     const sp = Fam.spouseHome();
     if (G.flags.welfare) return 140 + (sp ? 60 : 0); // 生活保護：最低限の生活費（医療費は無料）
+    if (G.flags.in_facility) return (30 + (Fam.household().length ? 140 : 0)) * LEVELS[lifeLevel()].mul; // 施設：食事は施設の費用にふくまれる（家に家族がいれば、その生活費）
     const base = { tokyo: 185, A: 175, B: 160, C: 150 }[tierKey()];
     let v = base * (G.vars.livingCostMul || 1);
     if (sp) v += 85;
     // 収入が多いほど使うお金も増える
     const net = (jobGross() + sideGross() + pensionAnnual()) * 0.78 + (sp ? (sp.income || 0) * 0.78 : 0);
     // 収入が多いほど使うお金も増える（ふえた分の6割）。子どもがいる家は、その分を子どもの費用にあてる
-    if (net > 260) v += Math.max(0, (net - 260) * 0.68 - childCosts() * 0.68);
+    if (net > 260) v += Math.max(0, (net - 260) * 0.74 - childCosts() * 0.74);
     if (G.age >= 65) v += 15; // 医療・介護
     if (G.cash < 0) v *= 0.85; // お金がないときは節約する
     v *= LEVELS[lifeLevel()].mul;
@@ -195,6 +198,7 @@ const Econ = (() => {
     if (G.flags.dz_diabetes || G.flags.dz_hypertension) add('💊', '通院・薬', (G.flags.dz_diabetes ? 2 : 0) + (G.flags.dz_hypertension ? 1.2 : 0));
     if (G.flags.life_insurance || G.flags.cancer_insurance) add('🛡️', '保険', (G.flags.life_insurance ? 6 : 0) + (G.flags.cancer_insurance ? 3.6 : 0), [G.flags.life_insurance ? '医療保険' : '', G.flags.cancer_insurance ? 'がん保険' : ''].filter(Boolean).join('・'));
     if (G.flags.caregiving) add('🤲', '介護', G.vars.careCost || 30, 'ヘルパー・おむつなど');
+    if (G.flags.in_facility) { const f = facilityFee(); add('🏢', '介護施設', f, `月${round1(f / 12)}万円（食事・介護をふくむ）`); }
     if (G.flags.exercise_habit && G.vars.gym) add('🏋️', 'ジム', 9.6);
     let lh = 0; const lhn = [];
     const parentsPay = Menu.isStudent() && !G.flags.self_pay_school; // 学生の習い事・教育費は、ふつうは親が出してくれる
@@ -348,5 +352,5 @@ const Econ = (() => {
     // 車は毎年値下がり（新車は年15%、中古は年12%。いくら古くても5万円くらいでは売れる）
     if (G.flags.owns_car) { if (G.vars.carValue == null) G.vars.carValue = 60; G.vars.carValue = Math.max(5, G.vars.carValue * (G.vars.carNew ? 0.85 : 0.88)); }
   }
-  return { consumerDebt, myPocket, parentsIncome, homeIncome, childCost1, pocketMoney, jobGross, sideGross, annualIncome, monthlyIncome, hasBonus, salaryPreview, salaryCurve, rankTrack, nextStep, curStep, nextStepRate, steps, overtime, aiRisk, pensionMonthly, pensionAnnual, incomeTaxes, livingCost, childCosts, childAllowanceYear, quarter, addLoan, totalDebt, loansLeft, netWorth, liquid, householdCash, assetsValue, yearAssets, working, tierKey, WORKING, expenses, netIncomeYear, welfareQ, LEVELS, lifeLevel, costKids, childStage, LOAN_L, scholarStart };
+  return { facilityFee, consumerDebt, myPocket, parentsIncome, homeIncome, childCost1, pocketMoney, jobGross, sideGross, annualIncome, monthlyIncome, hasBonus, salaryPreview, salaryCurve, rankTrack, nextStep, curStep, nextStepRate, steps, overtime, aiRisk, pensionMonthly, pensionAnnual, incomeTaxes, livingCost, childCosts, childAllowanceYear, quarter, addLoan, totalDebt, loansLeft, netWorth, liquid, householdCash, assetsValue, yearAssets, working, tierKey, WORKING, expenses, netIncomeYear, welfareQ, LEVELS, lifeLevel, costKids, childStage, LOAN_L, scholarStart };
 })();

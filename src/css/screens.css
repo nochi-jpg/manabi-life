@@ -501,4 +501,8 @@
 /* 出生画面：家族の職業は1行に */
 #card .kv{grid-template-columns:120px minmax(0,1fr)}
 #card .kv .one{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-#card .kv .one.f14{font-size:14px}#card .kv .one.f12{font-size:12px}#card .kv .one.f11{font-size:11px;letter-spacing:-.02em}
+#card .kv .one{font-size:14px}#card .kv .one.f14{font-size:14px}#card .kv .one.f12{font-size:12px}#card .kv .one.f11{font-size:11px;letter-spacing:-.02em}
+
+/* 誕生画面：続柄（母方の祖母など）が住まいの欄にかぶらないように */
+#card .kv .k{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#card .kv .k.long{font-size:11px;letter-spacing:-.02em}

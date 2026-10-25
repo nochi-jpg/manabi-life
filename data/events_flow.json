@@ -135,7 +135,7 @@
       "when": { "age": [7, 12], "talent": { "t_academic": ["<", 35] }, "once": true }, "weight": { "base": 2 },
       "text": "九九がなかなか覚えられなくて、居残りになった。" },
     { "id": "ev_f_hint_sport_hi", "kind": "flow", "emoji": "🏃", "cat": "hint",
-      "when": { "age": [4, 12], "talent": { "t_sport": [">=", 65] }, "once": true }, "weight": { "base": 3 },
+      "when": { "season": ["Q1", "Q3"], "age": [4, 12], "talent": { "t_sport": [">=", 65] }, "once": true }, "weight": { "base": 3 },
       "text": "運動会のかけっこで1位！「足が速いね」とみんなに言われた。" },
     { "id": "ev_f_hint_sport_lo", "kind": "flow", "emoji": "🤸", "cat": "hint",
       "when": { "age": [6, 12], "talent": { "t_sport": ["<", 35] }, "once": true }, "weight": { "base": 2 },
@@ -156,7 +156,7 @@
       "when": { "age": [4, 12], "talent": { "t_music": [">=", 68] }, "club": ["ls_piano", "ls_dance", "ls_violin", "ls_chorus"], "once": true }, "weight": { "base": 3 },
       "text": "一度聞いただけの曲を、すぐに口ずさめた。先生が目を丸くしていた。" },
     { "id": "ev_f_hint_looks", "kind": "flow", "emoji": "✨", "cat": "hint",
-      "when": { "age": [13, 18], "talent": { "looks": [">=", 70] }, "once": true }, "weight": { "base": 2 },
+      "when": { "season": ["Q3"], "age": [13, 18], "talent": { "looks": [">=", 70] }, "once": true }, "weight": { "base": 2 },
       "text": "文化祭のあと、知らない学年の人から声をかけられた。" },
     { "id": "ev_f_hint_like_gap", "kind": "flow", "emoji": "🤔", "cat": "hint",
       "when": { "age": [8, 14], "likeTalentGap": true, "once": true }, "weight": { "base": 3 },
@@ -258,9 +258,23 @@
       "text": "{adultDaily}" },
     { "id": "ev_f_daily_senior", "kind": "flow", "emoji": "🍵", "cat": "daily",
       "when": { "age": [65, 105] }, "weight": { "base": 1 },
-      "text": "{seniorDaily}" }
+      "text": "{seniorDaily}" },
+
+    {"id": "ev_f_facility_daily", "kind": "flow", "emoji": "🏡", "cat": "daily", "place": ["facility"], "when": {}, "weight": {"base": 2}, "text": "{facilityDaily}"},
+
+    {"id": "ev_f_facility_visit", "kind": "flow", "emoji": "💐", "cat": "family", "place": ["facility"], "when": {"person": {"role": "child|spouse|grandchild", "alive": true}}, "weight": {"base": 1.2}, "text": "{whoName}が施設に面会に来てくれた。{facilityVisitText}", "effects": {"stats": {"happiness": 4, "stress": -3}}},
+
+    {"id": "ev_f_hospital_daily", "kind": "flow", "emoji": "🏥", "cat": "daily", "place": ["hospital"], "when": {}, "weight": {"base": 2}, "text": "{hospitalDaily}"},
+
+    {"id": "ev_f_hospital_visit", "kind": "flow", "emoji": "💐", "cat": "family", "place": ["hospital"], "when": {"person": {"role": "spouse|child|father|mother|partner", "alive": true}}, "weight": {"base": 1.2}, "text": "{whoName}がお見舞いに来てくれた。{hospitalVisitText}", "effects": {"stats": {"happiness": 3, "stress": -3}}},
+
+    {"id": "ev_f_sequela_pain", "kind": "flow", "emoji": "🩹", "cat": "health", "when": {"all": ["sequela"], "cooldownYears": 2}, "weight": {"base": 1.5}, "text": "{sequelaPain}", "effects": {"stats": {"stress": 2, "happiness": -1}}},
+
+    {"id": "ev_m_discharge", "kind": "flow", "emoji": "🌤️", "cat": "health", "type": "scheduled", "when": {}, "roll": {"rate": "$hospOkRate"}, "success": {"text": "🌤️ {hospDays}日間の入院を終えて、退院した。{hospOkText}（入院費 {hospBill}万円{hospInsText}）", "effects": {"discharge": "ok", "stats": {"happiness": 6, "stress": -5}}}, "fail": {"text": "🩹 {hospDays}日間の入院を終えて退院した。でも、{sequelaName}の後遺症が残った。（入院費 {hospBill}万円{hospInsText}）", "effects": {"discharge": "sequela", "stats": {"happiness": -6, "stress": 4}}}}
   ],
   "textPools": {
+    "facilityDaily": ["レクリエーションで、みんなで風船バレーをした。", "職員さんといっしょに、季節のかざりを作った。", "同じフロアの人とお茶を飲みながら、昔の話をした。", "歌の会で、なつかしい歌をみんなで歌った。", "訪問の床屋さんに、髪を切ってもらった。", "リハビリで、前より少し長く歩けるようになった。", "窓から見える木の葉の色で、季節が変わったのを感じた。", "夕ごはんに好物が出て、うれしかった。", "施設の書道クラブで、お手本を見ながら字を書いた。", "となりの部屋の人と、テレビの話でもりあがった。"],
+    "hospitalDaily": ["消灯は夜9時。病院の夜は長く感じる。", "看護師さんが、毎朝体温と血圧を測りにきてくれる。", "病院の食事は薄味だけど、だんだん慣れてきた。", "点滴をしながら、本を読んで過ごした。", "窓から見える景色を、ぼんやりながめた。", "先生の回診で「順調ですね」と言われて、ほっとした。", "リハビリの先生といっしょに、病棟の廊下を歩く練習をした。", "入院してから、家のありがたさがよくわかった。"],
     "babyMilestone": ["はじめて「ママ」と言った。", "つかまり立ちができた。", "公園の砂場で1時間も遊んだ。", "ひらがなが少し読めるようになった。", "補助輪なしで自転車に乗れた。"],
     "studentDaily": ["テスト前日、一夜づけをした。", "給食のカレーをおかわりした。", "席がえで、仲のいい友だちと近くになった。", "部活の帰りに友だちとアイスを食べた。", "雨の日の体育は体育館でドッジボール。", "定期テストの結果が返ってきた。"],
     "adultDaily": ["休日は家でゆっくり過ごした。", "久しぶりに地元の友だちと飲みに行った。", "新しいスマホに買いかえた。", "職場の後輩に仕事を教えた。", "健康のために、エレベーターでなく階段を使っている。", "仕事帰りに同僚とごはんを食べた。", "近所のスーパーの特売で、まとめ買いをした。"],
