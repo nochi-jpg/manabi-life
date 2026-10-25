@@ -160,6 +160,7 @@ const Effects = (() => {
         case 'hqMove': setFlag('hq_assign', true, ctx); break;
         case 'benefit': { const g = Econ.jobGross() || G.vars.lastGross || 200; G.vars.benefitLeft = Math.round(g * 0.6 * 0.5); G.vars.benefitQ = Math.round(G.vars.benefitLeft / 2); break; }
         case 'incomeMul': if (G.job) G.job.mul = (G.job.mul || 1) * v; break;
+        case 'fame': Fame.change(v, logs); break;
         case 'raiseMul': G.vars.raiseMul = v; break;
         case 'sideIncome': G.vars.sideIncome = Math.round(rangeVal(v)); break;
         case 'invest': Life.invest(v, ctx); break;
@@ -309,6 +310,7 @@ const Work = {
     const oldTrack = Econ.rankTrack();
     if (G.job && G.job.part) School.dropPart('就職したので');
     else if (G.focus === 'focus_parttime') Engine.setFocus(Menu.isStudent() ? 'focus_study' : 'focus_work', true);
+    G.vars.fameLv = 0;
     G.job = { id, form: f, startAge: Math.min(G.age, (G.job && G.job.startAge) ?? G.age), since: G.year, mul: 1, pref: G.pref };
     School.dropYobiko();
     delete G.flags.long_commute;
@@ -440,6 +442,32 @@ const People = {
 };
 
 // ===== 住まい・投資など =====
+// ===== 夢の仕事（動画配信者・芸人・アイドル・DJ など）=====
+//  学歴がなくてもなれるが、ふだんは低収入。毎年10月に、ほんの少しの確率で人気が上がる（0→1→2→3）。
+//  1=食べていける（×2.5） 2=人気者（×8） 3=大ブレイク（×40）。人気は落ちることもある。売れないまま5年ごとに「続ける？」
+const Fame = {
+  MUL: [1, 2.5, 8, 40],
+  job() { const j = G.job && G.job.id && Menu.job(G.job.id); return j && j.dream && Econ.working() ? j : null; },
+  mul() { return this.job() ? this.MUL[G.vars.fameLv || 0] : 1; },
+  yearRoll() {
+    const j = this.job(); if (!j || G.vars.hosp || G.flags.in_facility) return null;
+    const lv = G.vars.fameLv || 0;
+    const fit = clamp(1 + (Menu.selfHensachi(j.weights) - (j.hensachi || 50)) / 25, 0.4, 1.8); // 才能・実力
+    const age = G.age > 45 ? 0.4 : G.age > 35 ? 0.7 : 1;
+    const up = [0.04, 0.08, 0.06][lv] ?? 0;
+    if (lv < 3 && chance(up * fit * age)) return 'ev_m_fame_up';
+    if (lv >= 1 && chance(lv === 3 ? 0.05 : 0.09)) return 'ev_m_fame_down';
+    if (lv === 0 && G.jobYears > 0 && G.jobYears % 5 === 0 && G.age < 60) return 'ev_m_dream_crossroad';
+    return null;
+  },
+  change(d, logs) {
+    const lv = clamp((G.vars.fameLv || 0) + d, 0, 3);
+    G.vars.fameLv = lv; G.vars.fameBest = Math.max(G.vars.fameBest || 0, lv);
+    Effects.setFlag('creator_hit', lv >= 2);
+  },
+  label() { const j = this.job(); if (!j) return ''; return ['', '食べていける', '人気者', '大ブレイク'][G.vars.fameLv || 0]; },
+};
+
 // ===== 妊活・妊娠・不妊治療 =====
 //  妊活中（wants_children）→ 毎年4月に年齢に合った確率で妊娠（pregnant）→ 3季節後（約10か月）に出産
 //  3年たっても妊娠しなければ「不妊治療をする？」（保険適用・年齢で妊娠しやすさが変わる）。2年ごとに続けるか聞く

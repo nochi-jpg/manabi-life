@@ -236,7 +236,7 @@ const Menu = (() => {
     // 地方は会社の数が少なく、事務・企画などの仕事は少ない枠の取りあいになる
     if (!LOCAL_JOBS.includes(j.id) && j.cat !== 'civil') d -= tier() === 'C' ? 4 : tier() === 'B' ? 2 : 0;
     // TOEICの点数は、英語を使う仕事（外資・商社・航空・ホテル・通訳など）でだけ有利
-    if (engJob(j)) d += G.flags.toeic_900 ? 7 : G.flags.toeic_800 ? 5 : G.flags.toeic_600 ? 2.5 : 0;
+    if (engJob(j)) d += G.flags.toeic_900 ? 7 : G.flags.toeic_800 ? 5 : G.flags.toeic_600 ? 2.5 : G.flags.eiken_2 || G.flags.eiken_p1 ? 1.5 : 0;
     const sc = G.school && picked(G.vars.schoolPick || '');
     if (sc && sc.tmpl) { const t = school(sc.tmpl); if (t && t.jobRank) d += (t.jobRank - 3) * 2; }
     if (G.vars.major) { const dp = dept(G.vars.major); if (dp && (dp.opens || []).some((o) => (j.tags || []).includes(o) || j.cat === o)) d += 3; }
@@ -256,7 +256,8 @@ const Menu = (() => {
     if (t) [...(t.onGraduate || []), ...(t.grantOnGrad || [])].forEach((f) => { if (!G.flags[f]) out.add(f); });
     return out;
   }
-  const licLabel = (f) => (D().flags.flags.license || {})[f] || f;
+  const LIC = () => D().flags.flags.license || {};
+  const licLabel = (f) => LIC()[f] || f;
   const engJob = (j) => ((j.weights || {}).eng || 0) >= 1 || (j.tags || []).some((t) => t === 'global' || t === 'airline');
   const hasToeic = () => !!(G.flags.toeic_600 || G.flags.toeic_800 || G.flags.toeic_900);
   function jobOk(j, mode) {
@@ -274,6 +275,8 @@ const Menu = (() => {
     if (j.maxAge && G.age > j.maxAge) return false;
     if (j.healthMin && G.stats.health < j.healthMin) return false;
     if (j.tiers && !j.tiers.includes(tier()) && !G.flags.moved_to_tokyo) return false;
+    // 東京（や大阪）にしかない仕事：ほかの県からは、上京して働く（45歳まで）
+    if (j.prefOnly && !j.prefOnly.includes(G.pref) && (G.age > 45 || G.flags.in_facility)) return false;
     if (j.coastOnly && pref().rural < 0.3) return false;
     if (j.id === 'j_pro_athlete' && !(G.flags.national_tournament || G.flags.koshien || (G.skill.sport || 0) >= 70)) return false;
     if (G.job && G.job.id === j.id) return false;
@@ -285,7 +288,8 @@ const Menu = (() => {
   const LOCAL_JOBS = ['j_care', 'j_nurse', 'j_nursery', 'j_teacher_elem', 'j_teacher_sec', 'j_civil_local', 'j_police', 'j_firefighter', 'j_sdf', 'j_farmer', 'j_fisher', 'j_factory', 'j_carpenter', 'j_electrician', 'j_truck', 'j_delivery', 'j_taxi', 'j_office', 'j_sales', 'j_sales_shop', 'j_store_manager', 'j_cook', 'j_family_business', 'j_parttime_general', 'j_pharmacist', 'j_doctor', 'j_dentist', 'j_pt', 'j_beautician', 'j_mechanic', 'j_hotel', 'j_juku', 'j_construction_mgr', 'j_bank', 'j_cleaning', 'j_welfare', 'j_accounting', 'j_realestate'];
   // 地方の求人：その年に募集がある仕事だけ（大都市圏はぜんぶ、地方中核は7割、地方は4割）。仕事の種類が少ないぶん、決まった枠を取りあう
   function jobHere(j) {
-    const T = tier(); if (T === 'A' || LOCAL_JOBS.includes(j.id) || j.cat === 'civil') return true;
+    const T = tier(); if (T === 'A' || LOCAL_JOBS.includes(j.id) || j.cat === 'civil' || j.prefOnly) return true;
+    if ((j.requires || []).some((f) => G.flags[f] && LIC()[f])) return true; // 資格がいる仕事（会計士・弁護士など）はどこの県にもある
     return seeded(G.seed + j.id + G.pref + calYear()) < (T === 'B' ? 0.7 : 0.4);
   }
   function jobMenu(mode) {
@@ -293,9 +297,17 @@ const Menu = (() => {
     const exp = expectedFlags();
     const out = list.map((j) => {
       const ai = D().ai_impact.jobs[j.id];
-      const sal = Econ.salaryPreview(j);
+      const sal = Econ.salaryPreview(j, j.prefOnly && !j.prefOnly.includes(G.pref) ? j.prefOnly[0] : null);
       const expect = (j.requires || []).filter((f) => exp.has(f));
-      return { id: j.id, tmpl: j.id, emoji: j.emoji, label: j.label, name: j.label, sub: `年収 約${sal}万円${ai && ai.risk >= 0.7 ? '・🤖AIの影響大' : ''}${expect.length ? `・🎓 ${expect.map(licLabel).join('・')}取得見込み` : ''}`, rate: jobRate(j, mode), job: true, expect: expect.length > 0 };
+      // 持っている資格が生きる仕事（必須の資格・有利になる資格）
+      const held = (j.requires || []).filter((f) => G.flags[f] && LIC()[f]);
+      const plus = Object.keys(j.bonusFlags || {}).filter((f) => G.flags[f] && LIC()[f] && !held.includes(f));
+      const away = j.prefOnly && !j.prefOnly.includes(G.pref) ? j.prefOnly[0] : null;
+      const tags = [];
+      if (j.prefOnly) tags.push(`🗼 ${j.prefOnly.map((p) => Fam.prefName(p).replace(/[都道府県]$/, '')).join('・')}だけの仕事${away ? '（上京する）' : ''}`);
+      if (j.dream) tags.push('🎲 ふだんは低収入・売れれば大金持ち');
+      if (held.length || plus.length) tags.push(`📜 ${[...held, ...plus].map(licLabel).join('・')}が生きる`);
+      return { id: j.id, pref: away || undefined, lic: held.length ? 2 : plus.length ? 1 : 0, xtra: tags.length ? '・' + tags.join('・') : '', tmpl: j.id, emoji: j.emoji, label: j.label, name: j.label, sub: `年収 約${sal}万円${ai && ai.risk >= 0.7 ? '・🤖AIの影響大' : ''}${expect.length ? `・🎓 ${expect.map(licLabel).join('・')}取得見込み` : ''}`, rate: jobRate(j, mode), job: true, expect: expect.length > 0 };
     });
     const tm = G.school && school(G.school.tmpl);
     // 好きなこと・学部に合うものを先に。そのあと合格率の高い順
@@ -304,8 +316,9 @@ const Menu = (() => {
       // 通っている学校（専門学校・短大など）で学んだこと
       if (s < 3 && tm && (tm.opens || []).some((x) => (j.tags || []).includes(x) || j.cat === x || j.id.includes(x))) s += 3;
       if (o.expect) s += 6; // 資格取得見込みの仕事はいちばん上に
+      if (o.lic === 2) s += 6; else if (o.lic === 1) s += 1.5; // 持っている資格が必須の仕事も上に
       return s; };
-    for (const o of out) { const jj = job(o.id); if (jj && engJob(jj) && hasToeic()) o.sub += '・🔤 TOEICが生きる'; }
+    for (const o of out) { o.sub += o.xtra; delete o.xtra; const jj = job(o.id); if (jj && engJob(jj) && hasToeic()) o.sub += '・🔤 TOEICが生きる'; }
     for (const o of out) { const f = fit(o); if (f >= 3 && !o.expect) o.sub += '・👍 学んだことが生きる'; else if (f >= 2) o.sub += '・💚 好きなことに合う'; }
     return out.sort((a, b) => fit(b) + b.rate / 40 - (fit(a) + a.rate / 40)).slice(0, 25);
   }

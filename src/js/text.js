@@ -1,5 +1,18 @@
 'use strict';
 // ===== テキストの差し込み（{name} など）と、動的な値（$pick など） =====
+// 夢の仕事の「売れた」「人気が落ちた」の文（[1段目, 2段目, 3段目, 落ちたとき]）
+const FAME_TXT = {
+  _: ['{job}の仕事が少しずつ増えてきた。アルバイトをしなくても、なんとか食べていけるようになった。', '{job}として名前が知られるようになった！仕事の依頼がひっきりなしに来る。', '🌟 大ブレイク！日本中の人が知っている{job}になった。収入はけた違いに。', '人気が少し落ちてきた。前ほど仕事の依頼が来なくなった。'],
+  j_youtuber: ['チャンネル登録者が10万人をこえた！広告収入で、なんとか食べていけるようになった。', '動画がつぎつぎにバズって、登録者100万人に！企業からの案件も入るようになった。', '🌟 登録者数が日本トップクラスに！テレビにも呼ばれ、収入はけた違いになった。', '再生数が落ちてきた。視聴者の好みが変わったのかもしれない。'],
+  j_entertainer: ['ドラマの脇役に決まった！少しずつ仕事が増えて、バイトをやめられた。', '主演ドラマが大ヒット！街を歩くと声をかけられるようになった。', '🌟 映画もCMも引っぱりだこの売れっ子に！収入はけた違いになった。', 'レギュラー番組が終わって、仕事が減ってきた。'],
+  j_dj: ['人気クラブのレギュラーDJに決まった！なんとかDJだけで食べていけるようになった。', '大きな音楽フェスに出演！海外からもオファーが来るようになった。', '🌟 世界ツアーをするほどの人気DJに！収入はけた違いになった。', '流行りの音楽が変わって、出番が減ってきた。'],
+  j_voice_actor: ['アニメの準レギュラーに決まった！声の仕事だけで食べていけるようになった。', '主役の声を担当したアニメが大ヒット！イベントにも呼ばれる人気声優に。', '🌟 だれもが知る人気声優に！歌もCDも大ヒットして、収入はけた違いになった。', 'レギュラーの作品が終わって、オーディションに落ちる日が続いている。'],
+  j_idol: ['ライブのチケットが売り切れるようになった！ファンが少しずつ増えている。', 'テレビの歌番組に出演！グループの人気が一気に広がった。', '🌟 ドームでライブをするほどの国民的アイドルに！収入はけた違いになった。', '新しいグループに人気をうばわれて、ライブのお客さんが減ってきた。'],
+  j_comedian: ['お笑いの賞レースで準決勝まで進んだ！劇場の出番が増えて、バイトをやめられた。', '賞レースで優勝！テレビに引っぱりだこになった。', '🌟 冠番組をいくつも持つ売れっ子芸人に！収入はけた違いになった。', '「一発屋」と言われはじめた。テレビの出番が減ってきた。'],
+  j_pro_gamer: ['チームに所属して給料がもらえるようになった！なんとか食べていける。', '大きな大会で優勝！賞金と配信で、人気プレイヤーになった。', '🌟 世界大会で優勝！スポンサーがつぎつぎについて、収入はけた違いに。', '若い選手に勝てなくなってきた。反応速度が落ちたのかもしれない。'],
+  j_band: ['インディーズで出したCDが少しずつ売れはじめた！ライブハウスがいっぱいになるようになった。', 'メジャーデビュー！曲がドラマの主題歌になって、ヒットチャートに入った。', '🌟 武道館もドームも満員に！国民的な人気者になって、収入はけた違いになった。', '新曲があまり売れず、ライブのお客さんが減ってきた。'],
+  j_novelist: ['新人賞をとってデビュー！本が少しずつ売れて、なんとか書くことで食べていけるようになった。', '書いた小説がベストセラーに！テレビや雑誌の取材も来るようになった。', '🌟 小説が映画化されて大ヒット！大きな文学賞もとり、印税はけた違いになった。', '新しい本があまり売れなかった。次の作品の依頼が減ってきた。'],
+};
 const Text = (() => {
   const P = () => D().text_pools;
   const pool = () => D().events_flow.textPools;
@@ -46,7 +59,14 @@ const Text = (() => {
       case 'lastGpa': return (G.vars.lastGpa ?? 0).toFixed(2);
       case 'studentDaily': { const key = ['univ', 'univ_med', 'junior_college', 'vocational', 'grad_master', 'grad_doctor', 'grad_prof'].includes(G.stage) ? 'univ' : ['hs', 'hs_corr', 'hs_night', 'kosen'].includes(G.stage) ? 'hs' : G.stage === 'free_school' ? 'elem' : G.stage; const sd = P().studentDaily[key]; return pk(sd || pool().studentDaily); }
       // 職場・仕事・同僚の文は、働いている人だけ
-      case 'adultDaily': { const working = !!(G.job && G.job.id && Econ.working()); return pk(pool().adultDaily.filter((t) => working || !/職場|仕事|同僚|会社/.test(t))); }
+      case 'adultDaily': { const working = !!(G.job && G.job.id && Econ.working()); const org = Cond.test({ orgWorker: true }, {}); return pk(pool().adultDaily.filter((t) => (working || !/職場|仕事|同僚|会社/.test(t)) && (org || !/職場|同僚|後輩|会社/.test(t)))); }
+      // 仕事ごとの日常（jobDaily：職業ID → なければ分野）
+      case 'jobDaily': { const P2 = pool().jobDaily || {}; const j = G.job && Menu.job(G.job.id); if (!j) return '今日も一日、がんばって働いた。'; const st = Econ.steps()[G.rank || 0]; let L = (P2[j.id] || P2[j.cat] || P2._default).slice(); if (st && st.mgr && P2._mgr) L = L.concat(P2._mgr); return pk(L); }
+      case 'fameUpText': { const j = Fame.job(); const lv = G.vars.fameLv || 0; const t = (FAME_TXT[j && j.id] || FAME_TXT._)[lv - 1] || ''; return t.replace('{job}', j ? j.label : '仕事'); }
+      case 'fameDownText': { const j = Fame.job(); const t = (FAME_TXT[j && j.id] || FAME_TXT._)[3]; return t.replace('{job}', j ? j.label : '仕事'); }
+      case 'fameNow': return ['まだ売れていない', 'なんとか食べていける', '人気者', '大ブレイク中'][G.vars.fameLv || 0];
+      case 'dreamYears': return G.jobYears;
+      case 'dreamJobLabel': { const j = Fame.job(); return j ? j.label : '夢の仕事'; }
       case 'seniorDaily': return pk(pool()[k]);
       case 'tripDest': return pk(pool().tripDest[G.stage] || pool().tripDest.elem);
       case 'kenshinResult': { const bad = G.stats.health < 60 || G.flags.dz_hypertension || G.flags.smoker || G.flags.heavy_drinker; ctx.kenshinBad = bad; return pk(P().kenshinResult[bad ? 'warn' : 'good']); }
@@ -198,7 +218,7 @@ const Text = (() => {
       case 'age': return G.age;
       case 'who': return ctx.who ? ctx.who.id : null;
       case 'parentId': return ctx.who ? ctx.who.id : (person('father|mother') || {}).id;
-      case 'parentBusinessJob': { const p = people('father|mother').find((x) => x.employment === 'self_employed'); G.vars.nextForm = 'self_employed'; G.vars.familyBiz = true; return p && p.job && Menu.job(p.job) ? p.job : 'j_family_business'; }
+      case 'parentBusinessJob': { const p = people('father|mother').find((x) => x.employment === 'self_employed'); G.vars.nextForm = 'self_employed'; G.vars.familyBiz = true; const pj = p && p.job && Menu.job(p.job); return pj && !(pj.requires || []).some((f) => !G.flags[f]) ? p.job : 'j_family_business'; } // 資格がいる家業（美容院・歯科など）は、資格がなければ手伝いとして
       case 'ikkanHigh': { const sc = G.school && G.school.tmpl; const hs = D().schools.ikkanHigh[sc] || 'hs_pub_high'; const o = Menu.inst(Menu.school(hs), 0); const t = Menu.school(hs); const r = { ...o, emoji: t.emoji, name: Menu.schoolName(t), years: 3, cost: t.cost, stage: 'hs' }; Menu.remember(r); return r.id; }
       case 'affilFallback': { const r = { id: 'u_affil#lit', tmpl: 'u_private_mid', h: 52, dept: 'lit', emoji: '📖', name: '系列の私立大学 文学部', years: 4, cost: 100, stage: 'univ' }; Menu.remember(r); return r.id; }
       case 'examFlag': return G.vars.major === 'vo_pt' ? 'lic_pt' : 'lic_beauty';

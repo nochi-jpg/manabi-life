@@ -144,7 +144,14 @@ function testKey(k, v, ctx) {
     case 'cooldownYears': { const last = G.lastFired[ev.id]; return last == null || G.year - last >= v; }
     case 'yearsLeft': return !!G.school && schoolYearsLeft() === v;
     case 'yearInStage': return !!G.school && (Array.isArray(v) ? inRange(G.school.yearIn, v) : G.school.yearIn === v);
-    case 'hasBoss': { const st = Econ.steps(); const top = st.length > 0 && (G.rank || 0) >= st.length - 1; return (!top && G.employment !== 'executive' && G.employment !== 'self_employed') === !!v; } // 上の役職（上司）がいる
+    case 'hasBoss': { const st = Econ.steps(); const top = st.length > 0 && (G.rank || 0) >= st.length - 1; return (!top && !['executive', 'self_employed', 'freelance'].includes(G.employment)) === !!v; }
+    case 'rankMin': return !!G.job && (G.rank || 0) >= v; // 役職が v 段目以上
+    case 'isMgr': { const st = Econ.steps()[G.rank || 0]; return (!!st && !!st.mgr) === !!v; } // 管理職（部下がいる）
+    case 'rankTop': { const st = Econ.steps(); return (st.length > 1 && (G.rank || 0) >= st.length - 1) === !!v; } // いちばん上の役職
+    case 'dreamJob': return !!Fame.job() === !!v;
+    case 'fameMin': return !!Fame.job() && (G.vars.fameLv || 0) >= v;
+    case 'fameMax': return !!Fame.job() && (G.vars.fameLv || 0) <= v;
+    case 'orgWorker': return (!!G.job && !!G.job.id && ['seishain', 'keiyaku', 'haken', 'part', 'civil_servant'].includes(G.employment)) === !!v; // 会社・役所などの組織で働いている // 上の役職（上司）がいる
     case 'noGrandchild': return !people('grandchild').some((p) => p.alive) === !!v;
     case 'noHospStay': return (G.vars.hospYear !== G.year) === !!v; // 今年の入院は退院のときに精算ずみ
     case 'familyAtHome': return (Fam.household().length > 0) === !!v; // いっしょに住んでいる家族がいる

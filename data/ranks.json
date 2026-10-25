@@ -35,7 +35,7 @@
       "steps": [ { "t": "整備士" }, { "t": "主任整備士", "y": 5, "p": 0.3, "inc": 0.06 }, { "t": "工場長（サービスマネージャー）", "y": 12, "p": 0.12, "inc": 0.15, "ment": 8, "phys": -15, "mgr": true } ] },
     { "id": "t_craft", "jobs": ["j_carpenter", "j_electrician"],
       "steps": [ { "t": "見習い" }, { "t": "職人", "y": 3, "p": 0.5, "inc": 0.15 }, { "t": "職長", "y": 8, "p": 0.25, "inc": 0.1, "ment": 5 }, { "t": "親方（棟梁）", "y": 15, "p": 0.12, "inc": 0.15, "ment": 6, "mgr": true } ] },
-    { "id": "t_design", "jobs": ["j_designer", "j_architect"],
+    { "id": "t_design", "jobs": ["j_designer", "j_architect", "j_fashion"],
       "steps": [ { "t": "アシスタント" }, { "t": "デザイナー（設計者）", "y": 2, "p": 0.5, "inc": 0.1 }, { "t": "チーフ", "y": 7, "p": 0.2, "inc": 0.1, "ment": 5 }, { "t": "アートディレクター（設計部長）", "y": 12, "p": 0.1, "inc": 0.15, "ment": 8, "mgr": true } ] },
     { "id": "t_drive", "jobs": ["j_truck", "j_delivery", "j_taxi"],
       "steps": [ { "t": "ドライバー" }, { "t": "班長", "y": 5, "p": 0.2, "inc": 0.04 }, { "t": "運行管理者", "y": 10, "p": 0.12, "inc": 0.08, "ment": 8, "phys": -25 }, { "t": "営業所長", "y": 16, "p": 0.05, "inc": 0.12, "ment": 10, "phys": -10, "mgr": true } ] },
@@ -66,7 +66,7 @@
       "note": "管理職は試験。教頭は激務で、受けない先生も多い" },
     { "id": "t_juku", "jobs": ["j_juku"],
       "steps": [ { "t": "講師" }, { "t": "教室長", "y": 4, "p": 0.3, "inc": 0.1, "ment": 8, "mgr": true }, { "t": "エリアマネージャー", "y": 10, "p": 0.1, "inc": 0.15, "ment": 6, "mgr": true } ] },
-    { "id": "t_civil_national", "jobs": ["j_civil_national"],
+    { "id": "t_civil_national", "jobs": ["j_civil_national", "j_diplomat"],
       "steps": [ { "t": "係員" }, { "t": "係長", "y": 4, "p": 0.6, "inc": 0.1 }, { "t": "課長補佐", "y": 9, "p": 0.5, "inc": 0.12, "ment": 8 }, { "t": "企画官・室長", "y": 16, "p": 0.3, "inc": 0.1, "ment": 6, "mgr": true }, { "t": "課長", "y": 20, "p": 0.25, "inc": 0.12, "ment": 8, "mgr": true }, { "t": "審議官", "y": 26, "p": 0.06, "inc": 0.12, "ment": 6, "mgr": true }, { "t": "局長", "y": 30, "p": 0.03, "inc": 0.1, "ment": 6, "mgr": true }, { "t": "事務次官", "y": 34, "p": 0.01, "inc": 0.1, "ment": 6, "mgr": true } ] },
     { "id": "t_civil_local", "jobs": ["j_civil_local"],
       "steps": [ { "t": "主事" }, { "t": "主任", "y": 6, "p": 0.4, "inc": 0.04 }, { "t": "係長", "y": 11, "p": 0.25, "exam": true, "inc": 0.06, "ment": 5 }, { "t": "課長補佐", "y": 17, "p": 0.15, "inc": 0.06, "ment": 5 }, { "t": "課長", "y": 22, "p": 0.1, "inc": 0.1, "ment": 8, "mgr": true }, { "t": "部長", "y": 28, "p": 0.04, "inc": 0.1, "ment": 8, "mgr": true } ] },
@@ -80,7 +80,13 @@
       "officerSteps": [ { "t": "3尉" }, { "t": "2尉", "y": 2, "p": 0.8, "inc": 0.05 }, { "t": "1尉", "y": 5, "p": 0.6, "inc": 0.06 }, { "t": "3佐", "y": 10, "p": 0.35, "exam": true, "inc": 0.1, "ment": 6, "mgr": true }, { "t": "2佐", "y": 15, "p": 0.2, "inc": 0.08, "ment": 6, "mgr": true }, { "t": "1佐", "y": 20, "p": 0.08, "inc": 0.1, "ment": 6, "mgr": true }, { "t": "将補", "y": 28, "p": 0.02, "inc": 0.12, "ment": 6, "mgr": true } ] },
     { "id": "t_lawyer", "jobs": ["j_lawyer"],
       "steps": [ { "t": "アソシエイト" }, { "t": "シニアアソシエイト", "y": 4, "p": 0.4, "inc": 0.2 }, { "t": "パートナー", "y": 9, "p": 0.15, "inc": 0.5, "ment": 8, "mgr": true } ] },
-    { "id": "t_cpa", "jobs": ["j_cpa", "j_tax"],
+    { "id": "t_announce", "jobs": ["j_announcer"],
+      "steps": [ { "t": "新人アナウンサー" }, { "t": "中堅アナウンサー", "y": 4, "p": 0.5, "inc": 0.15 }, { "t": "看板アナウンサー", "y": 9, "p": 0.15, "inc": 0.3, "ment": 6 }, { "t": "アナウンス部長", "y": 18, "p": 0.06, "inc": 0.15, "ment": 6, "mgr": true } ] },
+    { "id": "t_consult", "jobs": ["j_consultant"],
+      "steps": [ { "t": "アナリスト" }, { "t": "コンサルタント", "y": 2, "p": 0.6, "inc": 0.25 }, { "t": "マネージャー", "y": 5, "p": 0.4, "inc": 0.3, "ment": 8, "mgr": true }, { "t": "プリンシパル", "y": 9, "p": 0.2, "inc": 0.3, "ment": 8, "mgr": true }, { "t": "パートナー", "y": 13, "p": 0.07, "inc": 0.6, "ment": 8, "mgr": true } ] },
+    { "id": "t_ibank", "jobs": ["j_ibanker"],
+      "steps": [ { "t": "アナリスト" }, { "t": "アソシエイト", "y": 3, "p": 0.6, "inc": 0.3 }, { "t": "ヴァイスプレジデント", "y": 6, "p": 0.4, "inc": 0.3, "ment": 8, "mgr": true }, { "t": "ディレクター", "y": 10, "p": 0.2, "inc": 0.3, "ment": 8, "mgr": true }, { "t": "マネージングディレクター", "y": 14, "p": 0.07, "inc": 0.6, "ment": 10, "mgr": true } ] },
+    { "id": "t_cpa", "jobs": ["j_cpa", "j_tax", "j_scrivener", "j_sharoushi"],
       "steps": [ { "t": "スタッフ" }, { "t": "シニア", "y": 3, "p": 0.5, "inc": 0.15 }, { "t": "マネージャー", "y": 7, "p": 0.3, "inc": 0.2, "ment": 8, "mgr": true }, { "t": "パートナー", "y": 14, "p": 0.08, "inc": 0.5, "ment": 8, "mgr": true } ] },
     { "id": "t_press", "jobs": ["j_journalist"],
       "steps": [ { "t": "記者" }, { "t": "キャップ", "y": 7, "p": 0.25, "inc": 0.06, "ment": 6 }, { "t": "デスク", "y": 13, "p": 0.18, "inc": 0.08, "ment": 8, "mgr": true }, { "t": "部長", "y": 20, "p": 0.06, "inc": 0.1, "ment": 6, "mgr": true }, { "t": "局長", "y": 26, "p": 0.02, "inc": 0.12, "ment": 6, "mgr": true } ] },
@@ -105,7 +111,7 @@
       "steps": [ { "t": "アルバイト" }, { "t": "バイトリーダー", "y": 2, "p": 0.3, "inc": 0.05, "ment": 3 } ] }
   ],
   "noRank": {
-    "jobs": ["j_illustrator", "j_musician", "j_youtuber", "j_entertainer", "j_farmer", "j_fisher", "j_ceo", "j_family_business", "j_interpreter"],
+    "jobs": ["j_illustrator", "j_musician", "j_youtuber", "j_entertainer", "j_farmer", "j_fisher", "j_ceo", "j_family_business", "j_interpreter", "j_dj", "j_voice_actor", "j_idol", "j_comedian", "j_pro_gamer", "j_band", "j_novelist"],
     "reason": "フリーランス・自営業・経営者（通訳・翻訳はフリーランスが多い）。昇進のかわりに『ヒット』『規模の拡大』などのイベントで収入が変わる"
   }
 }

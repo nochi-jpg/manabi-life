@@ -62,7 +62,7 @@ const Detail = (() => {
         <div><span>年収（1年目）</span><b>${sal0}</b><small>万円</small></div>
         <div><span>年収（${j.salary ? j.salary[2] : 45}歳ごろ）</span><b>${peak}</b><small>万円</small></div>
         <div><span>手取りの月収</span><b>${take}</b><small>万円</small></div></div>
-        <div class="note">💰 賞与（ボーナス）：${bm ? `年2回・合計${bm}か月分` : 'なし'}　／　${j.variance ? '収入は年によって大きく変わる' : '手取り＝給料から税金・保険料をひいた額'}</div></div>
+        <div class="note">💰 賞与（ボーナス）：${bm ? `年2回・合計${bm}か月分` : 'なし'}　／　${j.dream ? 'ふだんは低収入。売れれば収入がけた違いに' : j.variance ? '収入は年によって大きく変わる' : '手取り＝給料から税金・保険料をひいた額'}</div></div>
       <div class="sec"><h4>⚖️ たいへんさ・はたらきやすさ</h4>
         <div class="ld"><span>💪 肉体負荷</span><span class="bar c-red"><i style="--w:${clamp(plv, 0, 100)}%"></i></span><span class="num">${clamp(plv, 0, 100)}</span><span class="lv ${lvl(plv)[1]}">${lvl(plv)[0]}</span></div>
         <div class="ld"><span>🧠 精神負荷</span><span class="bar c-blue"><i style="--w:${clamp(mlv, 0, 100)}%"></i></span><span class="num">${clamp(mlv, 0, 100)}</span><span class="lv ${lvl(mlv)[1]}">${lvl(mlv)[0]}</span></div>

@@ -91,6 +91,8 @@ const Engine = (() => {
     if ((G.q === 0 || G.vars.lessonForce) && !placeNow() && G.clubs.some((c) => isLesson(c.id))) Q.push({ id: '__lessons', ctx: {} });
     // 妊活・不妊治療：毎年4月に、妊娠したか・治療の相談をするか
     if (G.q === 0) { const kid = Kids.yearRoll(); if (kid) Q.push({ id: kid, ctx: {}, sched: true }); }
+    // 夢の仕事：毎年10月に、売れたか・人気が落ちたか・続けるか
+    if (G.q === 2) { const fm = Fame.yearRoll(); if (fm) Q.push({ id: fm, ctx: {}, sched: true }); }
     // 3. リスク（病気・事故・失業など）
     let riskChoice = false;
     for (const src of ['events_random', 'events_flow', 'events_world', 'events_family']) {
@@ -596,6 +598,9 @@ const Engine = (() => {
     if (!G.alive) return;
     Fam.seasonTick();
     Kids.guard();
+    // 資格がいる仕事なのに資格がない（免許を返した・資格を失った）→ 続けられない
+    { const j = G.job && G.job.id && Econ.working() && Menu.job(G.job.id); const miss = j && (j.requires || []).find((f) => !G.flags[f]);
+      if (miss && !Menu.isStudent()) { Work.quit('self'); Fam.notice('🪪', `${D().flags.flags.license[miss] || '資格'}がなくなったので、${j.label}の仕事は続けられなくなった。`, 'work'); } }
     if (G.flags.sequela) Effects.stat('stress', 0.8); // 後遺症：少しずつストレスがたまる（1年で約+3）
     buildQueue();
     save();

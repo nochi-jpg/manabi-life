@@ -75,7 +75,7 @@ const Main = (() => {
       const ind = D().ranks.industry[j.cat] || j.label;
       const st = Econ.curStep();
       const form = G.job.form !== 'seishain' && G.job.form !== 'civil_servant' ? `<span class="form">${esc((D().jobs.forms[G.job.form] || {}).label || D().flags.employment[G.job.form] || '')}</span>` : '';
-      return `<span class="r1">${j.emoji || '💼'} ${esc(ind)}｜${esc(j.label)}</span><span class="r2">${st ? `<b>${esc(st.t)}</b>・` : ''}${G.jobYears + 1}年目${form}${G.employment === 'leave' ? '<span class="form">休職中</span>' : ''}${G.flags.long_commute ? '<span class="form">遠距離通勤</span>' : ''}</span>`;
+      return `<span class="r1">${j.emoji || '💼'} ${esc(ind)}｜${esc(j.label)}</span><span class="r2">${st ? `<b>${esc(st.t)}</b>・` : j.dream ? `<b>${['🌱 下積み', '🙂 食べていける', '⭐ 人気者', '🌟 大ブレイク'][G.vars.fameLv || 0]}</b>・` : ''}${G.jobYears + 1}年目${form}${G.employment === 'leave' ? '<span class="form">休職中</span>' : ''}${G.flags.long_commute ? '<span class="form">遠距離通勤</span>' : ''}</span>`;
     }
     if (G.school) {
       const stName = D().flags.stages[G.stage] || '';

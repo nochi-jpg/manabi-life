@@ -14,9 +14,10 @@ const Econ = (() => {
     if (age > pk) v *= Math.pow(0.995, age - pk);
     return v;
   }
-  function salaryPreview(j) {
+  function salaryPreview(j, at) {
     const f = D().jobs.forms[j.form || 'seishain'] || { salaryMul: 1 };
-    return Math.round((j.salary ? j.salary[0] : 200) * pref().wage * f.salaryMul);
+    const w = (at && prefOf(at) ? prefOf(at) : pref()).wage;
+    return Math.round((j.salary ? j.salary[0] : 200) * w * f.salaryMul);
   }
   // 本業の年収（額面・万円）
   function jobGross() {
@@ -28,6 +29,7 @@ const Econ = (() => {
     let v = salaryCurve(j, G.age, G.job.startAge ?? G.age) * pref().wage * (f.salaryMul ?? 1);
     v *= 1 + rankInc();
     v *= G.job.mul || 1;
+    if (j.dream) v *= Fame.mul(); // 夢の仕事：売れたら収入がけた違いに
     for (const [fl, up] of Object.entries(j.salaryFlagUp || {})) if (G.flags[fl]) v += up;
     if (G.flags.reemployed) v *= 0.6;
     if (G.job.hoursMul) v *= G.job.hoursMul;

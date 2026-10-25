@@ -269,6 +269,7 @@
     "j_parttime_general": "bg_konbini",
     "j_illustrator": "bg_home",
     "j_youtuber": "bg_home",
+    "j_consultant": "bg_hq", "j_ibanker": "bg_hq", "j_diplomat": "bg_hq", "j_novelist": "bg_home", "j_pro_gamer": "bg_arena", "j_dj": "bg_arena", "j_band": "bg_arena", "j_idol": "bg_arena", "j_scrivener": "bg_office", "j_sharoushi": "bg_office",
     "j_care": "bg_care"
   },
   "sportByClub": {
