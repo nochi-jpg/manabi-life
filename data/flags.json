@@ -161,6 +161,9 @@
       "widowed": "配偶者と死別",
       "single_parent": "ひとり親",
       "wants_children": "子どもを望んでいる",
+      "pregnant": "妊娠中（自分か配偶者）",
+      "fertility_tx": "不妊治療中",
+      "gave_up_children": "子どもをあきらめた（もう聞かない）",
       "no_children_choice": "子どもを持たないと決めた",
       "infertility_care": "不妊治療中",
       "pet": "ペットを飼っている",
@@ -269,6 +272,12 @@
     "mod_juku": "juku"
   },
   "vars": {
+    "kidRelLow": "不妊治療で配偶者がそこまで望んでいなかった（生まれた子どもとの関係の初期値が低い）",
+    "txYears": "不妊治療の年数",
+    "ftxAsked": "不妊治療の相談をしたか",
+    "infertile": "妊娠しにくい夫婦か",
+    "spouseWantsKids": "配偶者が子どもを強く望んでいるか",
+    "pregByTx": "不妊治療で妊娠したか",
     "hosp": "入院中のようす（cause・days・aft・room・left・rehab・surgery）",
     "lastHosp": "前の入院（退院の文と入院費）",
     "hospYear": "入院した年",

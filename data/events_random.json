@@ -276,22 +276,7 @@
         { "label": "📄 籍を入れるだけ", "effects": { "stats": { "happiness": 1 } } }
       ] },
 
-    { "id": "ev_r_pregnancy", "kind": "flow", "emoji": "🤰", "cat": "family",
-      "when": { "all": ["married"], "any": ["wants_children"], "person": { "role": "spouse", "alive": true, "fertile": true }, "childrenLess": 4 },
-      "risk": "fertility",
-      "roll": { "ageCurve": { "25": 0.82, "30": 0.78, "35": 0.66, "38": 0.5, "40": 0.36, "43": 0.16, "45": 0.04 }, "of": "birthParentAge" },
-      "success": { "text": "🤰 赤ちゃんができた！", "effects": { "schedule": [ { "event": "ev_f_childbirth", "inYears": [0, 1] } ] } },
-      "fail": { "text": "", "effects": { "counter": {}, "silent": true, "var": { "tryYears": "+1" } } } },
 
-    { "id": "ev_r_infertility", "kind": "choice", "emoji": "🏥", "cat": "family",
-      "when": { "all": ["married", "wants_children"], "none": ["infertility_care"], "var": { "tryYears": [">=", 2] }, "childrenLess": 1, "person": { "role": "spouse", "alive": true, "fertile": true } },
-      "weight": { "base": 4 },
-      "text": "2年以上、子どもができない。病院で相談してみる？",
-      "choices": [
-        { "label": "🏥 不妊治療を受ける（保険適用あり・年30〜100万）", "effects": { "set": ["infertility_care"], "cash": -40, "stats": { "stress": 6 }, "riskMul": { "fertility": 1.8 } } },
-        { "label": "🍀 自然にまかせる", "effects": {} },
-        { "label": "🙅 子どもはあきらめる", "effects": { "clear": ["wants_children"], "set": ["no_children_choice"], "stats": { "happiness": -5 } } }
-      ] },
 
     { "id": "ev_r_childcare_leave", "kind": "choice", "emoji": "🍼", "cat": "family", "type": "scheduled",
       "when": { "child": { "age": [0, 0] }, "employment": ["seishain", "civil_servant", "keiyaku"] },
@@ -415,7 +400,7 @@
       ] },
 
     { "id": "ev_r_first_drink", "kind": "choice", "emoji": "🍶", "cat": "health",
-      "when": { "age": [20, 21], "none": ["drinker"], "once": true },
+      "when": { "age": [20, 21], "none": ["drinker", "fertility_tx", "pregnant"], "once": true },
       "weight": { "base": 5 },
       "text": "20歳になり、お酒を飲めるようになった。お酒との付き合い方は？",
       "choices": [
@@ -434,7 +419,7 @@
       ] },
 
     { "id": "ev_r_smoke_adult", "kind": "choice", "emoji": "🚬", "cat": "health",
-      "when": { "age": [20, 50], "none": ["smoker", "ex_smoker"], "cooldownYears": 4 },
+      "when": { "employment": ["seishain", "keiyaku", "haken", "part", "civil_servant", "executive"], "age": [20, 50], "none": ["remote_work", "fertility_tx", "pregnant", "smoker", "ex_smoker"], "cooldownYears": 4 },
       "weight": { "base": 1, "mul": [["stress>=70", 1.6], ["gender:M", 1.6]] },
       "text": "職場の喫煙所で、先輩がタバコをすすめてきた。",
       "choices": [
@@ -1028,10 +1013,10 @@
     { "id": "ev_r_child_private_hs", "kind": "choice", "emoji": "🏫", "cat": "family",
       "when": { "child": { "age": [14, 14], "alive": true } },
       "weight": { "base": 4 },
-      "text": "{child}の第一志望の公立高校が不合格。合格した私立高校に行く？（入学金など約30万円＋年に約50万円）",
+      "text": "{child}の第一志望の公立高校が不合格。合格した私立高校に行く？（入学金など約30万円＋年に約{childPrivHs}万円）",
       "roll": { "base": 0.3 },
       "choices": [
-        { "label": "🏫 私立高校に行かせる", "effects": { "cash": -30, "cashYearly": -50, "yearsOf": 3, "personRelation": { "child": 4 } } },
+        { "label": "🏫 私立高校に行かせる{privHsNote}", "effects": { "cash": -30, "cashYearly": "-$childPrivHs", "yearsOf": 3, "personRelation": { "child": 4 } } },
         { "label": "📕 公立の二次募集を受けさせる", "effects": { "childRoll": "hs_second" } },
         { "label": "💻 通信制高校にする（年20万円）", "effects": { "cashYearly": -20, "yearsOf": 3 } }
       ],
@@ -1174,6 +1159,14 @@
 
     {"id": "ev_r_sequela_work", "kind": "choice", "emoji": "🩹", "cat": "work", "when": {"all": ["sequela"], "employment": ["seishain", "keiyaku", "haken", "part", "civil_servant", "self_employed", "executive"], "stat": {"physicalLoad": [">=", 85]}, "cooldownYears": 3}, "weight": {"base": 3}, "text": "後遺症で、いまの仕事の体の負担がかなりきつい……。", "choices": [{"label": "😣 がまんして、このまま続ける", "effects": {"stats": {"stress": 8, "health": -3}}}, {"label": "🗂️ 体の負担が少ない仕事にかえてもらう", "roll": {"base": 0.6}, "showRate": true, "success": {"jobLoadDelta": {"physical": -40}, "stats": {"stress": -4}, "log": "🗂️ 体の負担が少ない仕事にかえてもらえた"}, "fail": {"stats": {"stress": 4}, "log": "😞 「今は人が足りなくて……」と言われてしまった"}}, {"label": "🚪 思い切って仕事をやめる", "effects": {"job": {"quit": "self"}, "stats": {"stress": -6}}}]},
 
-    {"id": "ev_r_sequela_rehab", "kind": "choice", "emoji": "🦯", "cat": "health", "when": {"all": ["sequela"], "cooldownYears": 3}, "weight": {"base": 2}, "text": "後遺症のリハビリに、病院へ通っている。", "choices": [{"label": "💪 通院を続ける（年5万円くらい）", "roll": {"base": 0.25}, "showRate": true, "success": {"cash": -5, "clear": ["sequela"], "stats": {"happiness": 8}, "log": "🌈 後遺症がほとんど気にならないくらいまで回復した"}, "fail": {"cash": -5, "stats": {"health": 2}, "log": "🦯 少しずつ、できることがふえてきた"}}, {"label": "🙂 今の生活に慣れることにする", "effects": {"stats": {"stress": -2}}}]}
+    {"id": "ev_r_sequela_rehab", "kind": "choice", "emoji": "🦯", "cat": "health", "when": {"all": ["sequela"], "cooldownYears": 3}, "weight": {"base": 2}, "text": "後遺症のリハビリに、病院へ通っている。", "choices": [{"label": "💪 通院を続ける（年5万円くらい）", "roll": {"base": 0.25}, "showRate": true, "success": {"cash": -5, "clear": ["sequela"], "stats": {"happiness": 8}, "log": "🌈 後遺症がほとんど気にならないくらいまで回復した"}, "fail": {"cash": -5, "stats": {"health": 2}, "log": "🦯 少しずつ、できることがふえてきた"}}, {"label": "🙂 今の生活に慣れることにする", "effects": {"stats": {"stress": -2}}}]},
+
+    {"id": "ev_m_fertility_ask", "kind": "choice", "emoji": "🩺", "cat": "family", "type": "scheduled", "counselor": "spouse", "when": {"all": ["married", "wants_children"], "none": ["gave_up_children", "fertility_tx", "pregnant", "separated"]}, "text": "子どもがほしいと思って{tryYears}年。なかなか子どもができない……。不妊治療をする？", "fact": {"text": "不妊の検査や治療を受けたことがある夫婦は約4.4組に1組。2022年から不妊治療に健康保険が使えるようになった（女性が43歳未満のとき・自己負担3割、月の上限あり）。年齢が上がるほど妊娠しにくくなる。", "src": "国立社会保障・人口問題研究所 出生動向基本調査（2021）・厚生労働省"}, "choices": [{"label": "🤝 不妊治療をする｜{spouse}はほしいと願っている。私もほしい", "when": {"spouseWantsKids": true}, "effects": {"startFertilityTx": "A"}}, {"label": "🙇 不妊治療をする｜{spouse}はそこまで望んでいないが、私はほしい", "when": {"spouseWantsKids": false}, "effects": {"startFertilityTx": "B", "personRelation": {"spouse": -6}}}, {"label": "🙅 治療はしない｜{spouse}は強く願っているが、私は望まない", "when": {"spouseWantsKids": true}, "effects": {"giveUpChildren": "C", "personRelation": {"spouse": -25}}}, {"label": "🕊️ あきらめる｜{spouse}も私も、そこまで強く望んでいない", "when": {"spouseWantsKids": false}, "effects": {"giveUpChildren": "D"}}]},
+
+    {"id": "ev_m_fertility_continue", "kind": "choice", "emoji": "🩺", "cat": "family", "type": "scheduled", "counselor": "spouse", "when": {"all": ["married", "fertility_tx"], "none": ["pregnant", "separated"]}, "text": "不妊治療を始めて{txYears}年。治療を続ける？（{momAge}歳・{txCostNote}）", "fact": {"text": "不妊の検査や治療を受けたことがある夫婦は約4.4組に1組。2022年から不妊治療に健康保険が使えるようになった（女性が43歳未満のとき・自己負担3割、月の上限あり）。年齢が上がるほど妊娠しにくくなる。", "src": "国立社会保障・人口問題研究所 出生動向基本調査（2021）・厚生労働省"}, "choices": [{"label": "🤝 続ける｜{spouse}は強く望んでいる。私も続けたい", "when": {"spouseWantsKids": true}, "effects": {"stats": {"stress": 3}}}, {"label": "🙇 続ける｜{spouse}はそこまでではないが、私は続けたい", "when": {"spouseWantsKids": false}, "effects": {"stats": {"stress": 3}, "personRelation": {"spouse": -6}, "var": {"kidRelLow": true}}}, {"label": "🙅 やめる｜{spouse}は続けたいが、私はもうやめたい", "when": {"spouseWantsKids": true}, "effects": {"giveUpChildren": "C", "personRelation": {"spouse": -25}}}, {"label": "🕊️ やめる｜{spouse}も私も、もう十分がんばった", "when": {"spouseWantsKids": false}, "effects": {"giveUpChildren": "D"}}]},
+
+    {"id": "ev_r_fertility_work", "kind": "choice", "emoji": "🩺", "cat": "family", "when": {"all": ["fertility_tx"], "selfWorking": true, "cooldownYears": 2}, "weight": {"base": 3}, "text": "{fertilityWorkText}", "choices": [{"label": "🗣️ 職場に相談して、休みをとりやすくしてもらう", "roll": {"base": 0.6}, "showRate": true, "success": {"stats": {"stress": -5}, "log": "🗣️ 上司が「通院を優先して」と言ってくれた"}, "fail": {"stats": {"stress": 4}, "log": "😞 なかなか理解してもらえなかった"}}, {"label": "📅 有給休暇をやりくりして、がんばる", "effects": {"stats": {"stress": 4}}}, {"label": "⏱️ しばらく仕事をへらす", "effects": {"jobHoursMul": 0.85, "stats": {"stress": -3}}}]},
+
+    {"id": "ev_r_pregnancy_prep", "kind": "choice", "emoji": "🍼", "cat": "family", "when": {"all": ["pregnant"], "cooldownYears": 1}, "weight": {"base": 4}, "text": "もうすぐ出産。どこで産む？", "fact": {"text": "出産費用は平均で約50万円。健康保険から「出産育児一時金」50万円が出るので、ふつうの出産なら大きな負担にはなりにくい。無痛分娩は10〜20万円ほど追加でかかる。", "src": "厚生労働省・国民健康保険中央会（2023）"}, "choices": [{"label": "🏥 近くの病院で産む", "effects": {"stats": {"stress": -2}}}, {"label": "🏡 実家の近くの病院で産む（里帰り出産）", "when": {"person": {"role": "father|mother", "alive": true}}, "effects": {"stats": {"stress": -5, "happiness": 2}}}, {"label": "💉 無痛分娩を選ぶ（約15万円）", "effects": {"cash": -15, "stats": {"stress": -4}}}]}
   ]
 }

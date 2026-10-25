@@ -273,6 +273,7 @@ const Fam = (() => {
     out.push(`夫婦の財産 ${man(total)}万円を半分ずつに分けた（自分の分は ${man(share)}万円）。`);
     sp.role = 'ex_spouse'; sp.together = false; sp.exYear = G.year;
     delete G.flags.married; delete G.flags.separated; G.flags.divorced = true;
+    Kids.guard(); // 妊活・不妊治療はここで終わり
     if (kids.length) {
       // 養育費（裁判所の算定表のめやす：払う側の年収と人数で）
       const payer = mine ? sp : null;
@@ -290,7 +291,7 @@ const Fam = (() => {
   // 別居
   function separate(kidsGo) {
     const sp = person('spouse'); if (!sp) return;
-    sp.together = false; G.flags.separated = true; G.vars.sepYear = G.year;
+    sp.together = false; G.flags.separated = true; G.vars.sepYear = G.year; Kids.guard();
     if (kidsGo) for (const c of people('child')) if (c.together && c.age < 18) { c.together = false; c.withEx = true; }
   }
   function reunite() {
@@ -339,6 +340,7 @@ const Fam = (() => {
   function statusLabel(p) {
     if (!p.alive) return `🕊️ ${p.diedYear || ''}年に亡くなった`;
     if (p.hosp) return `🏥 入院中（${p.hosp.what}）`;
+    if (p.role === 'spouse' && p.alive && p.gender === 'F' && G.flags.pregnant) return '🤰 妊娠中';
     if (p.careLevel >= 1) return `🤲 要介護${p.careLevel}${p.inFacility ? '（施設）' : ''}`;
     if (p.employment === 'student' || (p.age >= 6 && p.age < 18 && ['child', 'sibling', 'grandchild'].includes(p.role))) return `🎒 ${kidStage(p)}`;
     if (p.age < 6) return p.age < 3 ? '👶 赤ちゃん' : '🧸 保育園・幼稚園';

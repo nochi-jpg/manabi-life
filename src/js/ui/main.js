@@ -148,6 +148,11 @@ const Main = (() => {
     if (G.flags.smoker) other.push('🚬 たばこ'); if (G.flags.drinker || G.flags.heavy_drinker) other.push('🍺 お酒');
     if (G.flags.nisa) other.push('📈 NISA'); if (G.flags.caregiving) other.push('🤲 介護中'); if (G.flags.volunteer) other.push('🤝 ボランティア');
     if (G.flags.welfare) other.push('🏛️ 生活保護');
+    // 妊活・妊娠・不妊治療（男性のときは配偶者のようす）
+    const spN = (person('spouse') || {}).name;
+    if (G.flags.pregnant) other.unshift(G.gender === 'F' ? '🤰 妊娠中' : `🤰 ${esc(spN || '妻')}が妊娠中`);
+    else if (G.flags.fertility_tx) other.unshift('🩺 不妊治療中');
+    else if (G.flags.wants_children && G.flags.married) other.unshift('🌱 妊活中');
     return { lessons, hobbies, love, lic, ill, other };
   }
   function pageStatus() {

@@ -100,7 +100,12 @@ const Effects = (() => {
         case 'whoGive': { const w = ctx.who; const amt = Math.min(num(v, ctx), Math.max(0, (w && w.assets) || 0)); if (w && amt > 0) { w.assets -= amt; G.cash += amt; logs.push(`🎁 ${Fam.callName(w)}から${man(amt)}万円の援助を受けた（${Fam.callName(w)}の貯金はその分へった）。`); } break; }
         case 'separate': { const kg = v.kidsGo === 'auto' ? (G.gender === 'M' ? chance(0.8) : chance(0.15)) : !!v.kidsGo; const anyKid = people('child').some((c) => c.together && c.age < 18); Fam.separate(kg); logs.push(kg && anyKid ? `🧳 ${(person('spouse') || {}).name || '配偶者'}は子どもを連れて家を出た。別居が始まった。` : `🧳 ${(person('spouse') || {}).name || '配偶者'}が家を出て、別居が始まった。`); break; }
         case 'reunite': Fam.reunite(); logs.push('🏠 もう一度いっしょに暮らすことになった。'); break;
-        case 'afterBirth': { setFlag('wants_children', false, ctx); const n = people('child').length; if (n < 3) Engine.schedule('ev_m_next_child', rint(1, 2), 'Q1', ctx); Engine.schedule('ev_m_baby_work', 0, null, ctx); break; }
+        // ---- 妊活・妊娠・不妊治療 ----
+        case 'startTrying': Kids.startTrying(); break;
+        case 'becomePregnant': Kids.becomePregnant(logs); break;
+        case 'startFertilityTx': Kids.startTx(v, logs); break;
+        case 'giveUpChildren': Kids.giveUp(v, logs); break;
+        case 'afterBirth': { delete G.flags.pregnant; G.vars.kidRelLow = false; G.vars.tryYears = 0; G.vars.ftxAsked = false; G.vars.infertile = null; delete G.flags.fertility_tx; setFlag('wants_children', false, ctx); const n = people('child').length; if (n < 3) Engine.schedule('ev_m_next_child', 1, 'Q1', ctx); Engine.schedule('ev_m_baby_work', 0, null, ctx); break; }
         case 'scholarStart': Econ.scholarStart(); break;
         case 'spouse': People.spouseDo(v, ctx, logs); break;
         case 'lifeLevel': G.vars.lifeLevel = v; break;
@@ -382,7 +387,7 @@ const People = {
       G.people.push(p); ctx.sib = p;
     } else if (role === 'child') {
       const g = chance(0.51) ? 'M' : 'F';
-      const p = newPerson('child', { name: pick(N.given[g])[0], gender: g, age: 0, relation: 80, born: calYear(), pref: G.pref, together: true, employment: 'none', acad: talent() });
+      const p = newPerson('child', { name: pick(N.given[g])[0], gender: g, age: 0, relation: G.vars.kidRelLow ? 62 : 80, born: calYear(), pref: G.pref, together: true, employment: 'none', acad: talent() });
       G.people.push(p); ctx.child = p;
     } else if (role === 'grandchild') {
       const par = ctx.child; const g = chance(0.5) ? 'M' : 'F';
@@ -435,6 +440,68 @@ const People = {
 };
 
 // ===== 住まい・投資など =====
+// ===== 妊活・妊娠・不妊治療 =====
+//  妊活中（wants_children）→ 毎年4月に年齢に合った確率で妊娠（pregnant）→ 3季節後（約10か月）に出産
+//  3年たっても妊娠しなければ「不妊治療をする？」（保険適用・年齢で妊娠しやすさが変わる）。2年ごとに続けるか聞く
+const Kids = {
+  momAge() { const sp = person('spouse'); return G.gender === 'F' ? G.age : sp ? sp.age : 99; },
+  // 妊娠しにくい夫婦の割合（妊娠を望みはじめたときの女性の年齢。Menken ほか 1986）
+  INFERTILE: { 20: 0.06, 25: 0.09, 30: 0.15, 35: 0.3, 40: 0.64, 45: 0.9 },
+  // 1年で妊娠する確率（自然）と、不妊治療で妊娠する確率（体外受精などを1年に数回）
+  NATURAL: { 20: 0.85, 25: 0.85, 30: 0.82, 35: 0.75, 38: 0.68, 40: 0.6, 43: 0.45, 45: 0.25, 47: 0.05 },
+  TX: { 25: 0.6, 30: 0.6, 35: 0.5, 38: 0.38, 40: 0.25, 42: 0.13, 43: 0.08, 45: 0.02, 47: 0 },
+  startTrying() {
+    if (G.flags.gave_up_children) return;
+    Effects.setFlag('wants_children', true);
+    G.vars.tryYears = 0; G.vars.ftxAsked = false;
+    G.vars.infertile = chance(curve(this.INFERTILE, this.momAge()));
+  },
+  // 毎年4月：妊娠したか（Engine から）
+  yearRoll() {
+    const sp = person('spouse');
+    if (!(G.flags.married && sp && sp.alive && !G.flags.separated && sp.together !== false)) return null;
+    if (!G.flags.wants_children || G.flags.pregnant || G.flags.gave_up_children) return null;
+    const age = this.momAge();
+    if (age >= 47) { this.giveUp('age', null); Fam.notice('🕊️', '年齢のこともあり、子どもはあきらめることにした。', 'family'); return null; }
+    const p = G.flags.fertility_tx ? curve(this.TX, age) : curve(this.NATURAL, age) * (G.vars.infertile ? 0.15 : 1);
+    if (chance(p)) return 'ev_m_pregnant';
+    G.vars.tryYears = (G.vars.tryYears || 0) + 1;
+    if (G.flags.fertility_tx) { G.vars.txYears = (G.vars.txYears || 0) + 1; return G.vars.txYears % 2 === 0 ? 'ev_m_fertility_continue' : null; }
+    if (G.vars.tryYears >= 3 && !G.vars.ftxAsked) { G.vars.ftxAsked = true; if (G.vars.spouseWantsKids == null) G.vars.spouseWantsKids = chance(0.65); return 'ev_m_fertility_ask'; }
+    return null;
+  },
+  becomePregnant(logs) {
+    G.vars.pregByTx = !!G.flags.fertility_tx;
+    Effects.setFlag('pregnant', true); delete G.flags.fertility_tx;
+    G.vars.txYears = 0;
+    // 約10か月後（3季節後）に出産
+    let q = G.q + 3, y = G.year; if (q > 3) { q -= 4; y++; }
+    G.scheduled.push({ event: 'ev_f_childbirth', at: { year: y, q }, data: {} });
+  },
+  startTx(kind, logs) {
+    Effects.setFlag('fertility_tx', true); G.vars.txYears = 0;
+    if (kind === 'B') G.vars.kidRelLow = true;
+    const quit = [];
+    if (G.flags.smoker) { delete G.flags.smoker; Effects.setFlag('ex_smoker', true); quit.push('タバコ'); }
+    if (G.flags.drinker || G.flags.heavy_drinker) { delete G.flags.drinker; delete G.flags.heavy_drinker; quit.push('お酒'); }
+    Effects.stat('stress', 5);
+    logs.push(`🩺 不妊治療を始めた（保険が使える）。${quit.length ? quit.join('と') + 'はやめた。' : ''}`);
+  },
+  giveUp(kind, logs) {
+    Effects.setFlag('gave_up_children', true);
+    for (const f of ['wants_children', 'fertility_tx']) delete G.flags[f];
+    G.vars.tryYears = 0; G.vars.txYears = 0;
+    if (logs && kind === 'C') logs.push('🙅 子どもは持たないことにした。{spouse}は、とても残念そうだった。'.replace('{spouse}', (person('spouse') || {}).name || '配偶者'));
+    if (logs && kind === 'D') logs.push('🕊️ 二人で話し合って、子どもはあきらめることにした。二人の時間を大切にしていこう。');
+  },
+  // 別れた・配偶者が亡くなった・別居：妊活と不妊治療は終わり（妊娠中なら子どもは生まれる）
+  guard() {
+    const sp = person('spouse');
+    if (G.flags.married && sp && sp.alive && !G.flags.separated) return;
+    if (G.flags.wants_children || G.flags.fertility_tx) { delete G.flags.wants_children; delete G.flags.fertility_tx; G.vars.tryYears = 0; G.vars.txYears = 0; }
+  },
+};
+
 const Life = {
   // 入院（docs：患者調査2023の平均在院日数・高額療養費・差額ベッド代・食事代）
   //   days：入院日数のめやす、aft：後遺症が残る確率、surgery：手術給付金の対象

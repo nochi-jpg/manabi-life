@@ -89,6 +89,8 @@ const Engine = (() => {
     Q.push(...afters);
     // 習い事を続ける？（要望3：春に。学年が上がる・入学・就職のとき）
     if ((G.q === 0 || G.vars.lessonForce) && !placeNow() && G.clubs.some((c) => isLesson(c.id))) Q.push({ id: '__lessons', ctx: {} });
+    // 妊活・不妊治療：毎年4月に、妊娠したか・治療の相談をするか
+    if (G.q === 0) { const kid = Kids.yearRoll(); if (kid) Q.push({ id: kid, ctx: {}, sched: true }); }
     // 3. リスク（病気・事故・失業など）
     let riskChoice = false;
     for (const src of ['events_random', 'events_flow', 'events_world', 'events_family']) {
@@ -355,7 +357,7 @@ const Engine = (() => {
     G.choiceCount++;
     const out = { posts: [] };
     if (o.menu && item) { ctx.pick = item; ctx.pickName = item.name; Menu.remember(item); G.vars.targetPref = item.pref && item.pref !== G.pref && !item.commute ? item.pref : null; if (item.commute && item.pref !== G.pref) G.vars.commutePref = item.pref; }
-    const label = (o.menu && item ? `${item.emoji} ${item.name}` : o.label || '').replace(/（[^）]*）/g, '');
+    const label = (o.menu && item ? `${item.emoji} ${item.name}` : Text.fill(o.label || '', {}) || '').replace(/（[^）]*）/g, '').replace(/｜.*$/, ''); // 「見出し｜説明」は見出しだけ
     const cp = post(out, e, v.text.replace(/（.*$/, '').slice(0, 60), ctx, 'choice', label);
     const s0 = snap();
     // 選択肢そのものの効果
@@ -593,6 +595,7 @@ const Engine = (() => {
     if (G.q === 3) yearlyGrowth();
     if (!G.alive) return;
     Fam.seasonTick();
+    Kids.guard();
     if (G.flags.sequela) Effects.stat('stress', 0.8); // 後遺症：少しずつストレスがたまる（1年で約+3）
     buildQueue();
     save();

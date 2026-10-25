@@ -138,8 +138,10 @@ const Menu = (() => {
         const s = inst(t, i);
         const hs = selfHensachi(t.subjects);
         const rate = t.hensachi && t.hensachi[1] === 0 ? 97 : rateOf(hs - s.h + examBonus(t));
-        const cost = t.cost;
-        out.push({ ...s, emoji: t.emoji, label: schoolName(t), name: schoolName(t), sub: s.h ? `偏差値${s.h}・年${cost}万円` : (t.exam === 'document' ? '書類と面接' : '面接のみ') + `・年${cost}万円`, rate, cost, years: t.years || 3, stage: t.stage });
+        // 東京都は私立高校の授業料を助成（所得制限なし・都内私立の平均授業料 年49万円くらいまで）
+        const tokyoAid = G.pref === 'tokyo' && t.id.startsWith('hs_priv');
+        const cost = tokyoAid ? t.cost - 49 : t.cost;
+        out.push({ ...s, emoji: t.emoji, label: schoolName(t), name: schoolName(t), sub: s.h ? `偏差値${s.h}・年${cost}万円${tokyoAid ? '（都の助成あり）' : ''}` : (t.exam === 'document' ? '書類と面接' : '面接のみ') + `・年${cost}万円`, rate, cost, years: t.years || 3, stage: t.stage });
       }
     }
     // 成績に合わせて、挑戦校〜安全校の順に（先生と親が出す候補）

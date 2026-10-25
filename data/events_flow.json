@@ -33,10 +33,10 @@
       "effects": { "person": { "kill": "spouse" }, "clear": ["married"], "set": ["widowed"], "stats": { "happiness": -15, "stress": 12, "social": -6 }, "survivorPension": true } },
 
     { "id": "ev_f_childbirth", "kind": "flow", "emoji": "👶", "cat": "family", "type": "scheduled",
-      "when": { "any": ["married", "has_partner"], "person": { "role": "spouse|partner", "alive": true } },
+      "when": { "all": ["pregnant"] },
       "text": "{year}年{month}月、{child}が生まれた！",
       "effects": { "person": { "add": "child" }, "stats": { "happiness": 12, "stress": 5 }, "childAllowance": true, "afterBirth": true },
-      "note": "I-2：配偶者・恋人がいない場合（死別・別れた直後）は、その時点の相手がいないと発生しない。予約時に相手のIDを保存し、その人が生存中のみ発生" },
+      "note": "妊娠（pregnant）から約10か月後（3季節後）に予約される。妊娠中に別れても、子どもは生まれる" },
 
     { "id": "ev_f_child_entry", "kind": "flow", "emoji": "🎒", "cat": "family",
       "when": { "child": { "age": [6, 6], "alive": true } },
@@ -270,7 +270,13 @@
 
     {"id": "ev_f_sequela_pain", "kind": "flow", "emoji": "🩹", "cat": "health", "when": {"all": ["sequela"], "cooldownYears": 2}, "weight": {"base": 1.5}, "text": "{sequelaPain}", "effects": {"stats": {"stress": 2, "happiness": -1}}},
 
-    {"id": "ev_m_discharge", "kind": "flow", "emoji": "🌤️", "cat": "health", "type": "scheduled", "when": {}, "roll": {"rate": "$hospOkRate"}, "success": {"text": "🌤️ {hospDays}日間の入院を終えて、退院した。{hospOkText}（入院費 {hospBill}万円{hospInsText}）", "effects": {"discharge": "ok", "stats": {"happiness": 6, "stress": -5}}}, "fail": {"text": "🩹 {hospDays}日間の入院を終えて退院した。でも、{sequelaName}の後遺症が残った。（入院費 {hospBill}万円{hospInsText}）", "effects": {"discharge": "sequela", "stats": {"happiness": -6, "stress": 4}}}}
+    {"id": "ev_m_discharge", "kind": "flow", "emoji": "🌤️", "cat": "health", "type": "scheduled", "when": {}, "roll": {"rate": "$hospOkRate"}, "success": {"text": "🌤️ {hospDays}日間の入院を終えて、退院した。{hospOkText}（入院費 {hospBill}万円{hospInsText}）", "effects": {"discharge": "ok", "stats": {"happiness": 6, "stress": -5}}}, "fail": {"text": "🩹 {hospDays}日間の入院を終えて退院した。でも、{sequelaName}の後遺症が残った。（入院費 {hospBill}万円{hospInsText}）", "effects": {"discharge": "sequela", "stats": {"happiness": -6, "stress": 4}}}},
+
+    {"id": "ev_m_pregnant", "kind": "flow", "emoji": "🤰", "cat": "family", "type": "scheduled", "when": {}, "text": "{pregnantText}", "effects": {"becomePregnant": true, "stats": {"happiness": 10, "stress": 2}}},
+
+    {"id": "ev_f_pregnancy_daily", "kind": "flow", "emoji": "🤰", "cat": "family", "when": {"all": ["pregnant"]}, "weight": {"base": 6}, "text": "{pregDaily}"},
+
+    {"id": "ev_f_fertility_daily", "kind": "flow", "emoji": "🩺", "cat": "family", "when": {"all": ["fertility_tx"]}, "weight": {"base": 4}, "text": "{fertilityDaily}", "effects": {"stats": {"stress": 1}}}
   ],
   "textPools": {
     "facilityDaily": ["レクリエーションで、みんなで風船バレーをした。", "職員さんといっしょに、季節のかざりを作った。", "同じフロアの人とお茶を飲みながら、昔の話をした。", "歌の会で、なつかしい歌をみんなで歌った。", "訪問の床屋さんに、髪を切ってもらった。", "リハビリで、前より少し長く歩けるようになった。", "窓から見える木の葉の色で、季節が変わったのを感じた。", "夕ごはんに好物が出て、うれしかった。", "施設の書道クラブで、お手本を見ながら字を書いた。", "となりの部屋の人と、テレビの話でもりあがった。"],

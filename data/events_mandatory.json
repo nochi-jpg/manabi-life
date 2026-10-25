@@ -618,20 +618,20 @@
     },
     {
       "id": "ev_m_child_plan", "kind": "choice", "emoji": "👶", "counselor": "spouse",
-      "when": { "season": ["Q1"], "all": ["married"], "none": ["no_children_choice", "wants_children"], "person": { "role": "spouse", "alive": true, "fertile": true }, "marriedYears": [1, 1] },
+      "when": { "season": ["Q1"], "all": ["married"], "none": ["no_children_choice", "wants_children", "gave_up_children", "separated"], "person": { "role": "spouse", "alive": true, "fertile": true }, "marriedYears": [1, 1] },
       "text": "結婚して1年。{spouse}と子どものことを話し合った。",
       "choices": [
-        { "label": "👶 子どもがほしい", "effects": { "set": ["wants_children"] } },
+        { "label": "👶 子どもがほしい", "effects": { "startTrying": true } },
         { "label": "⏳ もう少し2人で過ごしたい", "effects": { "schedule": [ { "event": "ev_m_child_plan2", "inYears": [2, 3] } ] } },
         { "label": "🙅 子どもは持たない", "effects": { "set": ["no_children_choice"] } }
       ]
     },
     {
       "id": "ev_m_child_plan2", "kind": "choice", "emoji": "👶", "type": "scheduled", "counselor": "spouse",
-      "when": { "all": ["married"], "none": ["no_children_choice", "wants_children"], "person": { "role": "spouse", "alive": true, "fertile": true } },
+      "when": { "all": ["married"], "none": ["no_children_choice", "wants_children", "gave_up_children", "separated"], "person": { "role": "spouse", "alive": true, "fertile": true } },
       "text": "もう一度、子どものことを話し合った。",
       "choices": [
-        { "label": "👶 子どもがほしい", "effects": { "set": ["wants_children"] } },
+        { "label": "👶 子どもがほしい", "effects": { "startTrying": true } },
         { "label": "🙅 子どもは持たない", "effects": { "set": ["no_children_choice"] } }
       ]
     },

@@ -28,11 +28,11 @@
       ] },
 
     { "id": "ev_m_next_child", "kind": "choice", "emoji": "👶", "cat": "family", "type": "scheduled", "counselor": "spouse",
-      "when": { "all": ["married"], "none": ["no_more_children", "no_children_choice", "wants_children", "separated"], "person": { "role": "spouse", "alive": true, "fertile": true } },
+      "when": { "all": ["married"], "none": ["no_more_children", "no_children_choice", "wants_children", "separated", "gave_up_children", "pregnant"], "person": { "role": "spouse", "alive": true, "fertile": true } },
       "text": "{spouse}と{nextChildNo}人目の子どもについて話し合った。（いまの家計：毎月{monthlyLeft}万円）",
       "fact": { "text": "子ども1人を大学まで育てると、教育費と生活費で約2,000万円〜（公立か私立かで大きく変わる）。夫婦が理想とする子どもの数は平均2.25人、実際は約1.9人で、理由の1位は「お金がかかりすぎる」。", "src": "国立社会保障・人口問題研究所 出生動向基本調査（2021）" },
       "choices": [
-        { "label": "👶 {nextChildNo}人目がほしい", "effects": { "set": ["wants_children"], "personRelation": { "spouse": 3 } } },
+        { "label": "👶 {nextChildNo}人目がほしい", "effects": { "startTrying": true, "personRelation": { "spouse": 3 } } },
         { "label": "🙂 今の人数で、大切に育てる", "effects": { "set": ["no_more_children"] } },
         { "label": "⏳ もう少し考える（2年後にまた話す）", "effects": { "schedule": [ { "event": "ev_m_next_child", "inYears": [2, 2], "season": "Q1" } ] } }
       ] },

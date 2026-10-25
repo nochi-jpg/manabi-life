@@ -131,6 +131,17 @@ const Text = (() => {
       case 'facilityEventName': return pick([['お花見会', '春の遠足'], ['夏祭り', 'すいか割り大会'], ['敬老会', '運動会'], ['クリスマス会', '書き初め大会']][G.q]); // 季節に合わせる
       case 'houseRentOut': return Math.max(4, Math.round((G.vars.houseValue || 1500) * 0.045 / 12));
       case 'houseStayWho': { const h = Fam.household(); const sp = h.find((p) => p.role === 'spouse'); return sp ? sp.name : h.length ? roleLabel(h[0]) : '家族'; }
+      // ---- 妊活・妊娠・不妊治療 ----
+      case 'pregnantText': { const sp = person('spouse'); const due = MONTH[(G.q + 3) % 4]; const pre = G.vars.pregByTx ? '不妊治療の結果、' : ''; return G.gender === 'F' ? `🤰 ${pre}妊娠がわかった！ 出産予定は${due}月ごろ。` : `🤰 ${pre}${sp ? sp.name : '妻'}の妊娠がわかった！ 出産予定は${due}月ごろ。`; }
+      case 'pregDaily': { const sp = (person('spouse') || {}).name || '配偶者'; return pick(G.gender === 'F' ? ['つわりがつらくて、においの強い料理が作れない日が続いた。', '健診で、おなかの赤ちゃんのエコー写真をもらった。', 'おなかの赤ちゃんが、はじめて動いた！', `${sp}といっしょに、赤ちゃんの名前を考えた。`, '両親学級に参加して、赤ちゃんのおふろの入れ方を練習した。', 'ベビーベッドやベビーカーなど、赤ちゃんのものをそろえた。', 'おなかが大きくなって、くつ下をはくのも大変になってきた。'] : [`${sp}のつわりがつらそうなので、家事を多めにやった。`, `${sp}の健診についていき、エコーで赤ちゃんを見た。`, `${sp}のおなかにさわったら、赤ちゃんが動いた！`, `${sp}といっしょに、赤ちゃんの名前を考えた。`, '両親学級に参加して、おむつの替え方を練習した。', 'ベビーベッドやベビーカーなど、赤ちゃんのものをそろえた。']); }
+      case 'fertilityDaily': { const sp = (person('spouse') || {}).name || '配偶者'; return pick(G.gender === 'F' ? ['病院の待合室で、長い時間待った。', '通院のために、仕事を休んで病院へ行った。', '自己注射にも、少しずつ慣れてきた。', `${sp}が通院に付きそってくれた。`, '結果を待つ2週間は、とても長く感じた。', '治療の日程に合わせて、予定を組みなおした。', '今回はうまくいかなかった。気持ちを切りかえて、次の治療にのぞむ。'] : [`${sp}の通院に付きそった。`, '結果を待つ2週間は、とても長く感じた。', `${sp}の体のことを考えて、家事を多めにやった。`, '二人で、治療のことをじっくり話し合った。', `今回はうまくいかなかった。落ちこむ${sp}をはげました。`, '男性側の検査も受けた。']); }
+      case 'fertilityWorkText': return G.gender === 'F' ? '通院が多くて、仕事との両立がむずかしい……。' : `${(person('spouse') || {}).name || '配偶者'}の通院の付きそいで、仕事を休む日がふえた……。`;
+      case 'tryYears': return G.vars.tryYears || 3;
+      case 'txYears': return G.vars.txYears || 2;
+      case 'momAge': return Kids.momAge();
+      case 'txCostNote': return Kids.momAge() < 43 ? '保険が使える：年30万円くらい' : '43歳からは保険が使えない：年150万円くらい';
+      case 'childPrivHs': return G.pref === 'tokyo' ? 15 : 50;
+      case 'privHsNote': return G.pref === 'tokyo' ? '（都の助成で授業料は実質無料）' : '';
       case 'cashNow': return man(Math.max(0, G.cash));
       case 'pocket': return round1(Econ.myPocket()).toFixed(1);
       case 'sendMoney': return ch ? String(ch.sendMoney ?? 7) : '7';
@@ -236,6 +247,7 @@ const Text = (() => {
       case 'offerJob': return G.job ? G.job.id : 'j_sales';
       case 'sameCompanyLowAi': return 'j_office';
       case 'loanAmountRental': return D().housing.investment.unitPrice[Econ.tierKey()] - 200;
+      case 'childPrivHs': return G.pref === 'tokyo' ? 15 : 50;
       case 'hospOkRate': { const h = G.vars.hosp; return h ? Math.round(100 * (1 - h.aft * (h.rehab ? 0.6 : 1))) : 100; }
       case 'houseRentOut': return Math.max(4, Math.round((G.vars.houseValue || 1500) * 0.045 / 12));
       default:

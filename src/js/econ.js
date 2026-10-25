@@ -198,6 +198,7 @@ const Econ = (() => {
     if (G.flags.dz_diabetes || G.flags.dz_hypertension) add('💊', '通院・薬', (G.flags.dz_diabetes ? 2 : 0) + (G.flags.dz_hypertension ? 1.2 : 0));
     if (G.flags.life_insurance || G.flags.cancer_insurance) add('🛡️', '保険', (G.flags.life_insurance ? 6 : 0) + (G.flags.cancer_insurance ? 3.6 : 0), [G.flags.life_insurance ? '医療保険' : '', G.flags.cancer_insurance ? 'がん保険' : ''].filter(Boolean).join('・'));
     if (G.flags.caregiving) add('🤲', '介護', G.vars.careCost || 30, 'ヘルパー・おむつなど');
+    if (G.flags.fertility_tx) add('🩺', '不妊治療', Kids.momAge() < 43 ? 30 : 150, Kids.momAge() < 43 ? '保険適用（3割）' : '43歳から保険が使えない');
     if (G.flags.in_facility) { const f = facilityFee(); add('🏢', '介護施設', f, `月${round1(f / 12)}万円（食事・介護をふくむ）`); }
     if (G.flags.exercise_habit && G.vars.gym) add('🏋️', 'ジム', 9.6);
     let lh = 0; const lhn = [];

@@ -148,6 +148,7 @@ function testKey(k, v, ctx) {
     case 'noGrandchild': return !people('grandchild').some((p) => p.alive) === !!v;
     case 'noHospStay': return (G.vars.hospYear !== G.year) === !!v; // 今年の入院は退院のときに精算ずみ
     case 'familyAtHome': return (Fam.household().length > 0) === !!v; // いっしょに住んでいる家族がいる
+    case 'spouseWantsKids': return !!G.vars.spouseWantsKids === !!v; // 配偶者が子どもを強く望んでいるか（AとC、BとDの組み合わせ）
     case 'lessonsLess': return G.clubs.filter((c) => Engine.isLesson(c.id)).length < v; // 習い事の数が v 個より少ない（4つまで）
     case 'noLesson': return !G.clubs.some((c) => c.id === v);
     case 'jobYears': return !!G.job && (Array.isArray(v) ? v.includes(G.jobYears) : G.jobYears === v);

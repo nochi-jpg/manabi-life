@@ -163,8 +163,11 @@ for (const e of allEvents) {
 
     // I-2 子ども
     if (ef.person && ef.person.add === 'child') {
-      if (!(all.has('married') || any.has('married') || any.has('has_partner'))) err(where, 'I-2違反：子どもを追加するのに結婚/恋人の条件がない');
-      if (!hasRoleAlive(/spouse|partner/)) err(where, 'I-2違反：子どもを追加するのに配偶者/恋人の生存条件がない');
+      // 妊娠（pregnant）は結婚していて配偶者が生きているときだけ付く（Kids.yearRoll）。妊娠中に別れても子どもは生まれる
+      if (!all.has('pregnant')) {
+        if (!(all.has('married') || any.has('married') || any.has('has_partner'))) err(where, 'I-2違反：子どもを追加するのに結婚/恋人の条件がない');
+        if (!hasRoleAlive(/spouse|partner/)) err(where, 'I-2違反：子どもを追加するのに配偶者/恋人の生存条件がない');
+      }
     }
     // I-1 孫
     if (ef.person && ef.person.add === 'grandchild') {

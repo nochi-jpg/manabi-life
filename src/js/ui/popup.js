@@ -101,8 +101,9 @@ const Popup = (() => {
       const vis = list.slice(page * PER, page * PER + PER);
       const btns = `<div class="opts">${vis.map((x, n) => {
         if (x.item) return `<button data-n="${n}" class="${x.item.rate == null ? 'norate' : ''}">${btnHtml(x.item.emoji, x.item.name, x.item.sub, x.item.rate)}</button>`;
-        const [e, l] = splitEmoji(x.label);
-        return `<button data-n="${n}" class="${x.rate == null ? 'norate' : ''}">${btnHtml(e, l + (x.sub ? ' ▶' : ''), '', x.rate)}</button>`;
+        const [e, l0] = splitEmoji(x.label);
+        const [l, note] = String(l0).split('｜'); // 「見出し｜説明」は2行（長い選択肢がはみ出さないように）
+        return `<button data-n="${n}" class="${x.rate == null ? 'norate' : ''}">${btnHtml(e, l + (x.sub ? ' ▶' : ''), note || '', x.rate)}</button>`;
       }).join('')}${subOpen ? '<button class="back2" id="pBack">◀ もどる</button>' : ''}</div>`;
       const prefBar = prefOpt && !subOpen ? `<div class="pbar"><span>📍 いま：<b>${esc(Fam.prefName(curPref))}</b>の候補</span>${curPref !== G.pref ? '<button id="pfHome">🏠 地元にもどす</button>' : ''}<button id="pfOther">🗾 ほかの都道府県で探す</button>${['ev_m_hs_target', 'ev_m_post_target', 'ev_m_bunri', 'ev_m_hs_plan'].includes(view.ev) && G.reports.length ? '<button id="pfRep">📋 通知表を見る</button>' : ''}</div>` : (['ev_m_hs_target', 'ev_m_post_target', 'ev_m_bunri', 'ev_m_hs_plan'].includes(view.ev) && G.reports.length ? '<div class="pbar"><span></span><button id="pfRep">📋 過去の通知表を見る</button></div>' : '');
       const sorter = canSort ? `<div class="flt"><button data-sort="def" class="${sort === 'def' ? 'on' : ''}">おすすめ順</button><button data-sort="rate" class="${sort === 'rate' ? 'on' : ''}">🎯 受かりやすい順</button>${canPay ? `<button data-sort="pay" class="${sort === 'pay' ? 'on' : ''}">💴 年収が高い順</button>` : ''}</div>` : '';
