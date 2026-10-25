@@ -467,7 +467,7 @@
     },
     {
       "id": "ev_m_kyosai", "kind": "choice", "emoji": "🍎", "counselor": "self",
-      "when": { "season": ["Q2"], "age": [21, 45], "var": { "plan": ["teacher"] }, "any": ["teacher_course", "lic_teacher_elem", "lic_teacher_sec"], "none": ["arrest", "naitei"] },
+      "when": { "season": ["Q2"], "age": [21, 45], "var": { "plan": ["teacher", "undecided"] }, "any": ["teacher_course", "lic_teacher_elem", "lic_teacher_sec"], "none": ["arrest", "naitei"] },
       "text": "教員採用試験の日。（合格率は全国平均で約3〜4倍の倍率）",
       "choices": [
         { "label": "🧑‍🏫 小学校の先生", "showRate": true, "roll": { "base": 0.4, "w": { "academic": 0.5, "t_comm": 0.5 } }, "success": { "set": ["naitei"], "var": { "target": "j_teacher_elem" } }, "fail": { "var": { "target": "j_juku" }, "log": "🍂 不合格。講師（臨時の先生）として働きながら再挑戦できる" } },

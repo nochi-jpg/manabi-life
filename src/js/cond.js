@@ -180,6 +180,7 @@ function testKey(k, v, ctx) {
     case 'jobTransfer': return !!G.job && !!(Menu.job(G.job.id) || {}).transfer;
     case 'jobCat': return !!G.job && v.includes((Menu.job(G.job.id) || {}).cat);
     case 'jobId': return !!G.job && v.includes(G.job.id);
+    case 'jobNot': return !(G.job && v.includes(G.job.id)); // その仕事についていない
     case 'careerEnd': { const j = G.job && Menu.job(G.job.id); return !!j && !!j.careerEndAge && G.age >= j.careerEndAge + (G.vars.careerExtra || 0); }
     case 'debtOverIncome': { if (Menu.isStudent()) return false; const sch = (G.loans || []).filter((l) => l.type === 'scholar' || l.type === 'settle').reduce((a, l) => a + Math.max(0, l.left), 0); return Econ.totalDebt(true) - sch - Math.max(0, G.assets) - Math.max(0, G.cash) > Math.max(50, Econ.annualIncome()) * v; }
     case 'welfareNeed': {

@@ -48,8 +48,9 @@ const Text = (() => {
       case 'income': return Math.round(Econ.jobGross());
       case 'jobYears': return G.jobYears; case 'jobSat': return Math.round(G.stats.jobSatisfaction);
       case 'crush': return pk(P().crush[G.gender]);
-      case 'someone': return pk(P().someone[ageKey()]);
-      case 'place': return pk(P().place);
+      // 職場の人は、会社などで働いている人だけ。学生なら大学・バイトの人
+      case 'someone': { const org = Cond.test({ orgWorker: true }, {}); let L = P().someone[ageKey()].filter((t) => org || !/職場|取引先/.test(t)); if (Menu.isStudent() && G.age >= 18) L = L.concat(['同じゼミの人', 'サークルの仲間'], G.job && G.job.part ? ['バイト先の人'] : []); return pk(L); }
+      case 'place': { const org = Cond.test({ orgWorker: true }, {}); return pk(P().place.filter((t) => org || !/職場/.test(t))); }
       case 'scamText': return pk(pool().scamText);
       case 'disasterType': return pk(pool().disasterType);
       case 'babyMilestone': { const b = pool().babyMilestone; const used = (G.vars.milestones = G.vars.milestones || []); const base = clamp(Math.floor(G.age * 0.9), 0, b.length - 1); const cand = [base, base - 1, base + 1, base + 2].filter((i) => i >= 0 && i < b.length && !used.includes(i)); const i = cand.length ? cand[0] : -1; if (i < 0) return pk(pool().studentDaily || ['すくすく育っている。']); used.push(i); return b[i]; }
