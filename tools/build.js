@@ -2,7 +2,7 @@
 // まなびライフ ビルド
 //   node tools/build.js        … data/*.json を src/js/data.gen.js にまとめる（開発用。src/index.html をそのまま開ける）
 //   node tools/build.js dist   … さらに、絵・音・フォント・CSS・JS をすべて埋め込んだ1つのHTML（dist/index.html）を作る
-//                                顔グラ・背景は WebP、BGM は 64kbps に再圧縮（ffmpeg / cwebp があれば）
+//                                顔グラ・背景は WebP、BGM は 40kbps に再圧縮（ffmpeg / cwebp があれば）
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -43,7 +43,7 @@ const img = (rel) => {
 };
 const sound = (rel, isBgm) => {
   const src = P(rel);
-  if (isBgm && has('ffmpeg')) return b64(cached(src, '.48k.mp3', (o) => execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', src, '-ac', '2', '-ar', '32000', '-b:a', '48k', o])), 'audio/mpeg');
+  if (isBgm && has('ffmpeg')) return b64(cached(src, '.40k.mp3', (o) => execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', src, '-ac', '2', '-ar', '32000', '-b:a', '40k', o])), 'audio/mpeg');
   if (!isBgm && has('ffmpeg')) {
     const max = (Object.values(data.audio.se).find((x) => x.file === rel) || {}).maxMs;
     return b64(cached(src, '.se.mp3', (o) => execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', src, ...(max ? ['-t', String(max / 1000 + 0.3)] : []), '-ac', '1', '-b:a', '64k', o])), 'audio/mpeg');
