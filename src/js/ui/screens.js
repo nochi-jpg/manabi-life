@@ -352,7 +352,7 @@ Screens.options = {
 };
 function credits() {
   const box = Popup.show(`<h2>📜 クレジット</h2>
-    <div class="cr"><span class="k">ゲームデザイン・制作</span><span>K.nomura</span></div>
+    <div class="cr"><span class="k">ゲームデザイン・制作</span><span>K.nom</span></div>
     <div class="cr"><span class="k">音楽</span><span>MusMus<small>https://musmus.main.jp/</small></span></div>
     <div class="cr"><span class="k">効果音</span><span>効果音ラボ<small>https://soundeffect-lab.info/</small></span></div>
     <div class="cr"><span class="k">フォント</span><span>M PLUS Rounded 1c<small>SIL Open Font License 1.1</small></span></div>
