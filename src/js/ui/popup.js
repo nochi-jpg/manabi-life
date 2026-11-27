@@ -130,6 +130,7 @@ const Popup = (() => {
       const pr = $('#pfRep', box); if (pr) pr.onclick = () => reports(() => render());
       $$('[data-n]', box).forEach((b) => (b.onclick = () => pickEntry(vis[+b.dataset.n])));
       $$('[data-sort]', box).forEach((b) => (b.onclick = () => { sort = b.dataset.sort; page = 0; render(); }));
+      if (!report) Tutorial.onChoice();
       bindPager(box, 'p', () => page, (v) => { page = v; render(); });
       const bk = $('#pBack', box); if (bk) bk.onclick = () => { subOpen = null; page = 0; render(); };
     }
@@ -163,6 +164,7 @@ const Popup = (() => {
       ${res ? `<div class="picked">選んだ：${esc(res.chosen)}</div>${res.fx && res.fx.length ? `<div class="fxl">${Main.fxHtml(res.fx)}</div>` : ''}` : ''}
       <div class="nx"><button class="main" id="msNx">つぎへ ▶</button></div>`, `cbox msbox ${bad ? 'bad' : ''} ${list.length > 1 || res ? 'compact' : ''}`);
     Audio2.se(bad ? 'shock' : 'cheer');
+    Tutorial.onMilestone();
     $('#msNx', box).onclick = () => { close(); cb(); };
   }
 

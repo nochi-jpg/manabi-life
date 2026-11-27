@@ -340,10 +340,13 @@ Screens.options = {
       <div class="orow"><span class="k">🔔 効果音の音量</span><input type="range" min="0" max="100" value="${Math.round(o.seVolume * 100)}" data-k="seVolume"><span class="v num">${Math.round(o.seVolume * 100)}</span></div>
       <div class="orow"><span class="k">⏩ はじめの速さ</span>${seg('speed', [1, 2, 4], ['▶ ふつう', '×2', '×4'])}</div>
       <div class="orow"><span class="k">💓 ドキドキ演出</span>${seg('suspenseSkip', [false, true], ['最後まで見る', 'タップで飛ばせる'])}</div>
-      ${Platform.canFull ? `<div class="orow"><span class="k">📱 画面</span><div class="seg one"><button id="fullBtn">${Platform.isFull() ? '全画面をやめる' : '全画面にする'}</button></div></div>` : ''}
+      <div class="orow"><span class="k">🖥️ 画面の表示</span>${seg('ui', ['simple', 'detail'], ['シンプル', 'くわしい'])}</div>
+      <div class="orow"><span class="k">🔰 あそびかた</span><div class="seg one"><button id="tutBtn">もう一度見る</button></div></div>
+      ${Platform.canFull ? `<div class="orow"><span class="k">📱 全画面</span><div class="seg one"><button id="fullBtn">${Platform.isFull() ? '全画面をやめる' : '全画面にする'}</button></div></div>` : ''}
       <div class="btns"><button id="crBtn">📜 クレジット</button><button class="main" id="oBack">もどる</button></div></div>`;
     $$('input[type=range]', el).forEach((r) => { const u = () => { r.style.setProperty('--p', r.value + '%'); r.nextElementSibling.textContent = r.value; Options.set(r.dataset.k, r.value / 100); Audio2.refresh(); }; r.oninput = u; u(); });
-    $$('.seg[data-key]', el).forEach((g) => $$('button', g).forEach((b) => (b.onclick = () => { $$('button', g).forEach((x) => x.classList.remove('on')); b.classList.add('on'); let v = b.dataset.v; v = v === 'true' ? true : v === 'false' ? false : +v; Options.set(g.dataset.key, v); if (g.dataset.key === 'speed' && G) G.uiSpeed = v; })));
+    $$('.seg[data-key]', el).forEach((g) => $$('button', g).forEach((b) => (b.onclick = () => { $$('button', g).forEach((x) => x.classList.remove('on')); b.classList.add('on'); let v = b.dataset.v; v = v === 'true' ? true : v === 'false' ? false : isNaN(+v) ? v : +v; Options.set(g.dataset.key, v); if (g.dataset.key === 'speed' && G) G.uiSpeed = v; if (g.dataset.key === 'ui') UIMode.apply(); })));
+    $('#tutBtn', el).onclick = () => { Tutorial.reset(); toast(G && G.alive ? 'ゲームにもどると、あそびかたが始まります' : '次の人生のはじめに、あそびかたが出ます'); };
     const fb = $('#fullBtn', el); if (fb) fb.onclick = async () => { await Platform.toggle(); setTimeout(() => { fb.textContent = Platform.isFull() ? '全画面をやめる' : '全画面にする'; }, 300); };
     $('#crBtn', el).onclick = () => credits();
     $('#oBack', el).onclick = () => App.show(from || 'title');
