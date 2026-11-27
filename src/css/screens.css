@@ -506,3 +506,35 @@
 /* 誕生画面：続柄（母方の祖母など）が住まいの欄にかぶらないように */
 #card .kv .k{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 #card .kv .k.long{font-size:11px;letter-spacing:-.02em}
+
+/* ===== v2（docs/13）：イベントCG・人生の分岐点・幸せレベル ===== */
+/* CG はポップアップのうしろに画面いっぱい。上にうすい白をかけて文字を読みやすく */
+.ov.cg{background:linear-gradient(rgba(253,253,251,.45),rgba(253,253,251,.45)),var(--cg) center/cover no-repeat}
+#sus.cg{background:linear-gradient(rgba(23,32,64,.62),rgba(23,32,64,.62)),var(--cg) center/cover no-repeat}
+/* 人生の分岐点 */
+.msbox{width:640px;padding:var(--sp4) var(--sp4) var(--sp3);display:flex;flex-direction:column;align-items:stretch}
+.cs.ms{background:var(--gold)}
+.msbox.bad .cs.ms{background:var(--ink2)}
+.msimg{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;background:var(--soft) center/cover no-repeat;margin-top:var(--sp1)}
+.mscat{position:absolute;left:12px;top:12px;height:32px;padding:0 14px;border-radius:999px;display:inline-flex;align-items:center;background:#fff;color:var(--blue);font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.mscat.sm{position:static;height:28px;font-size:13px;background:var(--soft2);box-shadow:none;flex:none}
+.msdate{margin-top:var(--sp2);font-size:15px;color:var(--ink2);text-align:center}
+.mshead{margin-top:4px;font-size:30px;font-weight:900;line-height:1.35;text-align:center;color:var(--ink)}
+.mssub{margin-top:var(--sp1);font-size:17px;line-height:1.5;text-align:center;color:var(--ink2)}
+.msmore{margin-top:var(--sp1);display:flex;align-items:center;gap:var(--sp1);height:40px;padding:0 12px;border-radius:12px;background:var(--soft);font-size:16px;overflow:hidden;white-space:nowrap}
+.msbox .picked{margin-top:var(--sp2);height:44px;justify-content:center;font-size:15px}
+.msbox.compact .msimg{aspect-ratio:21/9}
+.msbox .fxl{display:flex;justify-content:center;margin-top:var(--sp1)}
+.msbox .nx{margin-top:var(--sp3)}
+/* 幸せレベル（★）：絵文字ではなく文字の★を金色で */
+.stars b{color:var(--gold);font-weight:900}.stars i{color:var(--soft3);font-style:normal;font-weight:900}
+.stars.big{font-size:52px;letter-spacing:4px;line-height:1.1}
+.stars.sm{font-size:22px;letter-spacing:1px}
+#rme .end{margin-top:var(--sp3);font-size:18px;color:var(--ink2)}
+#rme .slabel{font-size:20px;font-weight:900;color:var(--ink);margin-bottom:var(--sp2)}
+.starbox{text-align:center}
+.starbox h2{line-height:1.5}
+.starpick{display:flex;justify-content:center;gap:var(--sp1);margin-top:var(--sp3)}
+.starpick button{width:80px;height:80px;border-radius:20px;font-size:48px;line-height:1;color:var(--soft3);background:#fff;border:2px solid var(--line2)}
+.starpick button.on{color:var(--gold);border-color:var(--gold);background:#fffaf0}
+.starbox .slabel{margin-top:var(--sp2);height:28px;font-size:20px;font-weight:900;color:var(--ink)}

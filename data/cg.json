@@ -1,0 +1,42 @@
+{
+  "_comment": "イベントCG（docs/13 §7）。絵は assets/cg/<id>.jpg（.png でも可）に置くだけで使われる。ないときは今までどおり（背景画像・色の画面）。1280×720・文字なし・大事なものは真ん中に。",
+  "list": [
+    { "id": "cg_exam_jhs", "use": "中学受験の試験中（ドキドキ演出の背景）" },
+    { "id": "cg_exam_hs", "use": "高校受験の試験中" },
+    { "id": "cg_exam_univ", "use": "大学・専門・大学院の受験" },
+    { "id": "cg_pass", "use": "合格（受験・資格・国家試験の結果）" },
+    { "id": "cg_fail", "use": "不合格（受験・就職の結果）" },
+    { "id": "cg_interview", "use": "就職・転職の面接" },
+    { "id": "cg_civil_exam", "use": "公務員試験・教員採用試験" },
+    { "id": "cg_offer", "use": "内定・採用（就職の結果）" },
+    { "id": "cg_propose_M", "use": "プロポーズ（主人公が男性）" },
+    { "id": "cg_propose_F", "use": "プロポーズ（主人公が女性）" },
+    { "id": "cg_wedding", "use": "結婚式・結婚の分岐点" },
+    { "id": "cg_marriage_reg", "use": "結婚（式をしないとき）" },
+    { "id": "cg_pregnant", "use": "妊娠がわかった" },
+    { "id": "cg_birth", "use": "子どもの誕生" },
+    { "id": "cg_entrance_elem", "use": "小学校の入学（任意）" },
+    { "id": "cg_graduation", "use": "卒業（任意）" },
+    { "id": "cg_first_day", "use": "入社初日・就職の分岐点（任意）" },
+    { "id": "cg_move_city", "use": "上京・県外への引っ越し（任意）" },
+    { "id": "cg_house", "use": "家を買う（任意）" },
+    { "id": "cg_retire", "use": "定年退職（任意）" },
+    { "id": "cg_elem_exam", "use": "小学校お受験（任意）" }
+  ],
+  "suspense": {
+    "ev_m_elem_exam": "cg_elem_exam", "ev_m_jhs_exam": "cg_exam_jhs", "ev_m_hs_exam": "cg_exam_hs",
+    "ev_m_post_exam": "cg_exam_univ", "ev_m_grad_school_exam": "cg_exam_univ", "ev_m_exam_retry": "cg_exam_univ",
+    "ev_m_hs_job_hunt": "cg_interview", "ev_m_hs_job_hunt2": "cg_interview", "ev_m_job_hunt": "cg_interview", "ev_m_job_hunt_autumn": "cg_interview",
+    "ev_m_after_jhs_work": "cg_interview", "ev_m_job_review": "cg_interview", "ev_r_job_search": "cg_interview", "ev_r_headhunt": "cg_interview",
+    "ev_m_civil_exam": "cg_civil_exam", "ev_m_kyosai": "cg_civil_exam",
+    "ev_r_propose": "cg_propose_{g}"
+  },
+  "suspenseResult": {
+    "exam": { "ok": "cg_pass", "ng": "cg_fail" },
+    "job": { "ok": "cg_offer", "ng": "cg_fail" },
+    "examEvents": ["ev_m_elem_exam", "ev_m_jhs_exam", "ev_m_hs_exam", "ev_m_post_exam", "ev_m_grad_school_exam", "ev_m_exam_retry", "ev_m_kokushi_doctor", "ev_m_kokushi_dentist", "ev_m_kokushi_pharm", "ev_m_kokushi_nurse", "ev_m_license_exam", "ev_m_shihou", "ev_r_qualify", "ev_r_eiken", "ev_r_kentei"],
+    "jobEvents": ["ev_m_hs_job_hunt", "ev_m_hs_job_hunt2", "ev_m_job_hunt", "ev_m_job_hunt_autumn", "ev_m_after_jhs_work", "ev_m_job_review", "ev_r_job_search", "ev_r_headhunt", "ev_m_civil_exam", "ev_m_kyosai"]
+  },
+  "choice": { "ev_r_propose": "cg_propose_{g}", "ev_r_proposed": "cg_propose_{g}", "ev_r_wedding": "cg_wedding" },
+  "milestone": { "entrance_elem": "cg_entrance_elem", "graduation": "cg_graduation", "first_job": "cg_first_day", "marry": ["cg_wedding", "cg_marriage_reg"], "pregnant": "cg_pregnant", "birth": "cg_birth", "move": "cg_move_city", "house": "cg_house", "retire": "cg_retire" }
+}

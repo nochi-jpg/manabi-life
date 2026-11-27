@@ -230,7 +230,7 @@ const Main = (() => {
       const p = postQ.shift();
       addPost(p);
       refresh();
-      timer = setTimeout(loop, BASE_MS / speed());
+      timer = setTimeout(loop, Pace.postMs(G.age) / speed());
       return;
     }
     const r = Engine.next();
@@ -249,10 +249,20 @@ const Main = (() => {
         Popup.choice(r.choice, (res) => handle(res));
         return;
       }
-      const wait = r.season ? 200 / speed() : 0;
+      const wait = r.season ? Pace.seasonMs(G.age) / speed() : 0;
       timer = setTimeout(loop, wait);
     };
-    const withResult = () => { if (r.result) { flushPosts(); refresh(); Popup.result(r.result, after); } else after(); };
+    // 人生の分岐点：前の投稿を出しきってから大きく知らせる（結果のポップアップと重なるときは1つにまとめる）
+    const ms = Milestone.take();
+    const withResult = () => {
+      if (ms.length) {
+        if (r.posts && r.posts.length) { postQ.push(...r.posts); r.posts = []; }
+        flushPosts(); refresh(); stop();
+        Popup.milestone(ms, r.result || null, () => { refresh(); if (!Tutorial.onMilestone(after)) after(); });
+        return;
+      }
+      if (r.result) { flushPosts(); refresh(); Popup.result(r.result, after); } else after();
+    };
     if (r.suspense) Sus.show(r.suspense, withResult); else withResult();
   }
   function deathInfo() {
@@ -287,11 +297,12 @@ const Main = (() => {
     enter(elm) {
       el = elm; postQ = [];
       Popup.clearMini();
+      Milestone.reset();
       skeleton(); refresh(); fillFeed();
       if (G.pending) { Popup.choice(G.pending.view, (res) => handle(res)); }
       else kick();
     },
-    refresh, kick, stop, fxHtml, FX_L, setMini,
+    refresh, kick, stop, fxHtml, FX_L, setMini, bgFile: () => bgOf().file,
   };
 })();
 Screens.main = { enter: (el) => Main.enter(el) };
@@ -305,6 +316,8 @@ const Sus = (() => {
       const box = $('#sus'); if (!box) { done(); return; }
       const S = D().suspense;
       on = true; Audio2.setDuck(true);
+      const cgu = CG.forSuspense(s.ev), cgr = CG.forSuspenseResult(s.ev, s.ok);
+      box.classList.toggle('cg', !!cgu); box.style.setProperty('--cg', cgu ? `url(${cgu})` : 'none');
       box.innerHTML = `<div class="ic">${s.emoji || '📝'}</div><div class="stx">${esc(s.text.replace(/……$/, ''))}<span id="dots"></span></div><div class="tap"></div>`;
       box.classList.add('on');
       const stopBeat = Audio2.loopSe(S.sound, S.durationMs - 1000);
@@ -314,9 +327,10 @@ const Sus = (() => {
         if (finished) return; finished = true;
         clearInterval(dt); stopBeat();
         const win = s.win || (s.kind === 'exam' ? '🌸 合格！' : '🌸 成功！'), lose = s.lose || (s.kind === 'exam' ? '🍂 不合格……' : '🍂 残念……');
+        if (cgr) { box.classList.add('cg'); box.style.setProperty('--cg', `url(${cgr})`); }
         box.innerHTML = `<div class="res">${s.ok ? win : lose}</div>`;
         Audio2.se(s.ok ? 'cheer' : 'shock');
-        setTimeout(() => { box.classList.remove('on'); on = false; Audio2.setDuck(false); done(); }, 1400);
+        setTimeout(() => { box.classList.remove('on', 'cg'); on = false; Audio2.setDuck(false); done(); }, 1400);
       };
       const t = setTimeout(end, S.durationMs);
       setTimeout(() => { if (finished) return; if (Options.get().suspenseSkip) { $('.tap', box).textContent = 'タップで結果へ'; box.onclick = () => { clearTimeout(t); end(); }; } }, S.skippableAfterMs);

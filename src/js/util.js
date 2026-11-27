@@ -47,6 +47,16 @@ const curve = (obj, x) => {
 };
 const logistic = (d, s = 3.5) => clamp(1 / (1 + Math.exp(-d / s)), 0.03, 0.97);
 
+// ===== 進む速さ（ジャネーの法則：年をとるほど1年が速く流れる。docs/13 §5） =====
+const Pace = {
+  // タイムラインの投稿1件を見せる時間（等速・ミリ秒）
+  postMs: (age) => (age < 13 ? 1500 : age < 23 ? 1300 : age < 40 ? 1000 : age < 65 ? 800 : age < 80 ? 550 : 400),
+  // 季節が変わるときの間
+  seasonMs: (age) => (age < 23 ? 150 : 80),
+  // 等速での見こみ時間（tools/sim.js）：選択肢1回＝7秒、ドキドキ演出＝6.4秒
+  CHOICE_MS: 7000, SUS_MS: 4900,
+};
+
 // ===== お金の表示 =====
 const man = (v) => { const n = Math.round(v); return (n < 0 ? '−' : '') + Math.abs(n).toLocaleString('ja-JP'); };
 const manFull = (v) => { const n = Math.round(v); const a = Math.abs(n); const s = a >= 10000 ? `${Math.floor(a / 10000)}億${a % 10000 ? (a % 10000).toLocaleString('ja-JP') + '万' : ''}` : `${a.toLocaleString('ja-JP')}万`; return (n < 0 ? '−' : '') + s + '円'; };

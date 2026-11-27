@@ -60,16 +60,20 @@ const Ending = (() => {
   return { compute, avg };
 })();
 
+// ===== 幸せレベル（★1〜5。点数はつけず、自分で決める：docs/13 §3） =====
+const STAR_LABEL = ['', 'つらいことが多かった', 'すこしつらかった', 'ふつうだった', '幸せだった', 'とても幸せだった'];
+const starsHtml = (n, cls = 'stars') => `<span class="${cls}"><b>${'★'.repeat(n)}</b><i>${'★'.repeat(5 - n)}</i></span>`;
 // ===== 人生の記録（これまでの人生に保存する形） =====
 function lifeRecord(g) {
-  const e = Ending.compute(g);
   const jobs = (g.jobRecord || []).map((x) => x.l).filter((x, i, a) => a.indexOf(x) === i);
   return {
-    v: 1, id: g.seed, name: `${g.surname} ${g.given}`, kana: g.kana.join(' '), gender: g.gender, pref: prefOf(g.birthPref).name,
-    born: 2010, died: calYear(g), age: g.age, cause: g.deathCause || '病気', score: e.score, rank: e.rank.label, rankId: e.rank.id,
-    ha: e.ha, cr: e.cr, hp: g.happinessType, mode: g.mode, jobs: jobs.slice(0, 4).join(' → ') || 'なし', snap: snapOf(g),
+    v: 2, id: g.seed, name: `${g.surname} ${g.given}`, kana: g.kana.join(' '), gender: g.gender, pref: prefOf(g.birthPref).name,
+    born: 2010, died: calYear(g), age: g.age, cause: g.deathCause || '病気', stars: g.selfStars || 3,
+    ha: Math.round(Ending.avg(g.hist.happiness)), mode: g.mode, jobs: jobs.slice(0, 4).join(' → ') || 'なし', snap: snapOf(g),
   };
 }
+// 記録の右下：★（新しい記録）か、前のバージョンの点数
+const recEndHtml = (r) => (r.stars ? `<span>幸せレベル</span>${starsHtml(r.stars, 'stars sm')}` : `<span>${esc(r.rank || '')}</span><b class="num">${r.score}<small>点</small></b>`);
 // リザルトをもう一度見るための写し（ログは大事なできごとだけ）
 function snapOf(g) {
   try {
@@ -82,6 +86,8 @@ function snapOf(g) {
 Screens.result = {
   finish() {
     if (!G) return;
+    // 人生の最期に、幸せレベルを自分で決める（決めたらセーブ。とちゅうで閉じても、ここからやり直せる）
+    if (!G.selfStars) { save(); Popup.stars(G, (n) => { G.selfStars = n; save(); Screens.result.finish(); }); return; }
     const rec = lifeRecord(G);
     if (!G.savedToHistory) { pushHistory(rec); G.savedToHistory = true; }
     // 写しは新しい30人ぶんまで（保存できる量に限りがあるため）
@@ -94,11 +100,9 @@ Screens.result = {
     const viewing = mode === 'view';
     Audio2.bgm('result');
     if (!viewing) Screens.result.live = null;
-    const e = Ending.compute(G);
     const H = G.hist;
-    const crit = D().ending.criteria[G.happinessType];
-    const ranks = D().ending.ranks.slice().reverse();
-    const stars = Math.max(1, ranks.findIndex((r) => r.id === e.rank.id) + 1);
+    const stars = G.selfStars || 3;
+    const haAvg = Math.round(Ending.avg(H.happiness));
     const jobs = (G.jobRecord || []).map((x) => x.l).filter((x, i, a) => a.indexOf(x) === i);
     const edu = eduLabel();
     const kids = people('child', false).length, gks = people('grandchild', false).length;
@@ -114,14 +118,11 @@ Screens.result = {
       <div class="rttl"><div class="a">🕊️ ${esc(G.given)} の 人生</div><div class="b">2010年4月 ${esc(prefOf(G.birthPref).name)}に生まれる 〜 ${calYear()}年${MONTH[G.q]}月　${G.age}歳で人生を終える（${esc(G.deathCause || '病気')}）</div></div>
       <div class="panel" id="rme">
         <div class="pic" style="background-image:url(${faceImgOf(G)})"></div>
-        <div class="end">${esc(e.rank.label)}</div>
-        <div class="score num">${e.score}<small>点</small></div>
-        <div class="stars">${'⭐'.repeat(stars)}<span style="opacity:.25">${'⭐'.repeat(5 - stars)}</span></div>
-        <div class="hp"><span class="ic">😊</span><span><small>満足感（人生の平均 ${e.ha}点の6割）</small>毎日の満足感</span><b>${e.haPart}点</b></div>
-        <div class="hp"><span class="ic">💭</span><span><small>幸せの基準（${e.cr}点の4割）</small>${esc(crit.label)}</span><b>${e.crPart}点</b></div>
-        ${e.bonus ? `<div class="hp bn"><span class="ic">🎁</span><span><small>ボーナス</small>${esc(e.bonusList.map((x) => x.l.replace(/^\S+\s/, '')).join('・'))}</span><b>＋${e.bonus}点</b></div>` : ''}
+        <div class="end">幸せレベル</div>
+        ${starsHtml(stars, 'stars big')}
+        <div class="slabel">${esc(STAR_LABEL[stars])}</div>
+        <div class="hp"><span class="ic">😊</span><span><small>参考：毎日の満足感</small>人生の平均</span><b>${haAvg}</b></div>
         <div class="ep">${esc(ep)}</div>
-        <div class="rank">${ranks.map((r) => `<span class="${r.id === e.rank.id ? 'on' : ''}">${({ end_hard: '困難', end_trial: '試行錯誤', end_dramatic: '波乱万丈', end_balance: 'バランス', end_happy: '幸福' })[r.id] || ''}</span>`).join('')}</div>
       </div>
       <div class="panel" id="rinfo">
         <div class="tabs">${[['r1', '📋 まとめ'], ['r2', '🧬 才能'], ['r3', '💴 お金のグラフ'], ['r4', '📜 できごと']].map(([k, l], i) => `<button data-p="${k}" class="${i ? '' : 'on'}">${l}</button>`).join('')}</div>
@@ -251,11 +252,12 @@ Screens.history = {
       const pages = Math.max(1, Math.ceil((H.length + 1) / per));
       page = clamp(page, 0, pages - 1);
       const cards = H.slice(page * per, page * per + per);
-      const avgS = H.length ? Math.round(H.reduce((a, x) => a + x.score, 0) / H.length) : 0;
+      const SH = H.filter((x) => x.stars);
+      const avgS = SH.length ? (SH.reduce((a, x) => a + x.stars, 0) / SH.length).toFixed(1) : null;
       const longest = H.length ? Math.max(...H.map((x) => x.age)) : 0;
-      el.innerHTML = `<div class="hhd"><h1>📜 これまでの人生</h1><div class="st"><div>生きた人生 <b>${H.length}</b> 人</div><div>平均 <b>${avgS}</b> 点</div><div>いちばん長生き <b>${longest}</b> 歳</div></div></div>
+      el.innerHTML = `<div class="hhd"><h1>📜 これまでの人生</h1><div class="st"><div>生きた人生 <b>${H.length}</b> 人</div><div>幸せレベルの平均 <b>${avgS ? '★' + avgS : '—'}</b></div><div>いちばん長生き <b>${longest}</b> 歳</div></div></div>
         <div class="hgrid">${cards.map((r, i) => `<div class="hcard ${r.snap ? 'tap' : ''}" data-h="${i}"><div class="pic" style="background-image:url(${faceFile(r.gender, r.age)})"></div><div><div class="nm pn">${esc(r.name)}</div><div class="life">${esc(r.pref)}生まれ<br>${r.born}〜${r.died}年（${r.age}歳）<br>${esc(r.cause)}</div></div>
-          <div class="end"><span>${esc(r.rank)}</span><b class="num">${r.score}<small>点</small></b></div><div class="job"><span>💼</span><span>${esc(r.jobs)}</span></div></div>`).join('')}
+          <div class="end">${recEndHtml(r)}</div><div class="job"><span>💼</span><span>${esc(r.jobs)}</span></div></div>`).join('')}
           ${cards.length < per ? '<div class="hcard empty">つぎの人生が ここに入ります</div>' : ''}</div>
         <div class="hpager"><button id="hBack">◀ ${G && G.alive ? 'もどる' : 'タイトルへ'}</button>
           <div class="nav"><button id="hP" ${page ? '' : 'disabled'}>◀ 前</button><span class="num">${page + 1} / ${pages}</span><button id="hN" ${page < pages - 1 ? '' : 'disabled'}>次 ▶</button></div>
@@ -275,7 +277,7 @@ Screens.history = {
 };
 // QR／テキストで書き出す（manabi-battle と同じ方式：短い文字列にして QR に）
 function packHistory(list) {
-  const rows = list.map((r) => [r.name, r.kana, r.gender, r.pref, r.died, r.age, r.cause, r.score, r.rankId, r.jobs, r.mode, r.hp].join('|'));
+  const rows = list.map((r) => [r.name, r.kana, r.gender, r.pref, r.died, r.age, r.cause, r.score ?? '', r.rankId ?? '', r.jobs, r.mode, r.hp ?? '', r.stars ?? ''].join('|'));
   const txt = 'ML1;' + rows.join(';');
   return btoa(unescape(encodeURIComponent(txt)));
 }
@@ -283,7 +285,7 @@ function unpackHistory(s) {
   try {
     const txt = decodeURIComponent(escape(atob(s.trim())));
     if (!txt.startsWith('ML1;')) return null;
-    return txt.slice(4).split(';').map((row) => { const [name, kana, gender, prefName, died, age, cause, score, rankId, jobs, mode, hp] = row.split('|'); const rk = D().ending.ranks.find((r) => r.id === rankId) || D().ending.ranks[2]; return { v: 1, id: name + died + age, name, kana, gender, pref: prefName, born: 2010, died: +died, age: +age, cause, score: +score, rank: rk.label, rankId, jobs, mode, hp }; });
+    return txt.slice(4).split(';').map((row) => { const [name, kana, gender, prefName, died, age, cause, score, rankId, jobs, mode, hp, stars] = row.split('|'); if (+stars) return { v: 2, id: name + died + age, name, kana, gender, pref: prefName, born: 2010, died: +died, age: +age, cause, stars: +stars, jobs, mode }; const rk = D().ending.ranks.find((r) => r.id === rankId) || D().ending.ranks[2]; return { v: 1, id: name + died + age, name, kana, gender, pref: prefName, born: 2010, died: +died, age: +age, cause, score: +score, rank: rk.label, rankId, jobs, mode, hp }; });
   } catch (e) { return null; }
 }
 function exportQR(list) {
