@@ -152,7 +152,7 @@ const roleEmoji = (p) => {
 
 // ---- セーブ（docs/11：四半期ごと・選ぶたびに自動。手動セーブなし） ----
 function save() { if (!G || G.ended) return; G.rng = RNG.s; Store.set('life', G); }
-function loadLife() { const g = Store.get('life'); if (g && g.v === 1 && g.alive) { G = g; RNG.seed(g.rng); personSeq = g.people.length + 10; Fam.migrate(G); return true; } return false; }
+function loadLife() { const g = Store.get('life'); if (g && g.v === 1 && (g.alive || !g.savedToHistory)) { G = g; RNG.seed(g.rng); personSeq = g.people.length + 10; Fam.migrate(G); return true; } return false; }
 function deleteLife() { Store.del('life'); G = null; }
 const histories = () => Store.get('history', []);
 function pushHistory(rec) { const h = histories(); h.unshift(rec); Store.set('history', h.slice(0, 60)); }

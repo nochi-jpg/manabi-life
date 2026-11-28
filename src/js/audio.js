@@ -53,7 +53,7 @@ const Audio2 = (() => {
 // ===== オプション（保存する） =====
 const Options = (() => {
   let o = null;
-  const def = () => ({ bgmVolume: 0.6, seVolume: 0.8, speed: 1, suspenseSkip: false, tlSize: 'm', ...window.DATA.audio.optionsDefault });
+  const def = () => ({ bgmVolume: 0.6, seVolume: 0.8, speed: 1, suspenseSkip: false, tlSize: 'm', ui: 'simple', ...window.DATA.audio.optionsDefault });
   return {
     get() { if (!o) o = { ...def(), ...Store.get('options', {}) }; return o; },
     set(k, v) { this.get()[k] = v; Store.set('options', o); },

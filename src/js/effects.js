@@ -185,7 +185,7 @@ const Effects = (() => {
         case 'endGame': Engine.die(G.deathCause || '病気'); break;
         case 'autoplayChoices': G.vars.autoplay = v; break;
         case 'livingCostMul': G.vars.livingCostMul = (G.vars.livingCostMul || 1) * v; break;
-        case 'silent': case 'silentIfSmall': ctx.silent = !!v && (k === 'silent' || (G.lastDelta && G.lastDelta.bonus < 5)); break;
+        case 'silent': case 'silentIfSmall': ctx.silent = !!v && (k === 'silent' || (G.lastDelta && G.lastDelta.bonus < 5) || (k === 'silentIfSmall' && G.vars.bonusShown)); if (k === 'silentIfSmall' && !ctx.silent) G.vars.bonusShown = true; break; // ボーナスは初めての1回だけタイムラインに出す（お金の欄には毎回出る）
         default: if (!Effects.warned[k]) { Effects.warned[k] = 1; console.warn('未対応の効果', k); }
       }
     }

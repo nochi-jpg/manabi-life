@@ -12,6 +12,23 @@ const Engine = (() => {
   const gentleOut = (id) => G.mode === 'gentle' && D().modes.modes.gentle.excludeEvents.includes(id);
   const isQuietYear = () => G.age <= 5 || G.age >= 80; // 年2枠
   const activeQ = () => !isQuietYear() || G.q === 0 || G.q === 2;
+  // 年齢で選択肢・流れるイベントを減らす（docs/13 §5）
+  const randomMul = () => (G.age < 13 ? 1 : G.age < 23 ? 0.5 : G.age < 65 ? 0.25 : 0.15);
+  const randomPerYear = () => (G.age < 13 ? 2 : 1);
+  // 人生の形を決めるもの（恋愛・家族・お金）は減らさない：結婚・家・子どもの割合が統計からずれないように
+  const KEEP_CATS = ['love', 'family'];
+  const KEEP_IDS = ['ev_r_house', 'ev_r_car_buy', 'ev_r_startup', 'ev_r_job_search', 'ev_r_transfer', 'ev_r_invest_property'];
+  const isKeep = (e) => KEEP_CATS.includes(e.cat) || KEEP_IDS.includes(e.id);
+  const fillerPerYear = () => (G.age < 13 ? 4 : G.age < 65 ? 2 : 1);
+  // 通知表のポップアップは間引く（通知表そのものは毎年つくる。［通知表］ボタンでいつでも見られる）
+  //  小学校は3・6年、中高は3年、高専は3・5年、大学などは1年
+  function reportSkip() {
+    const sc = G.school; if (!sc) return false; const y = sc.yearIn;
+    if (G.stage === 'elem' || G.stage === 'free_school') return y !== 3 && y !== 6;
+    if (['jhs', 'hs', 'hs_corr', 'hs_night'].includes(G.stage)) return y !== 3;
+    if (G.stage === 'kosen') return y !== 3 && y !== 5;
+    return y !== 1;
+  }
 
   // ---------- はじまり ----------
   function begin() {
@@ -81,6 +98,7 @@ const Engine = (() => {
         if (e.type === 'scheduled' || (e.when && e.when.engine) || e.risk) continue;
         if (gentleOut(e.id) || has(e.id) || placeBlocked(e)) continue;
         if (!onceYearOk(e)) continue;
+        if (e.id === 'ev_m_report_card' && reportSkip()) continue;
         const ctx = { ev: e };
         if (!Cond.test(e.when, ctx)) continue;
         if (e.when.after) afters.push({ id: e.id, ctx: packCtx(ctx) }); else Q.push({ id: e.id, ctx: packCtx(ctx) });
@@ -88,7 +106,7 @@ const Engine = (() => {
     }
     Q.push(...afters);
     // 習い事を続ける？（要望3：春に。学年が上がる・入学・就職のとき）
-    if ((G.q === 0 || G.vars.lessonForce) && !placeNow() && G.clubs.some((c) => isLesson(c.id))) Q.push({ id: '__lessons', ctx: {} });
+    if (((G.q === 0 && G.age % 2 === 0) || G.vars.lessonForce) && !placeNow() && G.clubs.some((c) => isLesson(c.id))) Q.push({ id: '__lessons', ctx: {} }); // 2年に1回（入学などのときは必ず）
     // 妊活・不妊治療：毎年4月に、妊娠したか・治療の相談をするか
     if (G.q === 0) { const kid = Kids.yearRoll(); if (kid) Q.push({ id: kid, ctx: {}, sched: true }); }
     // 夢の仕事：毎年10月に、売れたか・人気が落ちたか・続けるか
@@ -142,12 +160,15 @@ const Engine = (() => {
     // 5. ランダムな選択肢イベント（1季節に最大1つ、同じ年に最大2つ）
     //    それぞれの候補が「重み×0.008／季節」の確率で起きる。起きたものが複数なら重みで1つ選ぶ
     const hasChoice = () => Q.some((x) => (ev(x.id) || {}).kind === 'choice');
-    if (!hasChoice() && (G.randomChoicesYear || 0) < 2) {
+    const nYear = G.randomChoicesYear || 0;
+    if (!hasChoice() && nYear < randomPerYear()) {
       const hit = [];
-      const k = G.age < 6 ? 0.005 : G.age >= 30 ? 0.0046 : 0.006;
+      const k0 = G.age < 6 ? 0.005 : G.age >= 30 ? 0.0046 : 0.006;
       for (const e0 of [...D().events_random.events, ...FAM]) {
         const e = ev(e0.id);
         if (e.kind !== 'choice' || !e.weight || e.type === 'scheduled' || e.risk || gentleOut(e.id) || placeBlocked(e)) continue;
+        const keep = isKeep(e);
+        const k = keep ? k0 : k0 * randomMul();
         if (!onceYearOk(e)) continue;
         const ctx = { ev: e };
         if (!Cond.test(e.when, ctx)) continue;
@@ -155,13 +176,17 @@ const Engine = (() => {
         const em = D().prefectures.tiers[tier()].eventMul || {}; if (em[e.id]) w *= em[e.id];
         if (chance(Math.min(0.6, w * k))) hit.push({ e, ctx, w });
       }
-      const c = weighted(hit, (x) => x.w);
+      const kh = hit.filter((x) => isKeep(x.e)); // 人生の形を決めるものを先に
+      const c = weighted(kh.length ? kh : hit, (x) => x.w);
       if (c) { add(c.e.id, c.ctx); G.randomChoicesYear = (G.randomChoicesYear || 0) + 1; }
     }
     // 6. 何もなければ流れるイベント（ヒント・日常）を1〜2本
     const visible = Q.filter((x) => !['ev_m_promotion'].includes(x.id)).length;
-    if (visible < 2) {
-      const n = visible === 0 ? (chance(0.5) ? 2 : 1) : 1;
+    if (G.vars.fillY !== G.year) { G.vars.fillY = G.year; G.vars.fillN = 0; }
+    const room = fillerPerYear() - (G.vars.fillN || 0);
+    if (visible < 2 && room > 0) {
+      const n = Math.min(room, visible === 0 ? (chance(0.5) ? 2 : 1) : 1);
+      G.vars.fillN = (G.vars.fillN || 0) + n;
       for (let i = 0; i < n; i++) {
         const cand = [];
         for (const e0 of [...D().events_flow.events, ...FAM.filter((x) => x.kind === 'flow')]) {
@@ -169,7 +194,7 @@ const Engine = (() => {
           if (!e.weight || e.risk || e.type === 'scheduled' || has(e.id) || gentleOut(e.id) || placeBlocked(e) || !onceYearOk(e)) continue;
           const ctx = { ev: e };
           if (!Cond.test(e.when, ctx)) continue;
-          cand.push({ e, ctx, w: Cond.weightOf(e.weight) * (e.cat === 'daily' ? 0.6 : 1) });
+          cand.push({ e, ctx, w: Cond.weightOf(e.weight) * (e.cat === 'daily' ? (G.age >= 23 ? 0.4 : 0.6) : 1) });
         }
         for (const e0 of D().events_random.events) { // 判定つきの流れ（コンテスト・ヒットなど）
           const e = ev(e0.id);
@@ -204,9 +229,10 @@ const Engine = (() => {
   function onceYearOk(e) {
     const w = e.when || {};
     // 社会人の「新しい1年の重点方針」は5年に1回（毎年だと選択が多すぎて1プレイが長くなる）
-    if (e.id === 'ev_m_focus_adult' && G.stage !== 'none' && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < 2) return false;
-    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 70) return false; // 70歳からは聞かない（いつでも▼から変えられる）
-    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 19 && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < (G.age >= 40 ? 15 : 12)) return false;
+    if (e.id === 'ev_m_focus_adult' && G.stage !== 'none') return false; // 学生の方針は通知表で決める（docs/13 §5）
+    if (e.id === 'ev_m_job_review' && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < 10) return false;
+    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 65) return false; // 70歳からは聞かない（いつでも▼から変えられる）
+    if (e.id === 'ev_m_focus_adult' && G.stage === 'none' && G.age >= 19 && G.lastFired[e.id] != null && G.year - G.lastFired[e.id] < 20) return false;
     // 30代からは、新しい趣味を聞くのは10年に1回
     if (['ev_r_new_hobby', 'ev_r_senior_hobby', 'ev_r_adult_lesson'].includes(e.id) && G.age >= 30) { const last = Math.max(...['ev_r_new_hobby', 'ev_r_senior_hobby', 'ev_r_adult_lesson'].map((x) => G.lastFired[x] ?? -99)); if (G.year - last < 10) return false; }
     if (w.season || w.date) return true;
@@ -306,11 +332,11 @@ const Engine = (() => {
         Effects.apply(blk.effects, ctx);
         const pp = post(out, e, blk.text, ctx, ok ? 'big' : ''); if (pp) pp.fx = diff(s0, snap());
         flushLogs(out, e, ctx);
-        if (sus) out.suspense = { ...sus, ok, kind: susKind(e) };
+        if (sus) out.suspense = { ...sus, ok, kind: susKind(e), ev: e.id };
         else Audio2.se(ok ? 'cheer' : 'shock');
         return out;
       }
-      out.suspense = sus ? { ...sus, ok: false, kind: susKind(e) } : null;
+      out.suspense = sus ? { ...sus, ok: false, kind: susKind(e), ev: e.id } : null;
       return openChoice(out, e, ctx, blk.text, blk.choices, 'fail');
     }
     return openChoice(out, e, ctx, text, e.choices, 'main');
@@ -391,7 +417,7 @@ const Engine = (() => {
       if (t) out.result = { emoji: e.emoji, date: v.date, ageLabel: v.ageLabel, text: v.text, chosen: label, rate: o.rate, ok, res: t, fx };
     }
     const calm = ['risk', 'health', 'money'].includes(e.cat);
-    if (ok !== null && sus) out.suspense = { ...sus, ok, kind: susKind(e) };
+    if (ok !== null && sus) out.suspense = { ...sus, ok, kind: susKind(e), ev: e.id };
     else if (ok !== null) Audio2.se(ok ? (e.cat === 'risk' ? 'decide' : calm ? 'up' : 'cheer') : 'shock');
     else if (/school|work|love|family/.test(e.cat || '') || e._src === 'm') Audio2.se('decide');
     // 続きのメニュー（専門学校を選ぶ など）

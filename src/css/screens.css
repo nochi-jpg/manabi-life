@@ -424,7 +424,7 @@
 .orow input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:5px;background:linear-gradient(90deg,var(--blue) var(--p),#e3ebf6 var(--p));outline:0}
 .orow input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--blue)}
 .orow input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--blue)}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp2);grid-column:2/4}.seg[data-key=suspenseSkip]{grid-template-columns:1fr 1fr}.seg.one{grid-template-columns:1fr}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp2);grid-column:2/4}.seg[data-key=suspenseSkip],.seg[data-key=ui]{grid-template-columns:1fr 1fr}.seg.one{grid-template-columns:1fr}
 .seg button{height:44px;font-size:16px;box-shadow:none}
 .opanel .btns{margin-top:var(--sp4);display:grid;grid-template-columns:1fr 1fr;gap:var(--sp3)}.opanel .btns button{height:52px;font-size:18px}
 .crbox{width:760px;padding:var(--sp4) var(--sp5)}.crbox h2{font-size:24px;color:var(--blue);margin-bottom:var(--sp1)}
@@ -506,3 +506,263 @@
 /* 誕生画面：続柄（母方の祖母など）が住まいの欄にかぶらないように */
 #card .kv .k{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 #card .kv .k.long{font-size:11px;letter-spacing:-.02em}
+
+/* ===== v2（docs/13）：イベントCG・人生の分岐点・幸せレベル ===== */
+/* CG はポップアップのうしろに画面いっぱい。上にうすい白をかけて文字を読みやすく */
+.ov.cg{background:linear-gradient(rgba(253,253,251,.45),rgba(253,253,251,.45)),var(--cg) center/cover no-repeat}
+#sus.cg{background:linear-gradient(rgba(23,32,64,.62),rgba(23,32,64,.62)),var(--cg) center/cover no-repeat}
+/* 人生の分岐点 */
+.msbox{width:640px;padding:var(--sp4) var(--sp4) var(--sp3);display:flex;flex-direction:column;align-items:stretch}
+.cs.ms{background:var(--gold)}
+.msbox.bad .cs.ms{background:var(--ink2)}
+.msimg{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;background:var(--soft) center/cover no-repeat;margin-top:var(--sp1)}
+.mscat{position:absolute;left:12px;top:12px;height:32px;padding:0 14px;border-radius:999px;display:inline-flex;align-items:center;background:#fff;color:var(--blue);font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.mscat.sm{position:static;height:28px;font-size:13px;background:var(--soft2);box-shadow:none;flex:none}
+.msdate{margin-top:var(--sp2);font-size:15px;color:var(--ink2);text-align:center}
+.mshead{margin-top:4px;font-size:30px;font-weight:900;line-height:1.35;text-align:center;color:var(--ink)}
+.mssub{margin-top:var(--sp1);font-size:17px;line-height:1.5;text-align:center;color:var(--ink2)}
+.msmore{margin-top:var(--sp1);display:flex;align-items:center;gap:var(--sp1);height:40px;padding:0 12px;border-radius:12px;background:var(--soft);font-size:16px;overflow:hidden;white-space:nowrap}
+.msbox .picked{margin-top:var(--sp2);height:44px;justify-content:center;font-size:15px}
+.msbox.compact .msimg{aspect-ratio:21/9}
+.msbox .fxl{display:flex;justify-content:center;margin-top:var(--sp1)}
+.msbox .nx{margin-top:var(--sp3)}
+/* 幸せレベル（★）：絵文字ではなく文字の★を金色で */
+.stars b{color:var(--gold);font-weight:900}.stars i{color:var(--soft3);font-style:normal;font-weight:900}
+.stars.big{font-size:52px;letter-spacing:4px;line-height:1.1}
+.stars.sm{font-size:22px;letter-spacing:1px}
+#rme .end{margin-top:var(--sp3);font-size:18px;color:var(--ink2)}
+#rme .slabel{font-size:20px;font-weight:900;color:var(--ink);margin-bottom:var(--sp2)}
+.starbox{text-align:center}
+.starbox h2{line-height:1.5}
+.starpick{display:flex;justify-content:center;gap:var(--sp1);margin-top:var(--sp3)}
+.starpick button{width:80px;height:80px;border-radius:20px;font-size:48px;line-height:1;color:var(--soft3);background:#fff;border:2px solid var(--line2)}
+.starpick button.on{color:var(--gold);border-color:var(--gold);background:#fffaf0}
+.starbox .slabel{margin-top:var(--sp2);height:28px;font-size:20px;font-weight:900;color:var(--ink)}
+
+/* ===== v2：メイン画面のレイアウト（docs/13 §1・§2） ===== */
+/* 一時停止は、タイムラインの見出しの中に */
+#paused{position:static;height:28px;flex:none}
+#tl{display:flex;flex-direction:column}
+#tl #feed{flex:1;height:auto;min-height:0}
+/* ---- シンプル（横） ---- */
+.simple #hero{left:16px;top:80px;width:400px;height:400px;padding:var(--sp1)}
+.simple #hero .pic{height:288px}
+.simple #hero .pic img{height:300px}
+.simple #hero .role{height:56px}
+.simple #hero .role .r1{max-width:376px;font-size:13px}
+.simple #hero .role .r2{max-width:376px}
+.simple #hero .now{height:32px;margin:0 8px;border-radius:999px;background:var(--soft2);color:var(--blue);font-size:15px;display:flex;align-items:center;justify-content:center;padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.simple #hero .now.flash{animation:nowflash 1.6s ease-out}
+@keyframes nowflash{0%{background:var(--gold);color:#fff;transform:scale(1.04)}100%{background:var(--soft2);color:var(--blue);transform:none}}
+.simple #gauge{left:16px;top:496px;width:400px;height:208px;padding:20px 24px}
+#gauge .row{grid-template-columns:112px 1fr 40px;height:32px;margin-bottom:12px;font-size:17px}
+#gauge .row:last-child{margin-bottom:0}
+#gauge .row .v{font-size:20px}
+#gauge .row.cash{border-top:2px dashed var(--soft3);padding-top:12px;height:44px}
+#gauge .row.cash .num{font-size:22px}#gauge .row.cash .num.neg{color:var(--red)}#gauge .row.cash .tx{font-size:18px}
+.simple #tl{left:432px;top:80px;width:832px;height:560px}
+.simple #foot{left:432px;top:656px;width:832px;grid-template-columns:repeat(4,1fr)}
+.simple #foot button{min-width:0;white-space:nowrap;overflow:hidden}
+.simple #focusBtn{width:auto;height:48px;font-size:16px;justify-content:center;padding:0 12px;color:var(--ink);gap:6px}
+.simple #focusBtn .k{font-size:13px;color:var(--ink2)}
+.simple #focusBtn .fv{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.simple .post .fx{display:none}
+/* ---- ［くわしく］のポップアップ ---- */
+#dpop{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(253,253,251,.88)}
+#dpop.on{display:flex}
+#dpop .dpbox{position:relative;width:960px;height:656px;padding:var(--sp3);display:flex;flex-direction:column;animation:pop .2s ease-out}
+.dtabs{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--sp1);flex:none}
+.dtabs button{height:44px;font-size:16px;padding:0 4px;white-space:nowrap;box-shadow:none}
+.dpage{display:none;flex:1;min-height:0;margin-top:var(--sp2);overflow:hidden}
+.dpage.on{display:block}
+#dpop .dpage.rs{position:static;width:auto;height:auto;padding:0;background:none;border:0;box-shadow:none;border-radius:0}
+#dpop .rs h3{height:32px;font-size:17px;margin-bottom:var(--sp1)}
+#dpop .rs .kv{height:44px;min-height:44px;font-size:17px;grid-template-columns:136px 1fr;border-bottom:2px dashed var(--soft3)}
+#dpop .rs .kv .k{font-size:15px}
+#dpop .rs .chip{height:30px;font-size:15px;line-height:30px;padding:0 12px}
+#dpop .rs .tiles{gap:var(--sp1);margin-bottom:var(--sp1)}
+#dpop .rs .tile{height:72px}#dpop .rs .tile small{font-size:14px}#dpop .rs .tile b{font-size:24px}
+#dpop .rs .fam{grid-template-columns:36px 96px 80px 1fr 80px;gap:var(--sp1)}
+#dpop .rs .fam .av{font-size:22px}#dpop .rs .fam .nm{font-size:15px}#dpop .rs .fam .tag{height:28px;font-size:14px}
+#dpop .rs h3 .pg button.pgb{width:36px;height:32px;font-size:13px}#dpop .rs h3 .pg{font-size:15px}
+#dpop .rs h3 .dmsg{font-size:14px;height:26px;line-height:26px}
+#dpop #statL,#dpop #statR{max-width:620px;margin:0 auto}
+#dpop #statL h3,#dpop #statR h3{height:32px;font-size:17px;margin-bottom:var(--sp2)}
+#dpop .row{height:44px;margin-bottom:var(--sp1);grid-template-columns:140px 1fr 48px;font-size:18px}
+#dpop .row .v{font-size:20px}#dpop .row .num{font-size:22px}
+#dpop .dnote{max-width:620px;margin:var(--sp3) auto 0;height:52px;border-radius:16px;background:var(--soft);display:grid;grid-template-columns:140px 1fr;align-items:center;padding:0 16px;font-size:18px}
+#dpop .dnote .k{font-size:15px;color:var(--ink2)}
+#dpop .bsec{margin-bottom:var(--sp2)}
+#dpop #d-born{display:none}#dpop #d-born.on{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--sp3)}
+#dpop #d-born .kv{grid-template-columns:112px 1fr;min-height:40px;font-size:15px}
+#dpop #d-born .kv .k{font-size:13px;white-space:normal;line-height:1.2}
+#dpop .dfoot{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:var(--sp2);margin-top:var(--sp2)}
+#dpop .dfoot button{height:52px;font-size:18px}
+.one{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.bnote{margin-top:var(--sp2);font-size:14px;line-height:1.5;color:var(--ink2)}
+.bfeat{margin-top:var(--sp2);display:flex;flex-direction:column;gap:6px}
+.bfeat span{min-height:36px;border-radius:12px;background:var(--soft);display:flex;align-items:center;padding:4px 12px;font-size:15px;line-height:1.4}
+/* ---- ゲーム開始時のお知らせ ---- */
+.binfo{width:600px}
+.binfo h2{font-size:24px;color:var(--ink);margin:var(--sp2) 0}
+.binfo .bdots{display:flex;gap:6px;justify-content:center;margin-top:var(--sp1)}
+.binfo .bdots i{width:10px;height:10px;border-radius:50%;background:var(--soft3)}.binfo .bdots i.on{background:var(--blue)}
+.binfo .kv{grid-template-columns:136px 1fr;min-height:44px;font-size:17px}
+.binfo .kv .k{font-size:15px}
+.binfo .mini{grid-template-columns:136px 1fr 56px;min-height:44px;font-size:16px}
+.binfo .nx button{width:280px}
+/* ---- 誕生画面（顔と名前だけ） ---- */
+#card.v2{left:360px;top:304px;width:560px;height:336px;display:flex;flex-direction:column;align-items:center}
+#card.v2 .pic{width:320px;height:144px}
+#card.v2 .fn{width:320px}
+#card.v2 .sx{width:320px}
+#card.v2 .src{margin-top:auto;width:100%}
+#gauge .row.cash .lb{font-size:17px}#gauge .row.cash .num{color:var(--ink)}
+/* タイムラインの下のはしは、うすく消す（切れた投稿を見せない） */
+#feed{-webkit-mask-image:linear-gradient(#000 calc(100% - 40px),transparent);mask-image:linear-gradient(#000 calc(100% - 40px),transparent)}
+
+/* ===== v2：縦画面（はば720・高さ var(--stageH)） ===== */
+.port #head{width:688px;gap:var(--sp1)}
+.port .date{flex:none;padding-right:16px}
+.port .pname{width:auto;flex:1;min-width:0}
+.port .ctrl{flex:none;padding:0 6px;gap:0}
+.port .ctrl .lb2,.port .ctrl .lifebar{display:none}
+.port #speed button{width:52px}
+/* 縦×シンプル */
+.port.simple #hero{left:16px;top:80px;width:688px;height:336px}
+.port.simple #hero .pic{height:224px}
+.port.simple #hero .pic img{height:236px}
+.port.simple #hero .role .r1,.port.simple #hero .role .r2{max-width:648px}
+.port.simple #gauge{left:16px;top:432px;width:688px;height:208px}
+.port.simple #gauge .row{grid-template-columns:136px 1fr 48px}
+.port.simple #tl{left:16px;top:656px;width:688px;height:calc(var(--stageH) - 736px)}
+.port.simple #foot{left:16px;top:calc(var(--stageH) - 64px);width:688px}
+.port #foot button{font-size:15px;padding:0 6px}
+/* 縦×くわしい */
+.port.detail #hero{left:16px;top:80px;width:216px;height:272px}
+.port.detail #hero .pic img{height:180px}
+.port.detail #hero .role .r1,.port.detail #hero .role .r2{max-width:200px}
+.port.detail #stat{left:248px;top:80px;width:456px;height:272px;padding:12px 16px;column-gap:var(--sp2)}
+.port.detail #stat .row{grid-template-columns:84px 1fr 30px;font-size:13px;column-gap:6px}
+.port.detail #stat .row .v{font-size:15px}.port.detail #stat .row .num{font-size:15px}
+.port.detail #stat h3{font-size:13px}
+.port.detail #mid{width:688px}
+.port.detail #focusBtn{width:232px;font-size:16px}
+.port.detail .seasons span{font-size:14px}
+#rtab{left:16px;top:432px;width:688px;height:264px;padding:12px 16px;display:flex;flex-direction:column}
+#rtab .dtabs{grid-template-columns:repeat(3,1fr)}
+#rtab .dtabs button{height:36px;font-size:15px}
+#rtab .rs{position:static;width:auto;height:auto;padding:0;background:none;border:0;box-shadow:none;border-radius:0;display:none;margin-top:var(--sp1)}
+#rtab .rs.on{display:block}
+#rtab .rs h3{display:none}
+#rtab #pF h3{display:flex;justify-content:flex-end}#rtab #pF h3::after{display:none}
+#rtab .rs .kv{height:28px;min-height:28px;font-size:14px;grid-template-columns:104px 1fr}
+#rtab .rs .kv .k{font-size:13px}
+#rtab .rs .fam{grid-template-columns:28px 64px 56px 1fr 64px}
+.port.detail #tl{left:16px;top:712px;width:688px;height:calc(var(--stageH) - 792px)}
+.port.detail #foot{left:16px;top:calc(var(--stageH) - 64px);width:688px}
+/* ［くわしく］（縦） */
+.port #dpop .dpbox{width:688px;height:calc(var(--stageH) - 160px);max-height:1200px}
+.port .dtabs{grid-template-columns:repeat(3,1fr)}
+.port #dpop #d-born.on{grid-template-columns:1fr;gap:var(--sp2)}
+.port #dpop .rs .tiles{grid-template-columns:1fr 1fr}
+.port #dpop .rs .kv{grid-template-columns:120px 1fr;height:auto;min-height:44px;white-space:normal;line-height:1.35;padding:4px 0}
+.port #dpop .rs .fam{grid-template-columns:32px 80px 64px 1fr 72px;white-space:nowrap}
+.port .post{grid-template-columns:48px 34px 44px 40px 1fr}
+.port .post .fx{grid-column:5;justify-self:start}
+/* ---- 縦：タイトル ---- */
+.port #scr-title .logo{left:-10px;top:calc(var(--stageH) * .5 - 560px);width:740px;height:420px}
+.port #scr-title .menu{top:calc(var(--stageH) * .5 - 80px);width:440px}
+.port #scr-title .menu button{height:64px;font-size:22px}
+.port #scr-title .note{white-space:normal;line-height:1.6;bottom:56px;padding:0 48px;font-size:13px}
+/* ---- 縦：はじめから ---- */
+.port .q{top:72px;font-size:30px;padding:0 24px}
+.port .sex{left:120px;width:480px;height:320px}
+.port .sex .pic{width:440px;height:160px}
+.port .sex .l{margin-top:var(--sp2)}
+.port #sM{top:216px}.port #sF{top:568px}
+.port .opts2{left:80px;right:80px;top:216px;grid-template-columns:1fr;gap:var(--sp3)}
+.port .pick.mode{height:296px}
+.port #nm{left:16px;top:216px;width:688px;height:400px;padding:var(--sp4) var(--sp3)}
+.port .stbtns{top:648px;flex-direction:column;align-items:center;gap:var(--sp2)}
+.port .stbtns button{width:440px;height:64px}
+.port .back{left:24px;top:auto;bottom:24px}
+/* ---- 縦：誕生 ---- */
+.port #roul{left:60px;width:600px;top:96px}
+.port #born{top:268px}
+.port #card.v2{left:80px;top:336px;width:560px;height:400px}
+.port #card.v2 .pic{height:180px}
+.port #scr-birth .go{top:776px;width:440px;height:64px}
+/* ---- 縦：オプション ---- */
+.port .opanel{left:16px;width:688px;padding:var(--sp4) var(--sp3) var(--sp4)}
+.port .orow{grid-template-columns:168px 1fr 48px;column-gap:var(--sp1);font-size:16px}
+.port .seg button{font-size:15px}
+/* ---- 縦：これまでの人生 ---- */
+.port .hhd{left:16px;right:16px;flex-direction:column;align-items:flex-start;height:auto;gap:var(--sp1)}
+.port .hhd .st div{font-size:13px;padding:0 12px}
+.port .hgrid{left:16px;right:16px;top:144px;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,264px);gap:var(--sp2)}
+.port .hpager{left:16px;right:16px;top:calc(var(--stageH) - 144px);height:auto;grid-template-columns:1fr 1fr;grid-template-rows:48px 48px;gap:var(--sp2)}
+.port .hpager .nav{grid-column:1/3;grid-row:1}
+.port .hpager #hBack{grid-row:2}.port .hpager #hQR{grid-row:2}
+/* ---- 縦：リザルト ---- */
+.port .rttl{padding:0 16px}.port .rttl .b{line-height:1.5}
+.port #rme{left:16px;top:120px;width:688px;height:400px}
+.port #rme .pic{width:640px;height:120px}
+.port #rinfo{left:16px;top:536px;width:688px;height:calc(var(--stageH) - 632px)}
+.port #rinfo .g2{grid-template-columns:1fr}
+.port #rinfo .kv{min-height:44px}
+.port .tal{grid-template-columns:150px 1fr 40px 96px;column-gap:var(--sp1);font-size:14px}
+.port .chart{width:100%;height:auto}
+.port #rbot{left:16px;top:calc(var(--stageH) - 80px);width:688px;grid-template-columns:1fr 1fr;height:64px}
+.port #rbot .saved{display:none}
+/* ---- 縦：バックログ ---- */
+.port #blog{left:16px;top:16px;width:688px;height:calc(var(--stageH) - 32px)}
+.port #blog .bhd{flex-direction:column;align-items:flex-start;gap:var(--sp1)}
+.port #blog .yr{flex-wrap:wrap}
+.port #sM,.port #sF{left:120px}
+.orow{height:60px}.opanel .btns{margin-top:var(--sp3)}
+/* ===== v2：縦画面のポップアップ（はば688まで・1列に） ===== */
+.port .box{max-width:688px}
+.port .cbox,.port .rbox,.port .msbox,.port .binfo,.port .mbox,.port .xbox,.port .pbox,.port .lbox,.port .death,.port .taxbox,.port .qrbox,.port .crbox,.port .dbgbox{width:688px}
+.port .cbox{padding:var(--sp4) var(--sp3) var(--sp3)}
+.port .cbox .top{grid-template-columns:64px 1fr;row-gap:var(--sp1)}
+.port .cbox .who{width:64px;height:64px;font-size:36px}
+.port .cbox .top .flt{grid-column:1/3;justify-content:flex-end}
+.port .opts{grid-template-columns:1fr}
+.port .pbar{flex-wrap:wrap;height:auto;gap:var(--sp1)}
+.port .pager{grid-template-columns:136px 1fr 136px}
+/* 通知表（紙）：上に通知表、下に選択肢 */
+.port .paper{width:688px;height:auto;max-height:calc(var(--stageH) - 48px);grid-template-columns:1fr;row-gap:var(--sp2);padding:var(--sp3)}
+.port .pright{padding-left:0;border-left:0;padding-top:var(--sp2);border-top:3px dashed #ecdcc2}
+.port .paper .opts{grid-template-columns:1fr 1fr}
+.port .tr{grid-template-columns:116px 44px 22px 1fr;height:36px;font-size:16px}
+.port .phd .t{font-size:24px}
+/* 支出・家族カード・職業の詳細 */
+.port .exp{grid-template-columns:1fr;gap:var(--sp2)}
+.port .pcard{grid-template-columns:1fr;gap:var(--sp2)}
+.port .pcard .pic{height:220px}
+.port .dbox{width:688px;height:auto;max-height:calc(var(--stageH) - 48px);grid-template-columns:1fr;row-gap:var(--sp2)}
+.port .dbox .img{height:200px}
+.port .lbox{padding:var(--sp4) var(--sp3)}
+.port .lbox .l{grid-template-columns:40px 1fr 104px 104px;column-gap:var(--sp1)}
+.port .death{padding:40px 24px 32px}
+.port .death .sum{grid-template-columns:1fr 1fr}
+.port .tcol{grid-template-columns:1fr}
+.port .taxbox .tx{grid-template-columns:28px 136px 64px 1fr}
+.port .qrwrap{grid-template-columns:1fr;justify-items:center}
+.port .cr{grid-template-columns:160px 1fr}
+.port .msimg{aspect-ratio:16/9}
+.port .lvb{grid-template-columns:1fr 1fr}
+.port .xbox,.port .pbox{padding-top:72px}
+/* ===== 動くチュートリアル ===== */
+#tut{position:absolute;inset:0;z-index:80;display:none}
+#tut.on{display:block}
+#tut .hole{position:absolute;border-radius:20px;box-shadow:0 0 0 4px var(--gold),0 0 0 4000px rgba(23,32,64,.55);transition:all .35s ease;pointer-events:none}
+#tut .bub{position:absolute;padding:var(--sp3);border-radius:24px;background:#fff;border:3px solid var(--gold);box-shadow:var(--shadow2);transition:top .35s,left .35s;animation:pop .25s ease-out}
+#tut .th{display:flex;align-items:center;gap:var(--sp1);margin-bottom:var(--sp1)}
+#tut .th b{font-size:22px;color:var(--ink)}
+#tut .tn{height:28px;padding:0 10px;border-radius:999px;background:var(--gold);color:#fff;font-size:14px;display:flex;align-items:center}
+#tut p{font-size:17px;line-height:1.7;color:var(--ink)}
+#tut .tb{display:flex;justify-content:space-between;align-items:center;margin-top:var(--sp2)}
+#tut .tb button{height:48px;padding:0 24px;font-size:17px}
+#tut .tb .main{min-width:180px}

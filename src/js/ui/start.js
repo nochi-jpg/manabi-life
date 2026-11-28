@@ -1,28 +1,23 @@
 'use strict';
-// ===== はじめから（ui/start.html）：①性別 ②幸せの基準 ③モード ④名前 =====
+// ===== はじめから（ui/start.html）：①性別 ②モード ③名前（幸せの基準はなくした：docs/13 §3） =====
 Screens.start = {
   enter(el) {
-    const E = D().ending, M = D().modes, N = D().names;
+    const M = D().modes, N = D().names;
     const st = { g: null, hp: null, mode: null, S: null, Gv: null, self: false };
     const pk = (a) => a[Math.floor(Math.random() * a.length)]; // 名前の候補は人生の乱数とは別
-    const dots = (n) => `<div class="dots">${[0, 1, 2, 3].map((i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div>`;
+    const dots = (n) => `<div class="dots">${[0, 1, 2].map((i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div>`;
     el.innerHTML = `
       <div class="step on" id="st1">${dots(1)}
         <div class="q">どちらで 生まれる？<small>あとから変えることはできません</small></div>
         <div class="panel sex" id="sM" data-g="M"><div class="pic" style="background-image:url(${asset('assets/faces/M_20.png')})"></div><div class="l">👦 男の子</div><div class="d">0歳から人生がはじまります</div></div>
         <div class="panel sex" id="sF" data-g="F"><div class="pic" style="background-image:url(${asset('assets/faces/F_20.png')})"></div><div class="l">👧 女の子</div><div class="d">0歳から人生がはじまります</div></div>
       </div>
-      <div class="step" id="stH">${dots(2)}
-        <div class="q">${esc(E.question.text)}<small>${esc(E.question.note)}</small></div>
-        <div class="opts4">${E.question.choices.map((c) => `<button class="pick sq" data-hp="${c.id}"><span class="i">${c.emoji}</span><span>${esc(c.label)}</span></button>`).join('')}</div>
-        <button class="back" data-back="st1">◀ もどる</button>
-      </div>
-      <div class="step" id="stM">${dots(3)}
+      <div class="step" id="stM">${dots(2)}
         <div class="q">${esc(M.question)}<small>あとから変えることはできません</small></div>
         <div class="opts2">${['real', 'gentle'].map((k) => { const m = M.modes[k]; const [ic, ...lb] = m.label.split(' '); return `<button class="pick mode sq" data-mode="${k}"><span class="i">${ic}</span><span class="l">${esc(lb.join(' '))}</span><span class="d">${esc(m.desc)}</span></button>`; }).join('')}</div>
-        <button class="back" data-back="stH">◀ もどる</button>
+        <button class="back" data-back="st1">◀ もどる</button>
       </div>
-      <div class="step" id="st2">${dots(4)}
+      <div class="step" id="st2">${dots(3)}
         <div class="q">名前は？<small>🔀 でべつの名前に。自分で決めることもできます</small></div>
         <div class="panel" id="nm">
           <div class="row"><span class="k">苗字</span><div class="field" id="fS"></div><button class="sh" id="shS">🔀</button></div>
@@ -52,9 +47,8 @@ Screens.start = {
     $$('.sex', el).forEach((c) => (c.onclick = () => {
       st.g = c.dataset.g; $$('.sex', el).forEach((x) => x.classList.toggle('sel', x === c));
       st.Gv = pk(N.given[st.g]); if (!st.S) st.S = pk(N.surnames);
-      setTimeout(() => go('stH'), 250);
+      setTimeout(() => go('stM'), 250);
     }));
-    $$('[data-hp]', el).forEach((b) => (b.onclick = () => { st.hp = b.dataset.hp; go('stM'); }));
     $$('[data-mode]', el).forEach((b) => (b.onclick = () => { st.mode = b.dataset.mode; go('st2'); }));
     $$('[data-back]', el).forEach((b) => (b.onclick = () => { readInputs(); go(b.dataset.back); }));
     $('#shS', el).onclick = () => { st.S = pk(N.surnames); st.self = false; draw(); };
@@ -63,7 +57,7 @@ Screens.start = {
     $('#ok', el).onclick = () => {
       readInputs();
       Audio2.se('decide');
-      G = newLife({ gender: st.g, surname: st.S[0], given: st.Gv[0], happinessType: st.hp, mode: st.mode });
+      G = newLife({ gender: st.g, surname: st.S[0], given: st.Gv[0], happinessType: null, mode: st.mode });
       App.show('birth');
     };
   },

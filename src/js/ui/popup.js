@@ -17,13 +17,17 @@ const Popup = (() => {
     return c;
   }
   const rc = (r) => (r >= 70 ? 'hi' : r >= 40 ? 'mid' : 'lo');
+  // イベントCG：ポップアップのうしろ（画面いっぱい）に敷く。null なら今までどおり
+  let bg = null;
+  const setBg = (u) => { bg = u || null; };
   function show(html, cls = 'cbox') {
     const o = ov();
     o.innerHTML = `<div class="box ${cls}">${html}</div>`;
+    o.classList.toggle('cg', !!bg); o.style.setProperty('--cg', bg ? `url(${bg})` : 'none');
     o.classList.add('on'); open = true;
     return $('.box', o);
   }
-  function close() { ov().classList.remove('on'); ov().innerHTML = ''; open = false; }
+  function close() { const o = ov(); o.classList.remove('on', 'cg'); o.style.removeProperty('--cg'); o.innerHTML = ''; open = false; bg = null; }
   // ---- 選択肢を最小化して、ステータスを見る ----
   // 最小化中はゲームが進まない（isOpen が true のまま）。顔グラの「選択肢にもどる」で元の画面にもどる
   const MINI_BTN = '<button class="minb" id="miniBtn">📊 ステータスを見る</button>';
@@ -47,6 +51,7 @@ const Popup = (() => {
   // view.opts: [{i, label, rate} | {i, menu:true, items:[...], label?}]
   function choice(view, cb) {
     if (view.type === 'lessons') return lessons(view, cb);
+    const cgu = CG.forChoice(view.ev);
     const entries = [];
     for (let k = 0; k < view.opts.length; k++) {
       const o = view.opts[k];
@@ -90,6 +95,7 @@ const Popup = (() => {
     const report = view.popup === 'reportCard' && G.reports.length ? G.reports[G.reports.length - 1] : null;
     const payOf = (x) => { const m = String((x.item && x.item.sub) || '').match(/年収 約?(\d+)/); return m ? +m[1] : 0; };
     function render() {
+      setBg(cgu);
       if (pmode === 'prefs') return prefList();
       let list = subOpen ? subOpen.o.items.map((it) => ({ k: subOpen.k, item: it, o: subOpen.o })) : entries.slice();
       const canSort = list.length > PER && list.some((x) => x.item && x.item.rate != null);
@@ -124,6 +130,7 @@ const Popup = (() => {
       const pr = $('#pfRep', box); if (pr) pr.onclick = () => reports(() => render());
       $$('[data-n]', box).forEach((b) => (b.onclick = () => pickEntry(vis[+b.dataset.n])));
       $$('[data-sort]', box).forEach((b) => (b.onclick = () => { sort = b.dataset.sort; page = 0; render(); }));
+      if (!report) Tutorial.onChoice();
       bindPager(box, 'p', () => page, (v) => { page = v; render(); });
       const bk = $('#pBack', box); if (bk) bk.onclick = () => { subOpen = null; page = 0; render(); };
     }
@@ -139,6 +146,26 @@ const Popup = (() => {
       cb(res);
     }
     render();
+  }
+
+  // ---- 人生の分岐点（docs/13 §6）。選んだ結果と重なるときは、ここに「選んだ」も出す ----
+  const MS_BAD = ['別れ', '健康'];
+  function milestone(list, res, cb) {
+    const m = list[0];
+    const img = CG.forMilestone(m.cg) || asset(Main.bgFile());
+    const bad = MS_BAD.includes(m.cat) || /失った|離婚/.test(m.head);
+    const date = `${calYear()}年${MONTH[G.q]}月`;
+    const box = show(`<div class="cs ms">人生の分岐点</div>
+      <div class="msimg" style="background-image:url(${img})"><span class="mscat">${esc(m.cat)}</span></div>
+      <div class="msdate num">${date} ・ ${G.age}歳</div>
+      <div class="mshead">${esc(m.head)}</div>
+      ${m.sub ? `<div class="mssub">${esc(m.sub)}</div>` : ''}
+      ${list.slice(1).map((x) => `<div class="msmore"><span class="mscat sm">${esc(x.cat)}</span><span>${esc(x.head)}</span></div>`).join('')}
+      ${res ? `<div class="picked">選んだ：${esc(res.chosen)}</div>${res.fx && res.fx.length ? `<div class="fxl">${Main.fxHtml(res.fx)}</div>` : ''}` : ''}
+      <div class="nx"><button class="main" id="msNx">つぎへ ▶</button></div>`, `cbox msbox ${bad ? 'bad' : ''} ${list.length > 1 || res ? 'compact' : ''}`);
+    Audio2.se(bad ? 'shock' : 'cheer');
+    Tutorial.onMilestone();
+    $('#msNx', box).onclick = () => { close(); cb(); };
   }
 
   // ---- 選んだ結果（どうなった？） ----
@@ -365,6 +392,19 @@ const Popup = (() => {
     $('#dthOk', box).onclick = () => { ov().classList.remove('dark'); Audio2.setDuck && Audio2.setDuck(false); close(); cb(); };
   }
 
+  // ---- 幸せレベルを自分で決める（docs/13 §3） ----
+  function stars(g, cb) {
+    let n = 0;
+    const box = show(`<h2>${esc(g.given)}の人生。<br>ふりかえってみて、幸せレベルは？</h2>
+      <p class="msg">点数はつきません。幸せだったかどうかは、自分で決めます。</p>
+      <div class="starpick">${[1, 2, 3, 4, 5].map((i) => `<button class="flat" data-s="${i}">★</button>`).join('')}</div>
+      <div class="slabel" id="stL">★をタップしてね</div>
+      <button class="main close" id="stOk" disabled>けってい</button>`, 'mbox starbox');
+    const draw = () => { $$('[data-s]', box).forEach((b) => b.classList.toggle('on', +b.dataset.s <= n)); $('#stL', box).textContent = n ? `★${n}　${STAR_LABEL[n]}` : '★をタップしてね'; const ok = $('#stOk', box); ok.disabled = !n; ok.textContent = n ? `★${n} でけってい` : 'けってい'; };
+    $$('[data-s]', box).forEach((b) => (b.onclick = () => { n = +b.dataset.s; Audio2.se('click'); draw(); }));
+    $('#stOk', box).onclick = () => { if (!n) return; Audio2.se('decide'); close(); cb(n); };
+  }
+
   // ---- 小さなポップアップ ----
   function info(title, text, cb) {
     const box = show(`<h2>${esc(title)}</h2><p class="msg">${esc(text)}</p><button class="close main" id="ifX">わかった</button>`, 'mbox');
@@ -379,5 +419,5 @@ const Popup = (() => {
     $('#cN', box).onclick = () => { close(); cb(false); };
     $('#cY', box).onclick = () => { close(); cb(true); };
   }
-  return { assets, invest, choice, result, reports, paperHtml, menu, picker, person, expenses, death, info, list, confirm, close, isOpen: () => open || !!mini, isMini: () => !!mini, restore, clearMini, show };
+  return { milestone, setBg, stars, assets, invest, choice, result, reports, paperHtml, menu, picker, person, expenses, death, info, list, confirm, close, isOpen: () => open || !!mini, isMini: () => !!mini, restore, clearMini, show };
 })();

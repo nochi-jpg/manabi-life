@@ -21,8 +21,8 @@ const LifeMovie = (() => {
     const L = g.log || [];
     const out = [];
     const add = (o) => out.push({ pri: 0, ord: out.length, ...o });
-    const type = g.happinessType || 'hp_self';
-    const want = (types) => (types.includes(type) ? 3 : 1);
+    const type = g.happinessType || null; // 前のバージョンのセーブだけにある
+    const want = (types) => (type && types.includes(type) ? 3 : 2);
     add({ age: 0, text: `${Fam.prefName(g.birthPref || g.pref)}に生まれた`, face: 0, bg: 'bg_home', must: true });
     // 好きなこと・趣味
     const hb = (g.hobbies || []).map((id) => Menu.hobby(id)).filter(Boolean)[0];

@@ -15,6 +15,9 @@ const data = {};
 for (const f of fs.readdirSync(P('data')).filter((f) => f.endsWith('.json')).sort()) {
   data[f.replace('.json', '')] = JSON.parse(fs.readFileSync(P('data', f), 'utf8'));
 }
+// イベントCG：assets/cg にある絵だけを使う（ないものは、ゲームの中で今までどおりの表示になる）
+data.cgFiles = {};
+if (fs.existsSync(P('assets/cg'))) for (const f of fs.readdirSync(P('assets/cg')).filter((f) => /\.(jpe?g|png|webp)$/i.test(f)).sort()) data.cgFiles[f.replace(/\.[^.]+$/, '')] = 'assets/cg/' + f;
 const dataJs = `// 自動生成（node tools/build.js）。直接編集しないこと。元は data/*.json\nwindow.DATA=${JSON.stringify(data)};\n`;
 fs.writeFileSync(P('src/js/data.gen.js'), dataJs);
 console.log(`data.gen.js: ${Object.keys(data).length} ファイル / ${(dataJs.length / 1024).toFixed(0)}KB`);
@@ -57,6 +60,7 @@ const add = (rel, v) => { assets[rel] = v; };
 for (const f of fs.readdirSync(P('assets/faces')).filter((f) => f.endsWith('.png'))) add('assets/faces/' + f, img('assets/faces/' + f));
 for (const b of data.visuals.backgrounds) add(b.file, img(b.file));
 add('assets/ui/title.jpg', img('assets/ui/title.jpg'));
+for (const f of Object.values(data.cgFiles)) add(f, img(f));
 let soundN = 0;
 if (fs.existsSync(P('sounds'))) {
   for (const [k, v] of Object.entries(data.audio.bgm)) if (v.file && fs.existsSync(P(v.file))) { add(v.file, sound(v.file, true)); soundN++; }

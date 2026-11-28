@@ -3,7 +3,9 @@
 Screens.title = {
   enter(el) {
     Audio2.bgm('title');
-    const has = !!G && G.alive;
+    // 幸せレベルを決める前に閉じた人生：つづきから（★を決めてリザルトへ）
+    const ending = !!G && !G.alive && !G.savedToHistory;
+    const has = !!G && (G.alive || ending);
     const n = histories().length;
     el.innerHTML = `
       <div class="logo" style="background-image:url(${asset('assets/ui/title.jpg')})"></div>
@@ -15,7 +17,7 @@ Screens.title = {
       <div class="note">人生は一度きり　途中でやめて最初からやり直すことはできません（自動でセーブされ、ブラウザを開きなおすと再開します）</div>
       <div class="cred">© K.nom</div>
       ${Platform.showIOSHint() ? '<div class="ios">📲 共有 → ホーム画面に追加 で全画面で遊べます <button id="iosX">✕</button></div>' : ''}`;
-    $('#tStart').onclick = () => (has ? App.show('main') : App.show('start'));
+    $('#tStart').onclick = () => (ending ? Screens.result.finish() : has ? App.show('main') : App.show('start'));
     $('#tHist').onclick = () => App.show('history');
     $('#tOpt').onclick = () => App.show('options', 'title');
     const x = $('#iosX'); if (x) x.onclick = () => { Store.set('iosHintClosed', true); x.parentElement.remove(); };

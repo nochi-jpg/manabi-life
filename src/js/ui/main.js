@@ -5,8 +5,12 @@ const Main = (() => {
   const speed = () => (G && G.uiSpeed != null ? G.uiSpeed : Options.get().speed || 1);
   const BASE_MS = 1500;
 
+  // 画面の組み立て：横×くわしい（今までの画面）／横×シンプル／縦×シンプル／縦×くわしい（docs/13 §1・§2）
+  const isSimple = () => UIMode.simple();
+  const isPort = () => Platform.portrait();
   function skeleton() {
-    el.innerHTML = `
+    const simple = isSimple(), port = isPort();
+    const head = `
       <div id="head">
         <div class="date"><span class="ssn" id="ssnIc">🌸</span><span id="date" class="num"></span></div>
         <div class="pname" id="pname"></div>
@@ -16,31 +20,69 @@ const Main = (() => {
             <button data-s="1" title="ふつう"><span class="pl"></span></button>
             <button data-s="2">×2</button><button data-s="4">×4</button>
           </div></div>
-      </div>
-      <div class="panel" id="hero"><div class="pic" id="pic"><img id="faceImg" alt=""><span class="place" id="bgTag"></span><button id="backChoice">💬 選択肢に<br>もどる ▶</button></div><div class="role" id="role"></div></div>
-      <div class="panel" id="stat"><div id="statL"></div><div id="statR"></div></div>
-      <div id="mid">
-        <button id="focusBtn"></button>
-        <div class="seasons" id="ssn">${SS_NAME.map((n, i) => `<span>${SS_EMOJI[i]} ${n}</span>`).join('')}</div>
-      </div>
-      <div id="tl"><div class="top"><div class="hd">📜 タイムライン</div>
+      </div>`;
+    const hero = `<div class="panel" id="hero"><div class="pic" id="pic"><img id="faceImg" alt=""><span class="place" id="bgTag"></span><button id="backChoice">💬 選択肢に<br>もどる ▶</button></div><div class="role" id="role"></div>${simple ? '<div class="now" id="now"></div>' : ''}</div>`;
+    const tl = `<div id="tl"><div class="top"><div class="hd">📜 タイムライン</div><div id="paused">⏸ 一時停止中</div>
         <div class="sz">${['s', 'm', 'l'].map((k) => `<button data-sz="${k}">${{ s: '小', m: '中', l: '大' }[k]}</button>`).join('')}</div></div>
-        <div id="feed"></div></div>
-      <div id="paused">⏸ 一時停止中</div>
-      <div class="panel rs" id="pS"></div>
-      <div class="panel rs" id="pM"></div>
-      <div class="panel rs" id="pF"></div>
-      <div id="foot"><button class="main" id="repBtn">📋 通知表</button><button id="logBtn">📖 バックログ</button><button id="optBtn">⚙️ オプション</button></div>
-      <div id="sus"></div>`;
+        <div id="feed"></div></div>`;
+    const mid = `<div id="mid"><button id="focusBtn"></button><div class="seasons" id="ssn">${SS_NAME.map((n, i) => `<span>${SS_EMOJI[i]} ${n}</span>`).join('')}</div></div>`;
+    let body;
+    if (simple) {
+      body = `${hero}
+        <div class="panel" id="gauge"></div>
+        ${tl}
+        <div id="foot" class="f4"><button class="main" id="moreBtn">📊 くわしく</button><button id="focusBtn"></button><button id="logBtn">📖 バックログ</button><button id="optBtn">⚙️ オプション</button></div>
+        <div id="dpop"><div class="dpbox panel">
+          <div class="dtabs">${DTABS.map(([k, l]) => `<button data-d="${k}">${l}</button>`).join('')}</div>
+          <div class="dpage" id="d-me"><div id="statL"></div><div class="dnote" id="dFocus"></div></div>
+          <div class="dpage" id="d-work"><div id="statR"></div></div>
+          <div class="dpage rs" id="pM"></div>
+          <div class="dpage rs" id="pF"></div>
+          <div class="dpage rs" id="pS"></div>
+          <div class="dpage" id="d-born"></div>
+          <div class="dfoot"><button id="repBtn">📋 通知表</button><button class="main" id="dClose">とじる</button></div>
+        </div></div>`;
+    } else if (port) {
+      body = `${hero}<div class="panel" id="stat"><div id="statL"></div><div id="statR"></div></div>${mid}
+        <div class="panel" id="rtab"><div class="dtabs">${[['pS', '📍 状況'], ['pM', '💰 お金'], ['pF', '👪 家族']].map(([k, l]) => `<button data-r="${k}">${l}</button>`).join('')}</div>
+          <div class="rs rpage" id="pS"></div><div class="rs rpage" id="pM"></div><div class="rs rpage" id="pF"></div></div>
+        ${tl}
+        <div id="foot"><button class="main" id="repBtn">📋 通知表</button><button id="logBtn">📖 バックログ</button><button id="optBtn">⚙️ オプション</button></div>`;
+    } else {
+      body = `${hero}<div class="panel" id="stat"><div id="statL"></div><div id="statR"></div></div>${mid}${tl}
+        <div class="panel rs" id="pS"></div>
+        <div class="panel rs" id="pM"></div>
+        <div class="panel rs" id="pF"></div>
+        <div id="foot"><button class="main" id="repBtn">📋 通知表</button><button id="logBtn">📖 バックログ</button><button id="optBtn">⚙️ オプション</button></div>`;
+    }
+    el.innerHTML = head + body + '<div id="sus"></div>';
     $$('#speed button', el).forEach((b) => (b.onclick = () => setSpeed(+b.dataset.s)));
     $$('[data-sz]', el).forEach((b) => (b.onclick = () => { Options.set('tlSize', b.dataset.sz); applySize(); }));
     $('#focusBtn', el).onclick = () => openFocus();
     $('#backChoice', el).onclick = () => Popup.restore();
-    $('#repBtn', el).onclick = () => { stop(); Popup.reports(() => { refresh(); kick(); }); };
+    $('#repBtn', el).onclick = () => { stop(); Popup.reports(() => { refresh(); if (!dOpen) kick(); }); };
     $('#logBtn', el).onclick = () => { stop(); App.show('history', 'backlog'); };
     $('#optBtn', el).onclick = () => { stop(); App.show('options', 'main'); };
+    if (simple) {
+      $('#moreBtn', el).onclick = () => openDetail('me');
+      $$('[data-d]', el).forEach((b) => (b.onclick = () => showTab(b.dataset.d)));
+      $('#dClose', el).onclick = () => closeDetail();
+    }
+    if (!simple && port) $$('[data-r]', el).forEach((b) => (b.onclick = () => { rTab = b.dataset.r; showRTab(); }));
+    dOpen = false;
+    showRTab();
     applySize();
   }
+  // ---- シンプル：［くわしく］のポップアップ（タブで切りかえ。ゲームは止まる） ----
+  const DTABS = [['me', '🙂 自分'], ['work', '💼 仕事'], ['pM', '💰 お金'], ['pF', '👪 家族'], ['pS', '📍 くらし'], ['born', '🏠 生まれ']];
+  let dOpen = false, dTab = 'me', rTab = 'pS';
+  const tabEl = (k) => $(k.startsWith('p') ? '#' + k : '#d-' + k, el);
+  function showTab(k) { dTab = k; $$('[data-d]', el).forEach((b) => b.classList.toggle('on', b.dataset.d === k)); $$('.dpage', el).forEach((p) => p.classList.toggle('on', p === tabEl(k))); if (k === 'born') $('#d-born', el).innerHTML = bornHtml(); }
+  function openDetail(k) { stop(); dOpen = true; refresh(); $('#dpop', el).classList.add('on'); showTab(k || dTab); }
+  function closeDetail() { dOpen = false; $('#dpop', el).classList.remove('on'); refresh(); kick(); }
+  function showRTab() { if (!$('#rtab', el)) return; $$('[data-r]', el).forEach((b) => b.classList.toggle('on', b.dataset.r === rTab)); $$('.rpage', el).forEach((p) => p.classList.toggle('on', p.id === rTab)); }
+  // 生まれ（ゲーム開始時のお知らせと同じ中身）
+  function bornHtml() { return BirthInfo.pages().map((p) => `<div class="bsec"><h3>${p.title}</h3>${p.body}</div>`).join(''); }
   function applySize() { const s = Options.get().tlSize || 'm'; $('#feed', el).className = s; $$('[data-sz]', el).forEach((b) => b.classList.toggle('on', b.dataset.sz === s)); }
   function setSpeed(s) { G.uiSpeed = s; $$('#speed button', el).forEach((b) => b.classList.toggle('on', +b.dataset.s === s)); $('#paused', el).classList.toggle('on', s === 0); if (s > 0) kick(); save(); }
 
@@ -49,7 +91,7 @@ const Main = (() => {
     if (!G) return;
     $('#date', el).textContent = `${calYear()}年 ${String(MONTH[G.q]).padStart(2, ' ')}月`;
     $('#ssnIc', el).textContent = SS_EMOJI[G.q];
-    $$('#ssn span', el).forEach((s, i) => s.classList.toggle('on', i === G.q));
+    $$('#ssn span', el).forEach((x, i) => x.classList.toggle('on', i === G.q));
     const hp = G.stats.happiness;
     $('#pname', el).innerHTML = `${hp >= 70 ? '😄' : hp >= 50 ? '🙂' : hp >= 30 ? '😐' : '😣'} <span class="pn">${esc(G.given)}</span> <small>${G.age}歳</small>`;
     $('#lifebar', el).style.setProperty('--w', Math.min(100, (G.age / 90) * 100) + '%');
@@ -59,8 +101,11 @@ const Main = (() => {
     $('#bgTag', el).textContent = '📍 ' + bg.label;
     $('#role', el).innerHTML = roleHtml();
     drawStats();
-    $('#focusBtn', el).innerHTML = `<span class="k">重点方針</span>${Menu.focusLabel(G.focus)}<span class="arw">▼</span>`;
+    if (isSimple()) { drawGauge(); drawNow(); }
+    const fl = Menu.focusLabel(G.focus);
+    $('#focusBtn', el).innerHTML = isSimple() ? `<span class="k">方針</span><span class="fv">${G.age < 6 ? '6歳から' : fl}</span>` : `<span class="k">重点方針</span>${fl}<span class="arw">▼</span>`;
     $('#focusBtn', el).disabled = G.age < 6;
+    const df = $('#dFocus', el); if (df) df.innerHTML = `<span class="k">🧭 重点方針</span><span>${G.age < 6 ? '6歳から選べます' : fl}</span>`;
     pageStatus(); pageMoney(); pageFamily();
     $$('#speed button', el).forEach((b) => b.classList.toggle('on', +b.dataset.s === speed()));
     $('#paused', el).classList.toggle('on', speed() === 0);
@@ -88,6 +133,34 @@ const Main = (() => {
     const emp = G.employment === 'homemaker' ? (G.gender === 'M' ? '専業主夫' : '専業主婦') : D().flags.employment[G.employment] || '';
     const ic = { retired: '🌴', unemployed: '🔍', homemaker: '🏠', leave: '😌' }[G.employment] || '🏠';
     return `<span class="r1">${ic} ${esc(G.stage === 'hikikomori' ? '家で過ごしている' : emp)}</span><span class="r2"><b>${G.age}歳</b></span>`;
+  }
+  // ---- シンプル：ゲージは満足感・健康・ストレスだけ（＋16歳から所持金） ----
+  function drawGauge() {
+    const s = G.stats, g = $('#gauge', el); if (!g) return;
+    const money = G.age >= 16
+      ? `<div class="row cash"><span class="lb">👛 所持金</span><span class="num ${G.cash < 0 ? 'neg' : ''}">${man(G.cash)}<small>万円</small></span></div>`
+      : `<div class="row cash"><span class="lb">🏠 家のくらし</span><span class="num tx">${esc(bandOf(G.talents.familyWealth).label)}</span></div>`;
+    g.innerHTML = `<div class="row"><span class="lb">😊 満足感</span>${bar('c-gold', s.happiness)}</div>
+      <div class="row"><span class="lb">❤️ 健康</span>${bar('c-pink', s.health)}</div>
+      <div class="row"><span class="lb">😣 ストレス</span>${bar('c-red', s.stress)}</div>${money}`;
+  }
+  // ---- シンプル：「いまの自分」1行（変わったら光る） ----
+  let lastNow = '';
+  function nowText() {
+    const a = [];
+    if (G.vars.hosp) a.push('入院中');
+    else if (G.job && G.job.id && Econ.working()) { const j = Menu.job(G.job.id) || {}; const st = Econ.curStep(); a.push(j.label + (st && G.rank ? `（${st.t}）` : '')); }
+    else if (G.school) a.push(G.stage === 'ronin' ? '浪人中' : ['nursery', 'kindergarten'].includes(G.stage) ? (D().flags.stages[G.stage] || '') : `${G.school.name.replace(/^.*?の/, '')} ${G.school.yearIn}年生`);
+    else if (G.age >= 6) a.push(G.employment === 'retired' ? '年金生活' : G.employment === 'homemaker' ? (G.gender === 'M' ? '専業主夫' : '専業主婦') : G.employment === 'unemployed' ? '仕事をさがしている' : '家で過ごしている');
+    if (G.flags.married) a.push('結婚している'); else if (G.flags.has_partner) a.push('恋人がいる');
+    const k = people('child').length; if (k) a.push(`子ども${k}人`);
+    return a.filter(Boolean).join('・');
+  }
+  function drawNow() {
+    const n = $('#now', el); if (!n) return;
+    const t = nowText();
+    if (t !== lastNow && lastNow) { n.classList.remove('flash'); void n.offsetWidth; n.classList.add('flash'); }
+    lastNow = t; n.textContent = t;
   }
   function bar(c, v, show = true) { return `<span class="bar ${c}"><i style="--w:${clamp(v, 0, 100)}%"></i></span><span class="v">${show ? Math.round(v) : '—'}</span>`; }
   function drawStats() {
@@ -197,7 +270,7 @@ const Main = (() => {
   function famList() { return G.people.filter((p) => FAM_ORDER.includes(p.role) && (p.alive || calYear() - (p.diedYear || 0) < 3)).sort((a, b) => FAM_ORDER.indexOf(a.role) - FAM_ORDER.indexOf(b.role) || (b.alive - a.alive) || b.age - a.age); }
   function pageFamily() {
     const list = famList();
-    const per = 4; const pages = Math.max(1, Math.ceil(list.length / per));
+    const per = isSimple() ? 7 : 4; const pages = Math.max(1, Math.ceil(list.length / per));
     famPage = clamp(famPage, 0, pages - 1);
     const vis = list.slice(famPage * per, famPage * per + per);
     const tag = (p) => (!p.alive ? '<span class="tag out">—</span>' : p.together ? '<span class="tag in">同居</span>' : `<span class="tag out">${esc(Fam.prefName(p.pref).replace(/[都府県]$/, ''))}</span>`);
@@ -225,12 +298,12 @@ const Main = (() => {
   function loop() {
     timer = 0;
     if (App.cur !== 'main' || !G) return;
-    if (speed() === 0 || Popup.isOpen() || Sus.isOn()) { running = false; return; }
+    if (speed() === 0 || Popup.isOpen() || Sus.isOn() || dOpen || Tutorial.isOn()) { running = false; return; }
     if (postQ.length) {
       const p = postQ.shift();
       addPost(p);
       refresh();
-      timer = setTimeout(loop, BASE_MS / speed());
+      timer = setTimeout(loop, Pace.postMs(G.age) / speed());
       return;
     }
     const r = Engine.next();
@@ -249,10 +322,20 @@ const Main = (() => {
         Popup.choice(r.choice, (res) => handle(res));
         return;
       }
-      const wait = r.season ? 200 / speed() : 0;
+      const wait = r.season ? Pace.seasonMs(G.age) / speed() : 0;
       timer = setTimeout(loop, wait);
     };
-    const withResult = () => { if (r.result) { flushPosts(); refresh(); Popup.result(r.result, after); } else after(); };
+    // 人生の分岐点：前の投稿を出しきってから大きく知らせる（結果のポップアップと重なるときは1つにまとめる）
+    const ms = Milestone.take();
+    const withResult = () => {
+      if (ms.length) {
+        if (r.posts && r.posts.length) { postQ.push(...r.posts); r.posts = []; }
+        flushPosts(); refresh(); stop();
+        Popup.milestone(ms, r.result || null, () => { refresh(); after(); });
+        return;
+      }
+      if (r.result) { flushPosts(); refresh(); Popup.result(r.result, after); } else after();
+    };
     if (r.suspense) Sus.show(r.suspense, withResult); else withResult();
   }
   function deathInfo() {
@@ -285,16 +368,28 @@ const Main = (() => {
 
   return {
     enter(elm) {
-      el = elm; postQ = [];
+      el = elm; postQ = []; lastNow = '';
       Popup.clearMini();
+      Milestone.reset();
       skeleton(); refresh(); fillFeed();
       if (G.pending) { Popup.choice(G.pending.view, (res) => handle(res)); }
-      else kick();
+      else if (!BirthInfo.maybeShow(() => Tutorial.start(() => kick()))) Tutorial.start(() => kick());
     },
-    refresh, kick, stop, fxHtml, FX_L, setMini,
+    // 縦⇔横が変わったとき：ゲームの状態とポップアップはそのまま、画面だけ組み立てなおす
+    relayout() {
+      if (!el || !G) return;
+      const wasOpen = dOpen, tab = dTab;
+      const run = running; stop(); flushPosts();
+      skeleton(); refresh(); fillFeed();
+      if (wasOpen && isSimple()) openDetail(tab);
+      else if (run && !Popup.isOpen()) kick();
+      Tutorial.relayout && Tutorial.relayout();
+    },
+    isDetailOpen: () => dOpen, openDetail, closeDetail,
+    refresh, kick, stop, fxHtml, FX_L, setMini, bgFile: () => bgOf().file,
   };
 })();
-Screens.main = { enter: (el) => Main.enter(el) };
+Screens.main = { enter: (el) => Main.enter(el), relayout: () => Main.relayout() };
 
 // ===== ドキドキ演出（ui/suspense.html, data/suspense.json） =====
 const Sus = (() => {
@@ -305,6 +400,8 @@ const Sus = (() => {
       const box = $('#sus'); if (!box) { done(); return; }
       const S = D().suspense;
       on = true; Audio2.setDuck(true);
+      const cgu = CG.forSuspense(s.ev), cgr = CG.forSuspenseResult(s.ev, s.ok);
+      box.classList.toggle('cg', !!cgu); box.style.setProperty('--cg', cgu ? `url(${cgu})` : 'none');
       box.innerHTML = `<div class="ic">${s.emoji || '📝'}</div><div class="stx">${esc(s.text.replace(/……$/, ''))}<span id="dots"></span></div><div class="tap"></div>`;
       box.classList.add('on');
       const stopBeat = Audio2.loopSe(S.sound, S.durationMs - 1000);
@@ -314,9 +411,10 @@ const Sus = (() => {
         if (finished) return; finished = true;
         clearInterval(dt); stopBeat();
         const win = s.win || (s.kind === 'exam' ? '🌸 合格！' : '🌸 成功！'), lose = s.lose || (s.kind === 'exam' ? '🍂 不合格……' : '🍂 残念……');
+        if (cgr) { box.classList.add('cg'); box.style.setProperty('--cg', `url(${cgr})`); }
         box.innerHTML = `<div class="res">${s.ok ? win : lose}</div>`;
         Audio2.se(s.ok ? 'cheer' : 'shock');
-        setTimeout(() => { box.classList.remove('on'); on = false; Audio2.setDuck(false); done(); }, 1400);
+        setTimeout(() => { box.classList.remove('on', 'cg'); on = false; Audio2.setDuck(false); done(); }, 1400);
       };
       const t = setTimeout(end, S.durationMs);
       setTimeout(() => { if (finished) return; if (Options.get().suspenseSkip) { $('.tap', box).textContent = 'タップで結果へ'; box.onclick = () => { clearTimeout(t); end(); }; } }, S.skippableAfterMs);
